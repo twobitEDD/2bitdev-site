@@ -1,8 +1,10 @@
-# Next.js & NextUI Template
+# SERV Protocol Website
+
+## Next.js & NextUI Template
 
 This is a template for creating applications using Next.js 13 (pages directory) and NextUI (v2).
 
-## Technologies Used
+### Technologies Used
 
 - [Next.js 13](https://nextjs.org/docs/getting-started)
 - [NextUI](https://nextui-docs-v2.vercel.app/)
@@ -12,13 +14,14 @@ This is a template for creating applications using Next.js 13 (pages directory) 
 - [Framer Motion](https://www.framer.com/motion/)
 - [next-themes](https://github.com/pacocoursey/next-themes)
 
-## How to Use
+### How to Use
 
 To create a new project based on this template using `create-next-app`, run the following command:
 
 ```bash
 npx create-next-app -e https://github.com/nextui-org/next-pages-template
 ```
-## License
+
+### License
 
 Licensed under the [MIT license](https://github.com/nextui-org/next-pages-template/blob/main/LICENSE).
