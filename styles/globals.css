@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* html {
+  font-size: 16px;
+  padding: 0px !important;
+  overflow-x: hidden;
+  scroll-padding-top: 64px;
+}
+
+body {
+  min-height: 100vh;
+}
+ */
+
+@keyframes glowing {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(0, 0, 0, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.4);
+  }
+}
+.animate-glow {
+  animation: glowing 2s infinite;
+}
