@@ -31,8 +31,6 @@ export const Navbar = () => {
 
   return (
     <NextUINavbar
-      position="sticky"
-      classNames={navBarStyles}
     >
       <NavbarBrand className="gap-3 mr-3 max-w-fit">
         <NextLink className="flex items-center justify-start gap-1" href="/">
