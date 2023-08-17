@@ -1,24 +1,22 @@
+import { HeartFilledIcon, Logo, SearchIcon } from "@/components/icons";
+import { siteConfig } from "@/config/site";
 import {
   Button,
+  Input,
   Kbd,
   Link,
-  Input,
-  Navbar as NextUINavbar,
-  NavbarContent,
-  NavbarMenu,
-  NavbarMenuToggle,
   NavbarBrand,
+  NavbarContent,
   NavbarItem,
+  NavbarMenu,
   NavbarMenuItem,
+  NavbarMenuToggle,
+  Navbar as NextUINavbar,
 } from "@nextui-org/react";
 import { link as linkStyles } from "@nextui-org/theme";
-import { siteConfig } from "@/config/site";
-import NextLink from "next/link";
 import clsx from "clsx";
+import NextLink from "next/link";
 import { usePathname } from "next/navigation";
-import { HeartFilledIcon, SearchIcon } from "@/components/icons";
-import { Logo } from "@/components/icons";
-import { useState } from "react";
 import { TailwindsThemeChanger } from "./theme-switch";
 
 export const Navbar = () => {
@@ -47,7 +45,6 @@ export const Navbar = () => {
 
   return (
     <NextUINavbar
-      maxWidth={siteConfig.maxHeaderWidth}
       disableAnimation={true}
       position="sticky"
       classNames={{
