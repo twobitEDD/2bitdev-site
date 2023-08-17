@@ -31,7 +31,6 @@ export const Navbar = () => {
 
   return (
     <NextUINavbar
-      maxWidth={siteConfig.maxHeaderWidth}
       position="sticky"
       classNames={navBarStyles}
     >
