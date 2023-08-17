@@ -1,4 +1,5 @@
 import DefaultLayout from "@/components/app-shell/layouts/default";
+import { BouncingArrow } from "@/components/bouncing-arrow";
 import { A11yOtb } from "@/components/marketing/a11y-otb";
 import { Community } from "@/components/marketing/community";
 import { CustomThemes } from "@/components/marketing/custom-themes";
@@ -13,9 +14,9 @@ export default function IndexPage() {
     <DefaultLayout>
       <section className="flex flex-col items-center justify-center max-w-[1280px] mx-auto">
         <Hero />
-        {/* <div className="my-3 fill-white">
+        { <div className="my-5 fill-white">
           <BouncingArrow />
-        </div> */}
+        </div> }
         <FeaturesGrid features={landingContent.topFeatures} />
         <CustomThemes />
         <A11yOtb />

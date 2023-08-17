@@ -1,6 +1,3 @@
-import React from "react";
-import { Code } from "@nextui-org/react";
-import { MagicIcon } from "@/components/icons/magic";
 import { DevicesIcon } from "@/components/icons/devices";
 import { FlashIcon } from "@/components/icons/flash";
 import { CodeDocumentLinearIcon } from "@/components/icons/linear/code-document";
@@ -9,33 +6,35 @@ import { HtmlLogoLinearIcon } from "@/components/icons/linear/html-logo";
 import { MouseCircleLinearIcon } from "@/components/icons/linear/mouse-circle";
 import { ServerLinearIcon } from "@/components/icons/linear/server";
 import { TagUserLinearIcon } from "@/components/icons/linear/tag-user";
+import { MagicIcon } from "@/components/icons/magic";
+import { MoneyIcon } from "@/components/icons/money";
 import { MoonIcon } from "@/components/icons/moon";
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
   topFeatures: [
     {
-      title: "Lorem ipsum dolor sit amet",
+      title: "SERVICES",
       description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse hendrerit eros eget arcu eleifend, ac viverra quam tincidunt.",
-      icon: <MagicIcon /* className="text-primary-500"  */ />,
+      "Our network aims to provide developers with decentralized access to services, allowing them to use our network to enhance their experience as a developer, without needing to master blockchain development.",
+      icon: <MagicIcon />,
     },
     {
-      title: "Sed do eiusmod tempor",
+      title: "ECONOMICS",
       description:
-        "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.",
-      icon: <FlashIcon /* className="text-pink-500" */ />,
+        "How we operate is based on sound economic principles, and decisions made about the protocol’s economics must consider all 4 pillars",
+      icon: <MoneyIcon /* className="text-pink-500" */ />,
     },
     {
-      title: "Duis aute irure dolor",
+      title: "RELIABILITY",
       description:
-        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+        "Reliability means that the network makes choices to allow our network to be sustainable and must work to have a multi-year emergency operations budget.",
       icon: <MoonIcon /* className="text-pink-500" */ />,
     },
     {
-      title: "Excepteur sint occaecat",
+      title: "VALUES",
       description:
-        "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        "Our ability to build this network without sacrificing the values which brought us all to blockchain is vital. Decentralized, Trustless, Open-Source.",
       icon: <DevicesIcon /* className="text-pink-500" */ />,
     },
   ],

@@ -1,6 +1,6 @@
 import { IconSvgProps } from "@/types";
 
-export const MagicIcon = ({
+export const MoneyIcon = ({
   size = 32,
   width,
   height,

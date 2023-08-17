@@ -1,14 +1,21 @@
-import { Spacer } from "@nextui-org/react";
-import { sectionWrapper, titleWrapper, title, subtitle } from "../primitives";
-import { FeaturesGrid } from "@/components/marketing/features-grid";
 import { DiscordIcon, GithubIcon, TwitterIcon } from "@/components/icons";
+import { FeaturesGrid } from "@/components/marketing/features-grid";
+import { Spacer } from "@nextui-org/react";
+import { sectionWrapper, subtitle, title, titleWrapper } from "../primitives";
 
 export const communityAccounts = [
   {
-    title: "Twitter",
-    description: "For announcements, tips and general information.",
+    title: "Protocol ",
+    description: "Technical announcements, Operations and Vital Information.",
     icon: <TwitterIcon className="!text-[#00ACEE]" size={32} />,
-    href: "https://twitter.com/getnextui",
+    href: "https://twitter.com/ServProtocol",
+    isExternal: true,
+  },
+  {
+    title: "Community",
+    description: "Ecosystem Announcements, Community Building and Support.",
+    icon: <TwitterIcon className="!text-[#00ACEE]" size={32} />,
+    href: "https://twitter.com/ServProNetwork",
     isExternal: true,
   },
   {
@@ -16,7 +23,7 @@ export const communityAccounts = [
     description:
       "To get involved in the community, ask questions and share tips.",
     icon: <DiscordIcon className="!text-[#7289DA]" size={32} />,
-    href: "https://discord.gg/9b6yyZKmH4",
+    href: "https://discord.gg/uFH988AfJA",
     isExternal: true,
   },
   {
@@ -24,7 +31,7 @@ export const communityAccounts = [
     description:
       "To report bugs, request features and contribute to the project.",
     icon: <GithubIcon className="!text-[#E7E7E7] dark:text-[#333]" size={32} />,
-    href: "https://github.com/nextui-org/nextui",
+    href: "https://github.com/ServProtocolOrg/",
     isExternal: true,
   },
 ];
@@ -53,7 +60,7 @@ export const Community = () => {
           <Spacer y={12} />
           <FeaturesGrid
             classNames={{
-              base: "lg:grid-cols-3",
+              base: "lg:grid-cols-4",
               iconWrapper: "bg-transparent",
               body: "pt-0",
             }}

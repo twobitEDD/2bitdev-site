@@ -1,14 +1,14 @@
-import React, { ReactNode } from "react";
-import { tv } from "tailwind-variants";
 import {
   Card,
-  CardHeader,
   CardBody,
+  CardHeader,
   LinkProps,
   SlotsToClasses,
 } from "@nextui-org/react";
-import { useRouter } from "next/navigation";
 import { LinkIcon } from "@nextui-org/shared-icons";
+import { useRouter } from "next/navigation";
+import React, { ReactNode } from "react";
+import { tv } from "tailwind-variants";
 
 const styles = tv({
   slots: {
@@ -16,9 +16,10 @@ const styles = tv({
     card: "border-transparent bg-white/5 dark:bg-default-400/10 backdrop-blur-lg backdrop-saturate-[1.8]",
     header: "gap-2 pb-0",
     body: "",
-    iconWrapper: "flex justify-center p-2 rounded-full items-center ",
-    //   "flex justify-center p-2 rounded-full items-center bg-secondary-100/80 text-pink-500",
-    //   "flex justify-center p-2 rounded-full items-center bg-secondary-100/80 text-pink-500",
+    iconWrapper:
+      "flex justify-center p-2 rounded-full items-center ",
+       //"flex justify-center p-2 rounded-full items-center bg-secondary-100/80 text-pink-500",
+       //"flex justify-center p-2 rounded-full items-center bg-secondary-100/80 text-pink-500",
     title: "text-base font-semibold",
     description: "font-normal text-base text-default-500",
   },
