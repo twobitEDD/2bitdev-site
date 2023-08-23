@@ -1,20 +1,20 @@
 {
-    "extends": "next/core-web-vitals",
-    "rules": {
-        "@next/next/no-html-link-for-pages": "off",
-        "react/jsx-key": "off",
-        "padding-line-between-statements": [
-            "error",
-            {
-                "blankLine": "always",
-                "prev": "import",
-                "next": "*"
-            },
-            {
-                "blankLine": "any",
-                "prev": "import",
-                "next": "import"
-            }
-        ]
-    }
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "@next/next/no-html-link-for-pages": "off",
+    "react/jsx-key": "off",
+    "padding-line-between-statements": [
+      "error",
+      {
+        "blankLine": "always",
+        "prev": "import",
+        "next": "*"
+      },
+      {
+        "blankLine": "any",
+        "prev": "import",
+        "next": "import"
+      }
+    ]
+  }
 }

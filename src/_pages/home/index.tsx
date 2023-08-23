@@ -9,27 +9,27 @@ import { InfoAndStats } from "@components/landing-page/InfoAndStats";
 import { PageAnimation } from "@components/motion/PageAnimation";
 
 const Home = () => {
-    return (
-        <PageAnimation>
-            <Flex
-                direction="column"
-                alignItems="center"
-                justifyContent="center"
-                minHeight="70vh"
-                gap={16}
-                mb={8}
-                w="full"
-            >
-                <Hero />
-                <Features />
-                <HighlightSwitchback />
-                <InfoAndStats />
-                <Community />
-                <Box p={10} />
-                <Divider />
-            </Flex>
-        </PageAnimation>
-    );
+  return (
+    <PageAnimation>
+      <Flex
+        direction="column"
+        alignItems="center"
+        justifyContent="center"
+        minHeight="70vh"
+        gap={16}
+        mb={8}
+        w="full"
+      >
+        <Hero />
+        <Features />
+        <HighlightSwitchback />
+        <InfoAndStats />
+        <Community />
+        <Box p={10} />
+        <Divider />
+      </Flex>
+    </PageAnimation>
+  );
 };
 
 export default Home;
