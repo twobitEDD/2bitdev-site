@@ -1,0 +1,12 @@
+{
+  "short_name": "",
+  "name": "Serv Protocol",
+  "lang": "en",
+  "start_url": "/",
+  "background_color": "#FFFFFF",
+  "theme_color": "#8500FF",
+  "dir": "ltr",
+  "display": "standalone",
+  "orientation": "portrait",
+  "prefer_related_applications": false
+}

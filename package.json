@@ -1,33 +1,43 @@
 {
-  "name": "next-pages-template",
+  "name": "website",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "preview": "next build && next start",
+    "--- build utils --- ": "",
     "lint": "next lint",
-    "delete-next": "rm -rf .next",
-    "delete-node-modules": "rm -rf node_modules"
+    "lint:fix": "next lint --fix",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "format:write": "prettier --write \"**/*.{ts,tsx,mdx}\" --cache",
+    "format:check": "prettier --check \"**/*.{ts,tsx,mdx}\" --cache",
+    "--- utils --- ": "",
+    "del--.next": "rmdir .next /s/q",
+    "del--node_modules": "rmdir .next /s/q"
   },
   "dependencies": {
-    "@nextui-org/react": "^0.0.0-dev-v2-20230714000855",
-    "framer-motion": "^10.12.20",
-    "@types/node": "20.4.2",
-    "@types/react": "18.2.15",
+    "@chakra-ui/icons": "^2.1.0",
+    "@chakra-ui/next-js": "^2.1.5",
+    "@chakra-ui/react": "^2.8.0",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@types/node": "20.5.0",
+    "@types/react": "18.2.20",
     "@types/react-dom": "18.2.7",
-    "autoprefixer": "10.4.14",
-    "clsx": "^1.2.1",
-    "eslint": "8.41.0",
-    "eslint-config-next": "13.4.4",
-    "intl-messageformat": "^10.1.0",
-    "next": "13.4.9",
-    "next-themes": "^0.2.1",
-    "postcss": "8.4.24",
+    "eslint": "8.47.0",
+    "eslint-config-next": "13.4.18",
+    "framer-motion": "^10.16.0",
+    "lucide-react": "^0.268.0",
+    "next": "^13.4.19",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "tailwind-variants": "^0.1.13",
-    "tailwindcss": "3.3.2",
-    "typescript": "5.0.4"
+    "react-icons": "^4.10.1",
+    "typescript": "5.1.6"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.2"
   }
 }
