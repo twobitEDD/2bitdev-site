@@ -1,17 +1,18 @@
 import type { DeepPartial, Theme } from "@chakra-ui/react";
-import { Figtree, Inter } from "next/font/google";
+import { Inter, Roboto_Mono } from "next/font/google";
 
+export const fontMono = Roboto_Mono({
+    subsets: ["latin"],
+    variable: "--font-mono",
+})
+
+// TODO: replace with actual sans font
 export const fontSans = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
-
-export const fontMono = Figtree({
-  subsets: ["latin"],
-  variable: "--font-mono",
-});
+    subsets: ["latin"],
+    variable: "--font-sans",
+})
 
 export const fonts: DeepPartial<Theme["fonts"]> = {
-  heading: fontSans.style.fontFamily,
-  body: fontMono.style.fontFamily,
+    heading: fontMono.style.fontFamily,
+    body: fontSans.style.fontFamily,
 };
