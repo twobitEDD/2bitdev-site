@@ -11,7 +11,7 @@ export const data = {
         {
             title: "ECONOMICS",
             description:
-                "How we operate is based on sound economic principles, and decisions made about the protocol’s economics must consider all 4 pillars",
+                "How we operate is based on sound economic principles, and decisions made about the protocol's economics must consider all 4 pillars",
             icon: <Icons.hallowCircle />,
         },
         {
