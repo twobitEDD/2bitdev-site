@@ -72,7 +72,7 @@ const stats = [
     title: "Proposal Portal",
     content: (
       <>
-        <StatsText>Funding.Serv.Services</StatsText> is where SERV's community can elect
+        <StatsText>Funding.Serv.Services</StatsText> is where SERV&apos;s community can elect
         to allocate SERV tokens using a decentralized cross chain proposal mechanism.
       </>
     ),
