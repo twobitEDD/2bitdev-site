@@ -2,8 +2,8 @@ export type SiteConfig = typeof siteConfig;
 
 const navItems = [
   {
-    label: "Staking",
-    href: "https://serv.services/staking",
+    label: "Services",
+    href: "https://serv.services",
   },
   {
     label: "Features",

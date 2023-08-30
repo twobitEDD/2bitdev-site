@@ -82,12 +82,14 @@ export default function Features() {
   return (
     <>
       <Stack as={Container} maxW={"3xl"} textAlign={"center"}>
-        <SuperTitle>Features</SuperTitle>
-        <Title>Short heading</Title>
+        <SuperTitle>How does it work?</SuperTitle>
+        <Title>Perpetual Server Services</Title>
         <Description>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Reiciendis
-          obcaecati ut cupiditate pariatur, dignissimos, placeat amet officiis.
+          Our Network is Built to Provide Affordable Server Services and Last Forever by being Community Owned Since Our Genesis.
+          <Text>
+          </Text>
         </Description>
+
       </Stack>
 
       <FadeIn direction="from-bottom-to-top">

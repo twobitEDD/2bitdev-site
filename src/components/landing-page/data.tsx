@@ -11,29 +11,28 @@ export const data = {
     {
       title: "ECONOMICS",
       description:
-        "How we operate is based on sound economic principles, and decisions made about the protocol's economics must consider all 4 pillars",
-      icon: <Icons.hallowCircle />,
+        "How we operate is based on sound economic principles, and decisions made about the protocol's economics must consider all 4 pillars (SERVICES, ECONOMICS, RELIABILITY & VALUES)",
+      icon: <Icons.billing />,
     },
     {
       title: "RELIABILITY",
       description:
-        "Reliability means that the network makes choices to allow our network to be sustainable and must work to have a multi-year emergency operations budget.",
-      icon: <Icons.billing />,
+        "Reliability means establishing a shared ownership of the network  across a globe  choices to allow our network to be sustainable long-term and must work to have a multi-year emergency operations budget in part by being Community Owned.",
+      icon: <Icons.sun />,
     },
     {
       title: "VALUES",
       description:
         "Our ability to build this network without sacrificing the values which brought us all to blockchain is vital. Decentralized, Trustless, Open-Source.",
-      icon: <Icons.copy />,
+      icon: <Icons.user />,
     },
   ],
   fullFeatures: [
     {
-      title: "Lorem ipsum dolor sit amet",
+      title: "Community-Owned, Decentralized, Fair-Launched",
       description: (
         <>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        At the root of our mission is to create a blockchain that is owned by it&apos;s community
         </>
       ),
       icon: <Icons.arrowRight />,

@@ -42,17 +42,21 @@ export default function App() {
   }, [scrollY]);
 
   const SponsorButton = (
-    <Button
-      variant="solid"
-      fontWeight={"bold"}
-      color={"white"}
-      colorScheme={"brand"}
-      bg={"brand.400"}
-      _hover={{ bg: "brand.500" }}
-      leftIcon={<Icon as={FaHeart} w="4" h="4" color="white" mr="1" />}
-    >
-      Donate
-    </Button>
+    <Link href={"https://twitter.com/servprotocol"} passHref key={"https://twitter.com/servprotocol"}>
+      <Button
+        variant="solid"
+        fontWeight={"bold"}
+        color={"white"}
+        colorScheme={"brand"}
+        bg={"brand.400"}
+        _hover={{ bg: "brand.500" }}
+        leftIcon={<Icon as={FaHeart} w="4" h="4" color="white" mr="1" />}
+      >
+        Follow SERV Protocol
+      </Button>
+    </Link>
+    
+    
   );
   const MobileNavContent = (
     <VStack

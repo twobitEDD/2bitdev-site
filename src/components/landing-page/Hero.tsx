@@ -5,13 +5,13 @@ import {
   Button,
   Flex,
   Heading,
-  IconButton,
   Image,
   Stack,
   Text,
-  createIcon,
+  createIcon
 } from "@chakra-ui/react";
 import { Icons } from "@components/icons";
+import Link from "next/link";
 
 export default function Hero() {
   return (
@@ -29,35 +29,38 @@ export default function Hero() {
           fontWeight={600}
           fontSize={{ base: "3xl", sm: "3xl", md: "4xl", lg: "5xl" }}
         >
-          {/* <Text as={"span"}>A Game-Changer,</Text>
+          <Text as={"span"}>A New Standard</Text>
           <br />
-          <Text as={"span"}>for Decentralization and Developers</Text> */}
-          <Text>
-            A New Standard for Empowering Game Developers with Decentralized
-            Server Services
-          </Text>
+          <Text as={"span"}>for Multiplayer Game Development </Text>
+          
         </Heading>
+
         <Text fontSize={"lg"} color={"gray.400"} mb={4}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam. Lorem ipsum dolor sit amet, consectetur adipiscing
-        </Text>
+          SERV Protocol provides an easy to use Multiplayer System, allowing Game Developers to focus on building games not running servers.
+          </Text>
+        <Text fontSize={"lg"} color={"gray.400"} mb={4}>
+          Defining a New Standard for sharing Gaming Experiences; Leaderboards, High-Scores, Match-Making and Player Messaging built to run on our perpetual server system.
+          </Text>
         <Stack
+      
           spacing={{ base: 4, sm: 6 }}
           direction={{ base: "column", sm: "row" }}
         >
-          <Button
-            rounded={"full"}
-            size={"lg"}
-            fontWeight={"bold"}
-            color={"white"}
-            px={6}
-            colorScheme={"brand"}
-            bg={"brand.400"}
-            _hover={{ bg: "brand.500" }}
-          >
-            Support Project
-          </Button>
+
+          <Link href={"/#/#BuiltToLast"} passHref key={"/#/#BuiltToLast"}>
+            <Button
+              rounded={"full"}
+              size={"lg"}
+              fontWeight={"bold"}
+              color={"white"}
+              px={6}
+              colorScheme={"brand"}
+              bg={"brand.400"}
+              _hover={{ bg: "brand.500" }}
+            >
+              View Roadmap
+            </Button>
+          </Link>
           <Button
             rounded={"full"}
             size={"lg"}
@@ -88,7 +91,7 @@ export default function Hero() {
           width={"full"}
           overflow={"hidden"}
         >
-          <IconButton
+          {/* <IconButton
             aria-label={"Play Button"}
             variant={"ghost"}
             _hover={{ bg: "transparent" }}
@@ -99,7 +102,7 @@ export default function Hero() {
             left={"50%"}
             top={"50%"}
             transform={"translateX(-50%) translateY(-50%)"}
-          />
+          /> */}
           <Image
             alt={"Hero Image"}
             fit={"cover"}
@@ -107,7 +110,7 @@ export default function Hero() {
             w={"100%"}
             h={"100%"}
             src={
-              "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=800&q=80"
+              "https://bafkreifuqcle5os7olroszotm62vrkgfxxrhuzg5lxam5jubaikmysifpu.ipfs.nftstorage.link/"
             }
           />
         </Box>

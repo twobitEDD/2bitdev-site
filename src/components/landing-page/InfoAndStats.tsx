@@ -1,10 +1,9 @@
 import {
   Box,
   Container,
-  Flex,
   SimpleGrid,
   Stack,
-  Text,
+  Text
 } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import { Description, SuperTitle, Title } from "./Section";
@@ -21,13 +20,10 @@ export function InfoAndStats() {
             py={{ base: 4, md: 20, xl: 40 }}
           >
             <Box mb={{ base: 8, md: 20 }}>
-              <SuperTitle>Features</SuperTitle>
-              <Title>Lorem ipsum dolor sit amet</Title>
+              <SuperTitle> Sounds Great... </SuperTitle>
+              <Title>What kind of Services? </Title>
               <Description>
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Reiciendis voluptatibus, quos quia, quibusdam, quod voluptatum
-                dolorum consequatur fugit, eaque explicabo nemo. Quisquam,
-                quibusdam
+                There are many Decentralized Services operated by external ecosystem developers, the SERV ORG and SERV Validators.
               </Description>
             </Box>
 
@@ -64,38 +60,37 @@ const StatsText = ({ children }: { children: ReactNode }) => (
 
 const stats = [
   {
-    title: "10+",
+    title: "Explorer",
     content: (
       <>
-        <StatsText>Lorem ipsum dolor</StatsText> for detailed monitoring and
-        real-time analytics
+        <StatsText>Explorer.Serv.Services</StatsText> is setup for detailed monitoring and
+        real-time analytics of what happens on the network.
       </>
     ),
   },
   {
-    title: "24/7",
+    title: "Proposal Portal",
     content: (
       <>
-        <StatsText>adipisicing elit. Quisquam</StatsText> enabled right in your
-        dashboard without history limitations
+        <StatsText>Funding.Serv.Services</StatsText> is where SERV's community can elect
+        to allocate SERV tokens using a decentralized cross chain proposal mechanism.
       </>
     ),
   },
   {
-    title: "13%",
+    title: "Deployment Hub",
     content: (
       <>
-        <StatsText>dolor sit amet adipisicing.</StatsText> in North America has
-        chosen NewLifeTM as their management solution
+        <StatsText>Deploy.Serv.Services</StatsText> is where developers can create their network
+        interfaces for their projects. Allowing them to easily create connections to their projects.
       </>
     ),
   },
   {
-    title: "250M+",
+    title: "",
     content: (
       <>
-        <StatsText>Amet consectetur quod.</StatsText> currently connected and
-        monitored by the NewLifeTM software
+        <StatsText> </StatsText> 
       </>
     ),
   },
