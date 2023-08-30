@@ -1,5 +1,4 @@
 import { Box, Button, Flex, SimpleGrid } from "@chakra-ui/react";
-import { SlideIn } from "@components/motion/Animation";
 import { Description, Title } from "./Section";
 
 export default function HighlightSwitchback() {
