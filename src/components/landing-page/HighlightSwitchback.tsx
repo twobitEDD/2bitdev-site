@@ -1,5 +1,5 @@
 import { Box, Button, Flex, SimpleGrid } from "@chakra-ui/react";
-import { SlideIn } from "@components/motion/Animation";
+import { FadeIn } from "@components/motion/Animation";
 import { Description, Title } from "./Section";
 
 export default function HighlightSwitchback() {
@@ -8,11 +8,11 @@ export default function HighlightSwitchback() {
       w="full"
       justifyContent="center"
       alignItems="center"
-      // mt={{ base: 10, md: 28 }}
+    // mt={{ base: 10, md: 28 }}
     >
       <Box bg="white" _dark={{ bg: "gray.800" }} px={8} py={20} mx="auto">
         {/* Left Section */}
-        <SlideIn direction="from-left-to-right">
+        <FadeIn direction="from-bottom-to-top">
           <SimpleGrid
             alignItems="start"
             columns={{ base: 1, md: 2 }}
@@ -21,10 +21,11 @@ export default function HighlightSwitchback() {
             spacingX={{ base: 10, md: 24 }}
           >
             <Box>
+
               <Title>Operational History Token Genesis</Title>
               <Description>
                 SERV Protocol uses a unique and effective way of starting the network by taking a list of
-                Server Operators which each have a proven history of operating the blockchain which SERV derives it codebase.                
+                Server Operators which each have a proven history of operating the blockchain which SERV derives it codebase.
               </Description>
               <Button
                 w={{ base: "full", sm: "auto" }}
@@ -46,10 +47,9 @@ export default function HighlightSwitchback() {
               Image Here
             </Box>
           </SimpleGrid>
-        </SlideIn>
-
+        </FadeIn>
         {/* Right section */}
-        <SlideIn direction="from-right-to-left">
+        <FadeIn direction="from-bottom-to-top">
           <SimpleGrid
             alignItems="center"
             columns={{ base: 1, md: 2 }}
@@ -63,8 +63,9 @@ export default function HighlightSwitchback() {
               <Description>
                 SERV Protocol is dedicated to making it easier to make games.
                 From creating easy to use game templates and code examples for games,
-                to encouraging open source work and working to establish &quot;Official&quot; versions of Unity Asset Store Products. 
+                to encouraging open source work and working to establish &quot;Official&quot; versions of Unity Asset Store Products.
               </Description>
+
               <Button
                 w={{ base: "full", sm: "auto" }}
                 mt="8"
@@ -85,10 +86,10 @@ export default function HighlightSwitchback() {
               Image Here
             </Box>
           </SimpleGrid>
-        </SlideIn>
+        </FadeIn>
 
         {/* Left Section */}
-        <SlideIn direction="from-left-to-right">
+        <FadeIn direction="from-bottom-to-top">
           <SimpleGrid
             alignItems="start"
             columns={{ base: 1, md: 2 }}
@@ -96,6 +97,7 @@ export default function HighlightSwitchback() {
             spacingX={{ base: 10, md: 24 }}
           >
             <Box>
+
               <Title>Community Owned from the Start </Title>
               <Description>
                 With the goal of lasting forever, SERV Protocol starts off by giving complete control over it&apos;s operation to it&apos;s operators.
@@ -121,7 +123,7 @@ export default function HighlightSwitchback() {
               Image Here
             </Box>
           </SimpleGrid>
-        </SlideIn>
+        </FadeIn>
       </Box>
     </Flex>
   );
