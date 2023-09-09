@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   openGraph: {
     url: "https://Serv.Services",
     title: "SERV Protocol",
-    description: "NA New Standard for Multiplayer Game Development",
+    description: "A New Standard for Multiplayer Game Development",
     images: {
       url: "https://servprotocol.nyc3.cdn.digitaloceanspaces.com/BlockchainImage.jpeg",
       alt: "https://serv.services",
