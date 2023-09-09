@@ -48,14 +48,11 @@ export default function HighlightSwitchback() {
               textAlign={"center"}
             >
               <Image
-                alt={"Hero Image"}
+                alt={"Token Genesis Image"}
                 fit={"cover"}
                 align={"center"}
                 src={
-                  //https://bafkreifuqcle5os7olroszotm62vrkgfxxrhuzg5lxam5jubaikmysifpu.ipfs.nftstorage.link/"
-                  //"https://bafybeiad2nhx4ozapxlqoh6ln3da2dnetnzscfa4nhqedk2lyuul45e3ju.ipfs.nftstorage.link/"
                   "https://bafybeiegajvj2jefyvhmytgp7obyy3woidkgdtxuz4mx5fiicyvmzrvbmm.ipfs.nftstorage.link/"
-                  //https://bafybeiclqk7znishm2jremdcl5id7mvqvvjla452rpkotfzzy3gur56stq.ipfs.nftstorage.link/
                 }
               />
             </Box>
@@ -102,15 +99,12 @@ export default function HighlightSwitchback() {
               textAlign={"center"}
             >
               <Image
-                alt={"Hero Image"}
+                alt={"Game Developer Image"}
                 fit={"cover"}
                 align={"center"}
                 w={"100%"}
                 h={"100%"}
                 src={
-                  //  "https://bafkreifuqcle5os7olroszotm62vrkgfxxrhuzg5lxam5jubaikmysifpu.ipfs.nftstorage.link/"
-                  // https://bafybeiad2nhx4ozapxlqoh6ln3da2dnetnzscfa4nhqedk2lyuul45e3ju.ipfs.nftstorage.link/
-                  // https://bafybeiegajvj2jefyvhmytgp7obyy3woidkgdtxuz4mx5fiicyvmzrvbmm.ipfs.nftstorage.link/
                   "https://bafybeiclqk7znishm2jremdcl5id7mvqvvjla452rpkotfzzy3gur56stq.ipfs.nftstorage.link/"
                 }
               />
@@ -156,7 +150,7 @@ export default function HighlightSwitchback() {
               textAlign={"center"}
             >
               <Image
-                alt={"Hero Image"}
+                alt={"Community Owned Image"}
                 fit={"cover"}
                 align={"center"}
                 src={
