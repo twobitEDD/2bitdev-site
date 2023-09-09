@@ -75,12 +75,12 @@ export default function HighlightSwitchback() {
                 The technical skilled related to Game Development are different
                 than the technical skills related to Network Server Operations.
                 SERV Protocol is dedicated to simiplifying the processes of
-                making games go online without demanding the game developers
-                learn everything about network operations or even blockchain
-                interactivity. From creating easy to use game templates and code
-                examples for Game Development, to encouraging open source work
-                and working to establish &quot;Official&quot; versions of Unity
-                Asset Store Products.
+                making online games without demanding the game developers
+                oversee network operations. From creating easy to use game
+                templates and examples for Game Development, to encouraging open
+                source inititives and working to establish &quot;Official&quot;
+                versions of Unity Asset Store Products, SERV is built to allow
+                game developers to stay focused on making games.
               </Description>
 
               <Button
