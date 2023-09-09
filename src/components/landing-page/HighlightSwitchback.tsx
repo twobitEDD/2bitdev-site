@@ -14,7 +14,7 @@ export default function HighlightSwitchback() {
         {/* Left Section */}
         <FadeIn direction="from-bottom-to-top">
           <SimpleGrid
-            alignItems="start"
+            alignItems="center"
             columns={{ base: 1, md: 2 }}
             mb={24}
             spacingY={{ base: 10, md: 32 }}
@@ -119,7 +119,7 @@ export default function HighlightSwitchback() {
         {/* Left Section */}
         <FadeIn direction="from-bottom-to-top">
           <SimpleGrid
-            alignItems="start"
+            alignItems="center"
             columns={{ base: 1, md: 2 }}
             spacingY={{ base: 10, md: 32 }}
             spacingX={{ base: 10, md: 24 }}
