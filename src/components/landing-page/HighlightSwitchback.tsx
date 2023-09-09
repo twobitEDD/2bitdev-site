@@ -70,7 +70,9 @@ export default function HighlightSwitchback() {
             spacingX={{ base: 10, md: 24 }}
           >
             <Box order={{ base: "initial", md: 2 }}>
-              <Title>Letting Game Developers focus on Game Development</Title>
+              <Title>
+                Allowing Game Developers to focus on Game Development
+              </Title>
               <Description>
                 The technical skilled related to Game Development are different
                 than the technical skills related to Network Server Operations.

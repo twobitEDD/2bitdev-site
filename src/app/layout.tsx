@@ -11,7 +11,7 @@ const APP_NAME = "SERV Protocol";
 
 export const metadata: Metadata = {
   title: { default: APP_NAME, template: "%s | nextarter-chakra" },
-  description: "Next.js + chakra-ui + TypeScript template",
+  description: "A New Standard for Multiplayer Game Development",
   viewport: {
     width: "device-width",
     initialScale: 1,
@@ -27,12 +27,12 @@ export const metadata: Metadata = {
   },
   themeColor: "#FFFFFF",
   openGraph: {
-    url: "https://google.com",
+    url: "https://Serv.Services",
     title: "SERV Protocol",
-    description: "Next.js + chakra-ui + TypeScript template",
+    description: "NA New Standard for Multiplayer Game Development",
     images: {
-      url: "https://og-image.sznm.dev/**nextarter-chakra**.sznm.dev.png?theme=dark&md=1&fontSize=125px&images=https%3A%2F%2Fsznm.dev%2Favataaars.svg&widths=250",
-      alt: "nextarter-chakra.sznm.dev og-image",
+      url: "https://servprotocol.nyc3.cdn.digitaloceanspaces.com/BlockchainImage.jpeg",
+      alt: "https://serv.services",
     },
   },
   twitter: {
