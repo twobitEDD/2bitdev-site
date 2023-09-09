@@ -111,6 +111,9 @@ export default function Hero() {
             h={"100%"}
             src={
               "https://bafkreifuqcle5os7olroszotm62vrkgfxxrhuzg5lxam5jubaikmysifpu.ipfs.nftstorage.link/"
+              https://bafybeiad2nhx4ozapxlqoh6ln3da2dnetnzscfa4nhqedk2lyuul45e3ju.ipfs.nftstorage.link/
+              https://bafybeiegajvj2jefyvhmytgp7obyy3woidkgdtxuz4mx5fiicyvmzrvbmm.ipfs.nftstorage.link/
+              https://bafybeiclqk7znishm2jremdcl5id7mvqvvjla452rpkotfzzy3gur56stq.ipfs.nftstorage.link/
             }
           />
         </Box>
