@@ -1,4 +1,4 @@
-import { Box, Button, Flex, SimpleGrid } from "@chakra-ui/react";
+import { Box, Button, Flex, Image, SimpleGrid } from "@chakra-ui/react";
 import { FadeIn } from "@components/motion/Animation";
 import { Description, Title } from "./Section";
 
@@ -8,7 +8,7 @@ export default function HighlightSwitchback() {
       w="full"
       justifyContent="center"
       alignItems="center"
-    // mt={{ base: 10, md: 28 }}
+      // mt={{ base: 10, md: 28 }}
     >
       <Box bg="white" _dark={{ bg: "gray.800" }} px={8} py={20} mx="auto">
         {/* Left Section */}
@@ -21,11 +21,15 @@ export default function HighlightSwitchback() {
             spacingX={{ base: 10, md: 24 }}
           >
             <Box>
-
-              <Title>Operational History Token Genesis</Title>
+              <Title>Network-Operator Token Genesis</Title>
               <Description>
-                SERV Protocol uses a unique and effective way of starting the network by taking a list of
-                Server Operators which each have a proven history of operating the blockchain which SERV derives it codebase.
+                SERV Protocol owes it&apos;s existance to it&apos;s network
+                operators, which is why SERV has implimented a unique and
+                effective way of starting the network. SERV has generated a list
+                of the proven Server Operators on the network which SERV derives
+                it&apos;s codebase, so initially the token supply will be
+                allocated directly the network operators (inspired by Proof of
+                Work blockchains like Bitcoin and Ergo).
               </Description>
               <Button
                 w={{ base: "full", sm: "auto" }}
@@ -39,12 +43,21 @@ export default function HighlightSwitchback() {
             <Box
               w="full"
               h="full"
-              py={48}
               bg="gray.200"
               _dark={{ bg: "gray.700" }}
               textAlign={"center"}
             >
-              Image Here
+              <Image
+                alt={"Hero Image"}
+                fit={"cover"}
+                align={"center"}
+                src={
+                  //https://bafkreifuqcle5os7olroszotm62vrkgfxxrhuzg5lxam5jubaikmysifpu.ipfs.nftstorage.link/"
+                  //"https://bafybeiad2nhx4ozapxlqoh6ln3da2dnetnzscfa4nhqedk2lyuul45e3ju.ipfs.nftstorage.link/"
+                  "https://bafybeiegajvj2jefyvhmytgp7obyy3woidkgdtxuz4mx5fiicyvmzrvbmm.ipfs.nftstorage.link/"
+                  //https://bafybeiclqk7znishm2jremdcl5id7mvqvvjla452rpkotfzzy3gur56stq.ipfs.nftstorage.link/
+                }
+              />
             </Box>
           </SimpleGrid>
         </FadeIn>
@@ -59,11 +72,17 @@ export default function HighlightSwitchback() {
             spacingX={{ base: 10, md: 24 }}
           >
             <Box order={{ base: "initial", md: 2 }}>
-              <Title>Letting Game Developers focus on Games</Title>
+              <Title>Letting Game Developers focus on Game Development</Title>
               <Description>
-                SERV Protocol is dedicated to making it easier to make games.
-                From creating easy to use game templates and code examples for games,
-                to encouraging open source work and working to establish &quot;Official&quot; versions of Unity Asset Store Products.
+                The technical skilled related to Game Development are different
+                than the technical skills related to Network Server Operations.
+                SERV Protocol is dedicated to simiplifying the processes of
+                making games go online without demanding the game developers
+                learn everything about network operations or even blockchain
+                interactivity. From creating easy to use game templates and code
+                examples for Game Development, to encouraging open source work
+                and working to establish &quot;Official&quot; versions of Unity
+                Asset Store Products.
               </Description>
 
               <Button
@@ -78,12 +97,23 @@ export default function HighlightSwitchback() {
             <Box
               w="full"
               h="full"
-              py={48}
               bg="gray.200"
               _dark={{ bg: "gray.700" }}
               textAlign={"center"}
             >
-              Image Here
+              <Image
+                alt={"Hero Image"}
+                fit={"cover"}
+                align={"center"}
+                w={"100%"}
+                h={"100%"}
+                src={
+                  //  "https://bafkreifuqcle5os7olroszotm62vrkgfxxrhuzg5lxam5jubaikmysifpu.ipfs.nftstorage.link/"
+                  // https://bafybeiad2nhx4ozapxlqoh6ln3da2dnetnzscfa4nhqedk2lyuul45e3ju.ipfs.nftstorage.link/
+                  // https://bafybeiegajvj2jefyvhmytgp7obyy3woidkgdtxuz4mx5fiicyvmzrvbmm.ipfs.nftstorage.link/
+                  "https://bafybeiclqk7znishm2jremdcl5id7mvqvvjla452rpkotfzzy3gur56stq.ipfs.nftstorage.link/"
+                }
+              />
             </Box>
           </SimpleGrid>
         </FadeIn>
@@ -97,11 +127,17 @@ export default function HighlightSwitchback() {
             spacingX={{ base: 10, md: 24 }}
           >
             <Box>
-
               <Title>Community Owned from the Start </Title>
               <Description>
-                With the goal of lasting forever, SERV Protocol starts off by giving complete control over it&apos;s operation to it&apos;s operators.
-                By being owned and operated by a proven community, SERV Community succeeds when SERV succeeds.
+                With the goal of perpetual network operations, SERV Protocol
+                starts off by giving complete control over it&apos;s operations
+                to it&apos;s operators. By giving ownership of the network to
+                it&apos;s operators, those whom run the network are set to
+                benefit from the long term success of the network; This mean
+                that the network has the ability to be supported longer than if
+                it were ran by a single business entity. It&apos;s shared
+                ownership allows for shared network costs, and ultimately a
+                chance at shared success.
               </Description>
               <Button
                 w={{ base: "full", sm: "auto" }}
@@ -115,12 +151,18 @@ export default function HighlightSwitchback() {
             <Box
               w="full"
               h="full"
-              py={48}
               bg="gray.200"
               _dark={{ bg: "gray.700" }}
               textAlign={"center"}
             >
-              Image Here
+              <Image
+                alt={"Hero Image"}
+                fit={"cover"}
+                align={"center"}
+                src={
+                  "https://bafybeiad2nhx4ozapxlqoh6ln3da2dnetnzscfa4nhqedk2lyuul45e3ju.ipfs.nftstorage.link/"
+                }
+              />
             </Box>
           </SimpleGrid>
         </FadeIn>
