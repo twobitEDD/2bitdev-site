@@ -8,7 +8,7 @@ import {
   Image,
   Stack,
   Text,
-  createIcon
+  createIcon,
 } from "@chakra-ui/react";
 import { Icons } from "@components/icons";
 import Link from "next/link";
@@ -32,21 +32,21 @@ export default function Hero() {
           <Text as={"span"}>A New Standard</Text>
           <br />
           <Text as={"span"}>for Multiplayer Game Development </Text>
-          
         </Heading>
 
         <Text fontSize={"lg"} color={"gray.400"} mb={4}>
-          SERV Protocol provides an easy to use Multiplayer System, allowing Game Developers to focus on building games not running servers.
-          </Text>
+          SERV Protocol provides an easy to use Multiplayer System, allowing
+          Game Developers to focus on building games not running servers.
+        </Text>
         <Text fontSize={"lg"} color={"gray.400"} mb={4}>
-          Defining a New Standard for sharing Gaming Experiences; Leaderboards, High-Scores, Match-Making and Player Messaging built to run on our perpetual server system.
-          </Text>
+          Defining a New Standard for sharing Gaming Experiences; Leaderboards,
+          High-Scores, Match-Making and Player Messaging built to run on our
+          perpetual server system.
+        </Text>
         <Stack
-      
           spacing={{ base: 4, sm: 6 }}
           direction={{ base: "column", sm: "row" }}
         >
-
           <Link href={"/#/#BuiltToLast"} passHref key={"/#/#BuiltToLast"}>
             <Button
               rounded={"full"}
@@ -110,10 +110,11 @@ export default function Hero() {
             w={"100%"}
             h={"100%"}
             src={
-              "https://bafkreifuqcle5os7olroszotm62vrkgfxxrhuzg5lxam5jubaikmysifpu.ipfs.nftstorage.link/"
-              https://bafybeiad2nhx4ozapxlqoh6ln3da2dnetnzscfa4nhqedk2lyuul45e3ju.ipfs.nftstorage.link/
-              https://bafybeiegajvj2jefyvhmytgp7obyy3woidkgdtxuz4mx5fiicyvmzrvbmm.ipfs.nftstorage.link/
-              https://bafybeiclqk7znishm2jremdcl5id7mvqvvjla452rpkotfzzy3gur56stq.ipfs.nftstorage.link/
+              "https://servprotocol.nyc3.cdn.digitaloceanspaces.com/BlockchainImage.jpeg"
+              //"https://bafkreifuqcle5os7olroszotm62vrkgfxxrhuzg5lxam5jubaikmysifpu.ipfs.nftstorage.link/"
+              //https://bafybeiad2nhx4ozapxlqoh6ln3da2dnetnzscfa4nhqedk2lyuul45e3ju.ipfs.nftstorage.link/
+              //https://bafybeiegajvj2jefyvhmytgp7obyy3woidkgdtxuz4mx5fiicyvmzrvbmm.ipfs.nftstorage.link/
+              //https://bafybeiclqk7znishm2jremdcl5id7mvqvvjla452rpkotfzzy3gur56stq.ipfs.nftstorage.link/
             }
           />
         </Box>
