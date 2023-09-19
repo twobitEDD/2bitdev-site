@@ -56,6 +56,15 @@ export const communityAccounts = [
     isExternal: true,
   },
   {
+    title: "Forum",
+    description:
+      "Where community decisions can be discussed in long form w/ everyone!",
+    icon: <Icons.pizza />,
+    iconColor: "#993270",
+    href: siteConfig.links.forum,
+    isExternal: true,
+  },
+  {
     title: "Github",
     description:
       "To report bugs, request features and contribute to the project.",

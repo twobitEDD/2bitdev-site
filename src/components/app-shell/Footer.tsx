@@ -27,10 +27,10 @@ const Footer2 = () => {
 
 export default Footer;
 
-import { IconButton, Input, VisuallyHidden, chakra } from "@chakra-ui/react";
-import { Icons } from "@components/icons";
+import { VisuallyHidden, chakra } from "@chakra-ui/react";
 import Image from "next/image";
-import { FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
+import { FaDiscord, FaTwitter, FaYoutube } from "react-icons/fa";
+import { MdForum } from "react-icons/md";
 
 const Logo = (props: any) => {
   return (
@@ -97,7 +97,7 @@ function Footer() {
     <Container as={Stack} maxW={"6xl"} py={10}>
       <SimpleGrid
         templateColumns={{ sm: "1fr 1fr", md: "2fr 1fr 1fr 2fr" }}
-        spacing={8}
+        spacing={1}
       >
         <Stack spacing={6}>
           <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
@@ -117,18 +117,33 @@ function Footer() {
             }. All rights reserved`}
           </Text>
           <Stack direction={"row"} spacing={6}>
-            <SocialButton label={"Twitter"} href={"#"}>
+            <SocialButton
+              label={"Twitter"}
+              href={"https://twitter.com/servprotocol"}
+            >
               <FaTwitter />
             </SocialButton>
-            <SocialButton label={"YouTube"} href={"#"}>
+            <SocialButton
+              label={"YouTube"}
+              href={"https://www.youtube.com/@harmonyvalidatordao7379"}
+            >
               <FaYoutube />
             </SocialButton>
-            <SocialButton label={"Instagram"} href={"#"}>
-              <FaInstagram />
+            <SocialButton
+              label={"discord"}
+              href={"https://discord.gg/uFH988AfJA"}
+            >
+              <FaDiscord />
+            </SocialButton>
+            <SocialButton
+              label={"forums"}
+              href={"https://forum.servprotocol.com"}
+            >
+              <MdForum />
             </SocialButton>
           </Stack>
         </Stack>
-        <Stack align={"flex-start"}>
+        {/* <Stack align={"flex-start"}>
           <ListHeader>Company</ListHeader>
           <Box as="a" href={"#"}>
             About us
@@ -145,8 +160,8 @@ function Footer() {
           <Box as="a" href={"#"}>
             Testimonials
           </Box>
-        </Stack>
-        <Stack align={"flex-start"}>
+        </Stack> */}
+        {/* <Stack align={"flex-start"}>
           <ListHeader>Support</ListHeader>
           <Box as="a" href={"#"}>
             Help Center
@@ -163,8 +178,8 @@ function Footer() {
           <Box as="a" href={"#"}>
             Satus
           </Box>
-        </Stack>
-        <Stack align={"flex-start"}>
+        </Stack> */}
+        {/* <Stack align={"flex-start"}>
           <ListHeader>Stay up to date</ListHeader>
           <Stack direction={"row"}>
             <Input
@@ -185,7 +200,7 @@ function Footer() {
               icon={<Icons.mail />}
             />
           </Stack>
-        </Stack>
+        </Stack> */}
       </SimpleGrid>
     </Container>
   );

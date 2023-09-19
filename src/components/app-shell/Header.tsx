@@ -5,7 +5,6 @@ import {
   CloseButton,
   Container,
   Flex,
-  HStack,
   Icon,
   IconButton,
   VStack,
@@ -42,7 +41,11 @@ export default function App() {
   }, [scrollY]);
 
   const SponsorButton = (
-    <Link href={"https://twitter.com/servprotocol"} passHref key={"https://twitter.com/servprotocol"}>
+    <Link
+      href={"https://twitter.com/servprotocol"}
+      passHref
+      key={"https://twitter.com/servprotocol"}
+    >
       <Button
         variant="solid"
         fontWeight={"bold"}
@@ -55,8 +58,6 @@ export default function App() {
         Follow SERV Protocol
       </Button>
     </Link>
-    
-    
   );
   const MobileNavContent = (
     <VStack
@@ -156,7 +157,7 @@ export default function App() {
               </Flex>
 
               {/* Nav links section */}
-              <Flex>
+              {/* <Flex>
                 <HStack
                   display={{
                     base: "none",
@@ -171,7 +172,7 @@ export default function App() {
                     </Link>
                   ))}
                 </HStack>
-              </Flex>
+              </Flex> */}
 
               {/* Right section */}
               <Flex

@@ -1,10 +1,4 @@
-import {
-  Box,
-  Container,
-  SimpleGrid,
-  Stack,
-  Text
-} from "@chakra-ui/react";
+import { Box, Container, SimpleGrid, Stack, Text } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import { Description, SuperTitle, Title } from "./Section";
 
@@ -23,7 +17,8 @@ export function InfoAndStats() {
               <SuperTitle> Sounds Great... </SuperTitle>
               <Title>What kind of Services? </Title>
               <Description>
-                There are many Decentralized Services operated by external ecosystem developers, the SERV ORG and SERV Validators.
+                There are many Decentralized Services operated by external
+                ecosystem developers, the SERV ORG and SERV Validator DAO.
               </Description>
             </Box>
 
@@ -60,11 +55,11 @@ const StatsText = ({ children }: { children: ReactNode }) => (
 
 const stats = [
   {
-    title: "Explorer",
+    title: "Network Explorer",
     content: (
       <>
-        <StatsText>Explorer.Serv.Services</StatsText> is setup for detailed monitoring and
-        real-time analytics of what happens on the network.
+        <StatsText>Explorer.Serv.Services</StatsText> is setup for detailed
+        monitoring and real-time analytics of what happens on the network.
       </>
     ),
   },
@@ -72,8 +67,9 @@ const stats = [
     title: "Proposal Portal",
     content: (
       <>
-        <StatsText>Funding.Serv.Services</StatsText> is where SERV&apos;s community can elect
-        to allocate SERV tokens using a decentralized cross chain proposal mechanism.
+        <StatsText>Funding.Serv.Services</StatsText> is where SERV&apos;s
+        community can elect to allocate SERV tokens using a decentralized cross
+        chain proposal mechanism.
       </>
     ),
   },
@@ -81,8 +77,9 @@ const stats = [
     title: "Deployment Hub",
     content: (
       <>
-        <StatsText>Deploy.Serv.Services</StatsText> is where developers can create their network
-        interfaces for their projects. Allowing them to easily create connections to their projects.
+        <StatsText>Deploy.Serv.Services</StatsText> is where developers can
+        create their network interfaces for their projects. Allowing them to
+        easily create online connections to their software.
       </>
     ),
   },
@@ -90,7 +87,7 @@ const stats = [
     title: "",
     content: (
       <>
-        <StatsText> </StatsText> 
+        <StatsText> </StatsText>
       </>
     ),
   },

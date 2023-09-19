@@ -7,7 +7,7 @@ const navItems = [
   },
   {
     label: "Features",
-    href: "/features",
+    href: "/#/page1",
   },
   {
     label: "Docs",
@@ -34,6 +34,7 @@ export const siteConfig = {
     twitter: "https://twitter.com/ServProtocol",
     docs: "https://servprotocol.com/docs",
     discord: "https://discord.gg/uFH988AfJA",
+    forum: "https://forum.servprotocol.com",
   },
   maxHeaderWidth: "xl",
   maxContentWidth: "max-w-[1280]",

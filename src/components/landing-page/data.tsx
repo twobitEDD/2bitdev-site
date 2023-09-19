@@ -32,7 +32,8 @@ export const data = {
       title: "Community-Owned, Decentralized, Fair-Launched",
       description: (
         <>
-        At the root of our mission is to create a blockchain that is owned by it&apos;s community
+          At the root of our mission is to create a blockchain that SERVs
+          it&apos;s community; Operators, Developers & Users.
         </>
       ),
       icon: <Icons.arrowRight />,

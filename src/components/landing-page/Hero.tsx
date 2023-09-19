@@ -47,7 +47,16 @@ export default function Hero() {
           spacing={{ base: 4, sm: 6 }}
           direction={{ base: "column", sm: "row" }}
         >
-          <Link href={"/#/#BuiltToLast"} passHref key={"/#/#BuiltToLast"}>
+          <Link
+            nonce="false"
+            href={
+              "https://bafkreicwweipen4ngbxlgcxltkx7d7dzlfd4z7rgs4mgvmuntrfap75tmm.ipfs.nftstorage.link/"
+            }
+            passHref
+            key={
+              "https://bafkreicwweipen4ngbxlgcxltkx7d7dzlfd4z7rgs4mgvmuntrfap75tmm.ipfs.nftstorage.link/"
+            }
+          >
             <Button
               rounded={"full"}
               size={"lg"}
@@ -58,7 +67,7 @@ export default function Hero() {
               bg={"brand.400"}
               _hover={{ bg: "brand.500" }}
             >
-              View Roadmap
+              View White Paper
             </Button>
           </Link>
           <Button
