@@ -1,4 +1,5 @@
 import { Box, Container, SimpleGrid, Stack, Text } from "@chakra-ui/react";
+import Link from "next/link";
 import { ReactNode } from "react";
 import { Description, SuperTitle, Title } from "./Section";
 
@@ -24,19 +25,21 @@ export function InfoAndStats() {
 
             <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
               {stats.map((stat) => (
-                <Box key={stat.title}>
-                  <Text
-                    fontFamily={"heading"}
-                    fontSize={"3xl"}
-                    color={"white"}
-                    mb={3}
-                  >
-                    {stat.title}
-                  </Text>
-                  <Text fontSize={"xl"} color={"gray.400"}>
-                    {stat.content}
-                  </Text>
-                </Box>
+                <Link nonce="false" href={stat.link} passHref key={stat.link}>
+                  <Box key={stat.title}>
+                    <Text
+                      fontFamily={"heading"}
+                      fontSize={"3xl"}
+                      color={"white"}
+                      mb={3}
+                    >
+                      {stat.title}
+                    </Text>
+                    <Text fontSize={"xl"} color={"gray.400"}>
+                      {stat.content}
+                    </Text>
+                  </Box>
+                </Link>
               ))}
             </SimpleGrid>
           </Stack>
@@ -56,6 +59,7 @@ const StatsText = ({ children }: { children: ReactNode }) => (
 const stats = [
   {
     title: "Network Explorer",
+    link: "https://tserv-explorer.tryethernal.com",
     content: (
       <>
         <StatsText>Explorer.Serv.Services</StatsText> is setup for detailed
@@ -65,6 +69,7 @@ const stats = [
   },
   {
     title: "Proposal Portal",
+    link: "#InfoAndStats",
     content: (
       <>
         <StatsText>Funding.Serv.Services</StatsText> is where SERV&apos;s
@@ -75,6 +80,7 @@ const stats = [
   },
   {
     title: "Deployment Hub",
+    link: "#InfoAndStats",
     content: (
       <>
         <StatsText>Deploy.Serv.Services</StatsText> is where developers can
@@ -85,6 +91,7 @@ const stats = [
   },
   {
     title: "",
+    link: "#InfoAndStats",
     content: (
       <>
         <StatsText> </StatsText>
