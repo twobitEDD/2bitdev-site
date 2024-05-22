@@ -135,12 +135,6 @@ function Footer() {
             >
               <FaDiscord />
             </SocialButton>
-            <SocialButton
-              label={"forums"}
-              href={"https://forum.servprotocol.com"}
-            >
-              <MdForum />
-            </SocialButton>
           </Stack>
         </Stack>
         {/* <Stack align={"flex-start"}>
