@@ -1,5 +1,6 @@
 import { Box, Button, Flex, Image, SimpleGrid } from "@chakra-ui/react";
 import { FadeIn } from "@components/motion/Animation";
+import Link from "next/link";
 import { Description, Title } from "./Section";
 
 export default function HighlightSwitchback() {
@@ -31,14 +32,21 @@ export default function HighlightSwitchback() {
                 allocated directly the network operators (inspired by Proof of
                 Work blockchains like Bitcoin and Ergo).
               </Description>
-              <Button
-                w={{ base: "full", sm: "auto" }}
-                mt="8"
-                size="lg"
-                variant="solid"
+              <Link
+                nonce="false"
+                href={"https://docs.serv.services"}
+                passHref
+                key={"https://docs.serv.services"}
               >
-                Learn More
-              </Button>
+                <Button
+                  w={{ base: "full", sm: "auto" }}
+                  mt="8"
+                  size="lg"
+                  variant="solid"
+                >
+                  Learn More
+                </Button>
+              </Link>
             </Box>
             <Box
               w="full"
@@ -70,29 +78,32 @@ export default function HighlightSwitchback() {
             spacingX={{ base: 10, md: 24 }}
           >
             <Box order={{ base: "initial", md: 2 }}>
-              <Title>
-                Allowing Game Developers to focus on Game Development
-              </Title>
+              <Title>Allowing Developers to focus on Development</Title>
               <Description>
-                The technical skilled related to Game Development are different
-                than the technical skills related to Network Server Operations.
-                SERV Protocol is dedicated to simiplifying the processes of
-                making online games without demanding the game developers
-                oversee network operations. From creating easy to use game
-                templates and examples for Game Development, to encouraging open
-                source inititives and working to establish &quot;Official&quot;
-                versions of Unity Asset Store Products, SERV is built to allow
-                game developers to stay focused on making games.
+                The technical skilled related to Software Development are
+                different than the technical skills related to Network Server
+                Operations. SERV Protocol is dedicated to simiplifying the
+                processes of making online experiences without demanding that
+                developers oversee network operations. From creating easy to use
+                templates and examples for Development, to encouraging open
+                source inititives, SERV is built to allow software developers to
+                stay focused on making software.
               </Description>
-
-              <Button
-                w={{ base: "full", sm: "auto" }}
-                mt="8"
-                size="lg"
-                variant="solid"
+              <Link
+                nonce="false"
+                href={"https://docs.serv.services"}
+                passHref
+                key={"https://docs.serv.services"}
               >
-                Learn More
-              </Button>
+                <Button
+                  w={{ base: "full", sm: "auto" }}
+                  mt="8"
+                  size="lg"
+                  variant="solid"
+                >
+                  Learn More
+                </Button>
+              </Link>
             </Box>
             <Box
               w="full"
@@ -137,14 +148,21 @@ export default function HighlightSwitchback() {
                 ownership allows for shared network costs, and ultimately a
                 chance at shared success.
               </Description>
-              <Button
-                w={{ base: "full", sm: "auto" }}
-                mt="8"
-                size="lg"
-                variant="solid"
+              <Link
+                nonce="false"
+                href={"https://docs.serv.services"}
+                passHref
+                key={"https://docs.serv.services"}
               >
-                Learn More
-              </Button>
+                <Button
+                  w={{ base: "full", sm: "auto" }}
+                  mt="8"
+                  size="lg"
+                  variant="solid"
+                >
+                  Learn More
+                </Button>
+              </Link>
             </Box>
             <Box
               w="full"

@@ -11,7 +11,8 @@ const APP_NAME = "SERV Protocol";
 
 export const metadata: Metadata = {
   title: { default: APP_NAME, template: "%s | nextarter-chakra" },
-  description: "A New Standard for Multiplayer Game Development",
+  description: "A Secure Decentralized Online Data Layer",
+
   viewport: {
     width: "device-width",
     initialScale: 1,
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
   openGraph: {
     url: "https://Serv.Services",
     title: "SERV Protocol",
-    description: "A New Standard for Multiplayer Game Development",
+    description: "A Secure Decentralized Online Data Layer",
     images: {
       url: "https://servprotocol.nyc3.cdn.digitaloceanspaces.com/BlockchainImage.jpeg",
       alt: "https://serv.services",

@@ -29,19 +29,22 @@ export default function Hero() {
           fontWeight={600}
           fontSize={{ base: "3xl", sm: "3xl", md: "4xl", lg: "5xl" }}
         >
-          <Text as={"span"}>A New Standard</Text>
-          <br />
-          <Text as={"span"}>for Multiplayer Game Development </Text>
+          <Text as={"span"}>A Secure</Text>
+          <Box></Box>
+          <Text as={"span"}>Decentralized</Text>
+          <Box></Box>
+          <Text as={"span"}>Online Data Layer</Text>
         </Heading>
 
         <Text fontSize={"lg"} color={"gray.400"} mb={4}>
-          SERV Protocol provides an easy to use Multiplayer System, allowing
-          Game Developers to focus on building games not running servers.
+          SERV Protocol provides an easy to use Perpetual Data System, allowing
+          Developers to focus on building sottware not running servers.
         </Text>
         <Text fontSize={"lg"} color={"gray.400"} mb={4}>
-          Defining a New Standard for sharing Gaming Experiences; Leaderboards,
-          High-Scores, Match-Making and Player Messaging built to run on our
-          perpetual server system.
+          Defining a Reliable Standard for Sharing Interactive Experiences;
+          Data-Management for: Payment Processing, Inventory Management,
+          Communications, Leaderboards, Match-Making and User Management built
+          to run on our perpetual server system.
         </Text>
         <Stack
           spacing={{ base: 4, sm: 6 }}
@@ -70,17 +73,24 @@ export default function Hero() {
               View White Paper
             </Button>
           </Link>
-          <Button
-            rounded={"full"}
-            size={"lg"}
-            fontWeight={"normal"}
-            // colorScheme="brand"
-            variant={"ghost"}
-            px={6}
-            rightIcon={<Icons.arrowRight />}
+          <Link
+            nonce="false"
+            href={"https://docs.serv.services"}
+            passHref
+            key={"https://docs.serv.services"}
           >
-            Learn More
-          </Button>
+            <Button
+              rounded={"full"}
+              size={"lg"}
+              fontWeight={"normal"}
+              // colorScheme="brand"
+              variant={"ghost"}
+              px={6}
+              rightIcon={<Icons.arrowRight />}
+            >
+              Learn More
+            </Button>
+          </Link>
         </Stack>
       </Stack>
 
