@@ -90,11 +90,13 @@ const stats = [
     ),
   },
   {
-    title: "",
-    link: "#InfoAndStats",
+    title: "ServRandom",
+    link: "/serv-random",
     content: (
       <>
-        <StatsText> </StatsText>
+        <StatsText>ServRandom</StatsText> provides production-ready
+        cryptographic randomness across multiple blockchains using Harmony VRF.
+        Get verifiable random values for your dApps and smart contracts.
       </>
     ),
   },
