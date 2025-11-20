@@ -23,6 +23,8 @@ import Link from "next/link";
 const ServRandom = () => {
   const bgColor = useColorModeValue("gray.50", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const iconBg = useColorModeValue("gray.100", "gray.700");
 
   const features = [
     {
@@ -129,7 +131,7 @@ const ServRandom = () => {
                   p={6}
                   borderRadius="lg"
                   borderWidth="1px"
-                  borderColor={useColorModeValue("gray.200", "gray.600")}
+                  borderColor={borderColor}
                   _hover={{
                     borderColor: "brand.400",
                     transform: "translateY(-4px)",
@@ -143,7 +145,7 @@ const ServRandom = () => {
                     justify="center"
                     color="brand.300"
                     rounded="full"
-                    bg={useColorModeValue("gray.100", "gray.700")}
+                    bg={iconBg}
                     mb={4}
                   >
                     {feature.icon}
