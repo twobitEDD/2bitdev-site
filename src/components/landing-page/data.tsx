@@ -26,6 +26,13 @@ export const data = {
         "Our ability to build this network without sacrificing the values which brought us all to blockchain is vital. Decentralized, Trustless, Open-Source.",
       icon: <Icons.user />,
     },
+    {
+      title: "ServRandom",
+      description:
+        "Production-ready cryptographic randomness service delivering verifiable random values across multiple blockchains using Harmony VRF. Perfect for dApps and smart contracts.",
+      icon: <Icons.slidersHorizontal />,
+      href: "/serv-random",
+    },
   ],
   fullFeatures: [
     {

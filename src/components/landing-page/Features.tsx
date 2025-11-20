@@ -11,6 +11,10 @@ import {
 } from "@chakra-ui/react";
 import { ReactElement } from "react";
 import { Description, SuperTitle, Title } from "./Section";
+import Link from "next/link";
+
+import { FadeIn } from "@components/motion/Animation";
+import { data } from "./data";
 
 interface CardProps {
   heading: string;
@@ -21,9 +25,6 @@ interface CardProps {
   isExternal?: boolean;
 }
 
-import { FadeIn } from "@components/motion/Animation";
-import { data } from "./data";
-
 export const FeatureCard = ({
   heading,
   description,
@@ -32,7 +33,7 @@ export const FeatureCard = ({
   href,
   isExternal,
 }: CardProps) => {
-  return (
+  const CardContent = (
     <Box
       maxW={{ base: "full", md: "275px" }}
       w={"full"}
@@ -40,11 +41,8 @@ export const FeatureCard = ({
       borderRadius="lg"
       overflow="hidden"
       p={6}
-      // @ts-ignore
-      href={href}
-      target={isExternal ? "_blank" : undefined}
-      as={href ? "a" : "div"}
       mb={100}
+      _hover={href ? { borderColor: "brand.400", cursor: "pointer" } : {}}
     >
       <Stack align={"start"} spacing={2}>
         <Flex
@@ -76,6 +74,23 @@ export const FeatureCard = ({
       </Stack>
     </Box>
   );
+
+  if (href) {
+    if (isExternal) {
+      return (
+        <a href={href} target="_blank" rel="noopener noreferrer">
+          {CardContent}
+        </a>
+      );
+    }
+    return (
+      <Link href={href} passHref>
+        {CardContent}
+      </Link>
+    );
+  }
+
+  return CardContent;
 };
 
 export default function Features() {
@@ -99,7 +114,7 @@ export default function Features() {
               heading={feat.title}
               icon={feat.icon}
               description={feat.description}
-              href={undefined}
+              href={(feat as { href?: string }).href}
               key={feat.title}
             />
           ))}

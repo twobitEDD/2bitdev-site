@@ -59,10 +59,7 @@ export default function HighlightSwitchback() {
                 alt={"Token Genesis Image"}
                 fit={"cover"}
                 align={"center"}
-                src={
-                  "https://servprotocol.nyc3.cdn.digitaloceanspaces.com/0_3_5.png"
-                  //"https://bafybeiegajvj2jefyvhmytgp7obyy3woidkgdtxuz4mx5fiicyvmzrvbmm.ipfs.nftstorage.link/"
-                }
+                src={"/0_3_5.png"}
               />
             </Box>
           </SimpleGrid>
@@ -118,10 +115,7 @@ export default function HighlightSwitchback() {
                 align={"center"}
                 w={"100%"}
                 h={"100%"}
-                src={
-                  "https://servprotocol.nyc3.cdn.digitaloceanspaces.com/0_3_6.png"
-                  //"https://bafybeiclqk7znishm2jremdcl5id7mvqvvjla452rpkotfzzy3gur56stq.ipfs.nftstorage.link/"
-                }
+                src={"/0_3_6.png"}
               />
             </Box>
           </SimpleGrid>
@@ -175,10 +169,7 @@ export default function HighlightSwitchback() {
                 alt={"Community Owned Image"}
                 fit={"cover"}
                 align={"center"}
-                src={
-                  "https://servprotocol.nyc3.cdn.digitaloceanspaces.com/0_0_3.png?"
-                  //"https://bafybeiad2nhx4ozapxlqoh6ln3da2dnetnzscfa4nhqedk2lyuul45e3ju.ipfs.nftstorage.link/"
-                }
+                src={"/0_0_3.png"}
               />
             </Box>
           </SimpleGrid>
