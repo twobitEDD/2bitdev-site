@@ -33,6 +33,8 @@ export const FeatureCard = ({
   href,
   isExternal,
 }: CardProps) => {
+  const cardBg = useColorModeValue("gray.100", "gray.700");
+  
   const CardContent = (
     <Box
       maxW={{ base: "full", md: "275px" }}
@@ -60,7 +62,7 @@ export const FeatureCard = ({
             justify={"center"}
             color={iconColor || "brand.300"}
             rounded={"full"}
-            bg={useColorModeValue("gray.100", "gray.700")}
+            bg={cardBg}
           >
             {icon}
           </Flex>
@@ -78,15 +80,15 @@ export const FeatureCard = ({
   if (href) {
     if (isExternal) {
       return (
-        <a href={href} target="_blank" rel="noopener noreferrer">
+        <Box as="a" href={href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
           {CardContent}
-        </a>
+        </Box>
       );
     }
     return (
-      <Link href={href} passHref>
+      <Box as={Link} href={href} style={{ textDecoration: "none" }}>
         {CardContent}
-      </Link>
+      </Box>
     );
   }
 

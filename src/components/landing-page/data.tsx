@@ -1,3 +1,5 @@
+"use client";
+
 import { Icons } from "@components/icons";
 
 export const data = {
