@@ -36,7 +36,7 @@ const ServRandom = () => {
     {
       title: "Multi-Chain Support",
       description:
-        "Production deployed on Base and Harmony mainnets, with Ergo network integration in development.",
+        "Production deployed on Base, Avalanche, and Polygon mainnets, with many more networks coming soon.",
       icon: <Icons.check />,
     },
     {
@@ -69,7 +69,7 @@ const ServRandom = () => {
     { label: "Processing Time", value: "<30 seconds" },
     { label: "Uptime Target", value: "99.9%" },
     { label: "Gas Optimization", value: "60% optimized" },
-    { label: "Networks", value: "2+ (Base, Harmony)" },
+    { label: "Networks", value: "3+ (Base, Avalanche, Polygon)" },
   ];
 
   return (
@@ -90,8 +90,7 @@ const ServRandom = () => {
             <Title>ServRandom</Title>
             <Description>
               Production-ready randomness service that delivers cryptographic
-              randomness across multiple blockchains using Harmony VRF. Get
-              verifiable random values for your dApps and smart contracts.
+              randomness across multiple blockchains. Powered by Harmony VRF as the randomness source, ServRandom is deployed on Base, Avalanche, and Polygon with more networks coming soon. Get verifiable random values for your dApps and smart contracts.
             </Description>
             <Stack direction={{ base: "column", sm: "row" }} spacing={4}>
               <Badge
@@ -110,7 +109,7 @@ const ServRandom = () => {
                 py={2}
                 borderRadius="full"
               >
-                Base + Harmony Mainnets
+                Base + Avalanche + Polygon
               </Badge>
             </Stack>
           </Stack>
@@ -194,8 +193,7 @@ const ServRandom = () => {
               <Title>Simple Integration</Title>
               <Description>
                 ServRandom provides cryptographic randomness sourced from
-                Harmony&apos;s VRF-enabled blocks. Users pay with SRAND tokens
-                to receive verifiable random values.
+                Harmony&apos;s VRF-enabled blocks. Deployed on Base, Avalanche, and Polygon, users pay with SRAND tokens to receive verifiable random values on their preferred network.
               </Description>
             </Stack>
 
@@ -246,8 +244,7 @@ const ServRandom = () => {
                   Automatic Processing
                 </Heading>
                 <Text fontSize="sm" color="gray.400">
-                  ServRandom server listens to Harmony blocks and processes VRF
-                  data
+                  ServRandom server listens to Harmony blocks (the randomness source) and processes VRF data for deployment networks
                 </Text>
               </Box>
 
@@ -294,11 +291,12 @@ const ServRandom = () => {
                   Randomness Source
                 </Heading>
                 <Text fontSize="sm" color="gray.400" mb={4}>
-                  Harmony VRF-enabled blocks provide cryptographic proof
-                  verification for maximum security.
+                  Harmony VRF-enabled blocks provide the cryptographic randomness source. ServRandom is deployed on Base, Avalanche, and Polygon, bringing this verifiable randomness to these networks.
                 </Text>
                 <Code p={2} borderRadius="md" display="block">
-                  Source: Harmony VRF Blocks
+                  Randomness Source: Harmony VRF Blocks
+                  <br />
+                  Deployed Networks: Base, Avalanche, Polygon
                   <br />
                   Security: Cryptographic Proof
                   <br />
@@ -315,9 +313,11 @@ const ServRandom = () => {
                   requests.
                 </Text>
                 <Code p={2} borderRadius="md" display="block">
-                  Token: SRAND (ERC20 on Base)
+                  Token: SRAND (ERC20)
                   <br />
                   Cost: 1 SRAND per request
+                  <br />
+                  Networks: Base, Avalanche, Polygon
                   <br />
                   Refund: Failed requests refunded
                 </Code>
