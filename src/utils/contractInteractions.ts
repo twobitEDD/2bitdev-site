@@ -769,7 +769,7 @@ export function getDungeonCrawlerContract(
     "function finalizeCharacter(uint256 _requestId) external",
     "function startInteraction(uint256 _characterId, uint8 _interactionType) external returns (uint256)",
     "function completeInteraction(uint256 _interactionId) external",
-    "function getCharacter(uint256 _characterId) external view returns (address player, uint8 class, uint8 strength, uint8 dexterity, uint8 intelligence, uint8 wisdom, uint8 constitution, uint8 charisma, uint256 level, uint256 experience, uint256 health, uint256 maxHealth, uint256 wealth, bytes32 creationSeed, bool alive, uint256 actionCount, uint8 status, uint256 createdAt)",
+    "function getCharacter(uint256 characterId) external view returns (address player, uint8 class, uint8 strength, uint8 dexterity, uint8 intelligence, uint8 wisdom, uint8 constitution, uint8 charisma, uint256 level, uint256 health, uint256 maxHealth, uint256 wealth, bool alive, uint256 actionCount, uint8 status, uint256 createdAt)",
     "function getInteraction(uint256 _interactionId) external view returns (address player, uint256 characterId, uint256 requestId, uint8 interactionType, bytes32 vrfSeed, bool completed, bool success, uint256 healthChange, uint256 wealthChange, string memory outcome, uint256 timestamp)",
     "function playerCharacters(address player) external view returns (uint256[] memory)",
     "function characterCounter() external view returns (uint256)",
@@ -875,6 +875,18 @@ export async function realFinalizeCharacter(
   // Get full character details from contract
   const character = await dungeonCrawler.getCharacter(characterId);
 
+  // Get creationSeed from FeeCollector request (the randomness value used to create the character)
+  const feeCollectorAddress = contractsConfig[network]?.feeCollector;
+  if (!feeCollectorAddress) {
+    throw new Error(`FeeCollector not configured for ${network}`);
+  }
+  const feeCollectorAbi = [
+    "function requests(uint256) view returns (uint256, address, uint256, uint256, uint256, uint256, bool, bytes32)"
+  ];
+  const feeCollector = new ethers.Contract(feeCollectorAddress, feeCollectorAbi, signer.provider);
+  const requestData = await feeCollector.requests(requestId);
+  const creationSeed = requestData[7]; // randomnessValue is at index 7
+
   return {
     characterId,
     class: classNum,
@@ -887,7 +899,7 @@ export async function realFinalizeCharacter(
     health,
     maxHealth: Number(character.maxHealth),
     wealth,
-    creationSeed: character.creationSeed,
+    creationSeed: creationSeed || "0x0000000000000000000000000000000000000000000000000000000000000000",
   };
 }
 
