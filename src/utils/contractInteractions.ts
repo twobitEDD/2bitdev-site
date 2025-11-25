@@ -95,7 +95,8 @@ export function getFeeCollectorContract(
 export async function ensureSRANDApproval(
   signer: ethers.JsonRpcSigner,
   network: "base" | "baseSepolia" = "baseSepolia",
-  amount: bigint = ethers.parseEther("10") // Approve 10 SRAND by default (enough for multiple requests)
+  amount: bigint = ethers.parseEther("10"), // Approve 10 SRAND by default (enough for multiple requests)
+  requiredAmount: bigint = ethers.parseEther("1") // Minimum required for one transaction (tier 1 fee)
 ): Promise<void> {
   const feeCollector = contractsConfig[network]?.feeCollector;
   if (!feeCollector) {
@@ -142,10 +143,23 @@ export async function ensureSRANDApproval(
     throw new Error(`Failed to check SRAND allowance: ${allowanceError.message || allowanceError.toString()}. Please verify the SRAND contract at ${srandAddress}.`);
   }
   
-  if (allowance >= amount) {
-    // Already approved enough
-    console.log('✅ Sufficient allowance already exists');
-    return;
+  // Check if current allowance is sufficient for at least one transaction
+  // This prevents re-approving when user has enough (even if less than the full amount)
+  if (allowance >= requiredAmount) {
+    // Already approved enough for at least one transaction
+    console.log(`✅ Sufficient allowance already exists: ${ethers.formatEther(allowance)} SRAND (need at least ${ethers.formatEther(requiredAmount)} SRAND)`);
+    
+    // If allowance is less than requested amount but sufficient for transactions, optionally approve more
+    // But don't fail if user doesn't want to approve more - they have enough for transactions
+    if (allowance < amount) {
+      console.log(`ℹ️ Current allowance (${ethers.formatEther(allowance)} SRAND) is sufficient for transactions but less than recommended (${ethers.formatEther(amount)} SRAND).`);
+      // Don't force approval - user has enough for transactions
+      // Return early to avoid unnecessary approval transaction
+      return;
+    } else {
+      // Already have enough, no need to approve
+      return;
+    }
   }
 
   // First, verify the token contract exists and user has balance
@@ -247,11 +261,20 @@ export async function ensureSRANDApproval(
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     // Re-check allowance after approval
+    // Wait a bit longer for state to propagate
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
     const newAllowance = await srand.allowance(address, feeCollector);
     console.log('New allowance:', ethers.formatEther(newAllowance), 'SRAND');
     
+    // Check if we have at least the required amount (not the full requested amount)
+    if (newAllowance < requiredAmount) {
+      throw new Error(`Approval completed but allowance is still insufficient. Expected at least ${ethers.formatEther(requiredAmount)} SRAND for transactions, got ${ethers.formatEther(newAllowance)} SRAND.`);
+    }
+    
+    // If we got less than requested but enough for transactions, that's fine
     if (newAllowance < amount) {
-      throw new Error(`Approval completed but allowance is still insufficient. Expected at least ${ethers.formatEther(amount)} SRAND, got ${ethers.formatEther(newAllowance)} SRAND.`);
+      console.log(`⚠️ Approved ${ethers.formatEther(newAllowance)} SRAND (less than requested ${ethers.formatEther(amount)} SRAND, but sufficient for transactions)`);
     }
   } catch (approveError: any) {
     console.error('Approval transaction error:', approveError);
@@ -353,8 +376,8 @@ export async function realRequestSpin(
   signer: ethers.JsonRpcSigner,
   network: "base" | "baseSepolia" = "baseSepolia"
 ): Promise<ContractRequestResult> {
-  // Ensure SRAND approval
-  await ensureSRANDApproval(signer, network, ethers.parseEther("10"));
+  // Ensure SRAND approval (approve 10 SRAND, but only need 1 SRAND per spin)
+  await ensureSRANDApproval(signer, network, ethers.parseEther("10"), ethers.parseEther("1"));
 
   const rouletteGame = getRouletteGameContract(signer, network);
   
@@ -496,8 +519,8 @@ export async function realCreateCharacter(
   signer: ethers.JsonRpcSigner,
   network: "base" | "baseSepolia" = "baseSepolia"
 ): Promise<ContractRequestResult> {
-  // Ensure SRAND approval
-  await ensureSRANDApproval(signer, network, ethers.parseEther("10"));
+  // Ensure SRAND approval (approve 10 SRAND, but only need 1 SRAND per spin)
+  await ensureSRANDApproval(signer, network, ethers.parseEther("10"), ethers.parseEther("1"));
 
   const dungeonCrawler = getDungeonCrawlerContract(signer, network);
   
@@ -607,8 +630,8 @@ export async function realStartInteraction(
   interactionType: number,
   network: "base" | "baseSepolia" = "baseSepolia"
 ): Promise<ContractRequestResult> {
-  // Ensure SRAND approval
-  await ensureSRANDApproval(signer, network, ethers.parseEther("10"));
+  // Ensure SRAND approval (approve 10 SRAND, but only need 1 SRAND per spin)
+  await ensureSRANDApproval(signer, network, ethers.parseEther("10"), ethers.parseEther("1"));
 
   const dungeonCrawler = getDungeonCrawlerContract(signer, network);
   
@@ -701,8 +724,8 @@ export async function realGoFishing(
   signer: ethers.JsonRpcSigner,
   network: "base" | "baseSepolia" = "baseSepolia"
 ): Promise<ContractRequestResult> {
-  // Ensure SRAND approval
-  await ensureSRANDApproval(signer, network, ethers.parseEther("10"));
+  // Ensure SRAND approval (approve 10 SRAND, but only need 1 SRAND per spin)
+  await ensureSRANDApproval(signer, network, ethers.parseEther("10"), ethers.parseEther("1"));
 
   const fishingGame = getFishingGameContract(signer, network);
   
