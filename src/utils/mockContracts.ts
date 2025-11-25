@@ -447,10 +447,10 @@ export async function mockCatchFish(
     { name: "Whale", type: 5 },
   ];
   
-  // Fish weights from contract: [50, 30, 15, 4, 1, 0]
-  // Total weight = 100
-  const fishWeights = [50, 30, 15, 4, 1, 0];
-  const totalWeight = 100;
+  // Fish weights from contract: [50, 30, 15, 4, 1, 1]
+  // Total weight = 101 (ensures all fish types including WHALE are catchable)
+  const fishWeights = [50, 30, 15, 4, 1, 1];
+  const totalWeight = 101;
   const randomFish = Number(randomValue % BigInt(totalWeight));
   
   // Determine fish type using cumulative weights (matches contract logic)

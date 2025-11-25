@@ -36,7 +36,7 @@ export const contractsConfig: ContractsConfig = {
     feeCollector: "0x630beA16eFe7A1673845FeB3782Fb0F32C9Ad6fD",
     srand: "0xC39FE2a3949CE09390e5663d105b81b5700C3ea4",
     randomnessAccess: "0xFfcBE939F8Aa8fd26E932E2327cD622B8cb148fA",
-    fishingGame: "0x1B958D032688eEBC367e8941a15bA2542bF36261", // Updated with authorized server fallback
+    fishingGame: "0x9D4C81422d7321B8F584cAd667D42786d4b8deEC", // Redeployed with fixed fish weights - all 6 fish types catchable (2025-11-25)
     fishingGameNFT: "0x974DC14df9316013455521A2Fa83B6ca9e8B2Fc3",
     rouletteGame: "0x76649078c51459d5D9bd8aE111ba6Bec0b199786", // Updated with authorized server fallback
     dungeonCrawler: "0x11a0336e0CF4952A7851Adf4498e1383775C892D",
