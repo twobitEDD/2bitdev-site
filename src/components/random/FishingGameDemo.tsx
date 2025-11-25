@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Button,
@@ -25,6 +25,8 @@ import {
 import { usePlaytestMode } from "@contexts/PlaytestModeContext";
 import { useWallet } from "@contexts/WalletContext";
 import { goFishing, catchFish, pollForFulfillmentStatus } from "@utils/contractHelpers";
+import { contractsConfig } from "@config/contracts";
+import { ethers } from "ethers";
 
 interface FishCatch {
   fishType: number;
@@ -78,7 +80,102 @@ export function FishingGameDemo() {
   const [caughtFish, setCaughtFish] = useState<FishCatch | null>(null);
   const [fishHistory, setFishHistory] = useState<FishCatch[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingNFTs, setLoadingNFTs] = useState(false);
   const [vrfSeed, setVrfSeed] = useState<string | null>(null);
+
+  // Load user's NFTs from contract
+  const loadUserNFTs = useCallback(async () => {
+    // Skip if in playtest mode or wallet not connected
+    if (isPlaytestMode || !isConnected || !signer || !provider) {
+      return;
+    }
+
+    try {
+      setLoadingNFTs(true);
+      const network = "baseSepolia"; // Using Base Sepolia for now
+      const nftAddress = contractsConfig[network]?.fishingGameNFT;
+      
+      if (!nftAddress) {
+        console.warn("FishingGameNFT address not configured for", network);
+        return;
+      }
+
+      const userAddress = await signer.getAddress();
+      
+      // NFT Contract ABI
+      const nftAbi = [
+        "function balanceOf(address owner) view returns (uint256)",
+        "function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)",
+        "function fishMetadata(uint256 tokenId) view returns (uint8 fishType, uint256 size, uint256 value, uint256 timestamp, string memory fishName, bytes32 randomness)",
+      ];
+
+      const nftContract = new ethers.Contract(nftAddress, nftAbi, provider);
+      
+      // Get user's balance
+      const balance = await nftContract.balanceOf(userAddress);
+      const balanceNum = Number(balance);
+      
+      if (balanceNum === 0) {
+        setFishHistory([]);
+        return;
+      }
+
+      // Get all token IDs owned by user
+      const tokenIds: bigint[] = [];
+      for (let i = 0; i < balanceNum; i++) {
+        try {
+          const tokenId = await nftContract.tokenOfOwnerByIndex(userAddress, i);
+          tokenIds.push(tokenId);
+        } catch (err) {
+          console.warn(`Error getting token ${i}:`, err);
+        }
+      }
+
+      // Get metadata for each token
+      const loadedFish: FishCatch[] = [];
+      for (const tokenId of tokenIds) {
+        try {
+          const metadata = await nftContract.fishMetadata(tokenId);
+          const fishType = Number(metadata.fishType);
+          const fishName = metadata.fishName;
+          const size = Number(metadata.size);
+          const value = Number(metadata.value);
+          const randomness = metadata.randomness;
+          
+          loadedFish.push({
+            fishType,
+            fishName,
+            size,
+            value,
+            rarity: getFishRarity(fishType),
+            randomness,
+            tokenId: Number(tokenId),
+          });
+        } catch (err) {
+          console.warn(`Error loading metadata for token ${tokenId}:`, err);
+        }
+      }
+
+      // Sort by token ID (newest first, assuming higher token IDs are newer)
+      loadedFish.sort((a, b) => (b.tokenId || 0) - (a.tokenId || 0));
+      
+      setFishHistory(loadedFish);
+    } catch (error) {
+      console.error("Error loading user NFTs:", error);
+    } finally {
+      setLoadingNFTs(false);
+    }
+  }, [isPlaytestMode, isConnected, signer, provider]);
+
+  // Load NFTs when component mounts or wallet connects
+  useEffect(() => {
+    if (isConnected && !isPlaytestMode && signer) {
+      loadUserNFTs();
+    } else if (isPlaytestMode) {
+      // In playtest mode, clear history on disconnect
+      setFishHistory([]);
+    }
+  }, [isConnected, isPlaytestMode, signer, loadUserNFTs]);
 
   const handleGoFishing = async () => {
     // Check if wallet connected when not in playtest mode
@@ -200,7 +297,16 @@ export function FishingGameDemo() {
       };
 
       setCaughtFish(fish);
-      setFishHistory([fish, ...fishHistory]);
+      // Reload NFTs from contract to get the actual token ID
+      if (!isPlaytestMode && isConnected && signer) {
+        // Wait a bit for the transaction to be mined
+        setTimeout(() => {
+          loadUserNFTs();
+        }, 2000);
+      } else {
+        // In playtest mode, just add to local history
+        setFishHistory([fish, ...fishHistory]);
+      }
       setFishingStep("caught");
 
       toast({
@@ -414,15 +520,23 @@ export function FishingGameDemo() {
       </Box>
 
       {/* Fish History */}
-      {fishHistory.length > 0 && (
+      {(loadingNFTs || fishHistory.length > 0) && (
         <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor} mb={4}>
-          <Heading size="sm" mb={4} color="white">
-            Your Fish Collection ({fishHistory.length})
-          </Heading>
+          <Flex justify="space-between" align="center" mb={4}>
+            <Heading size="sm" color="white">
+              Your Fish Collection ({fishHistory.length})
+            </Heading>
+            {loadingNFTs && <Spinner size="sm" color="brand.400" />}
+          </Flex>
+          {loadingNFTs && fishHistory.length === 0 && (
+            <Text color="gray.400" textAlign="center" py={4}>
+              Loading your NFTs...
+            </Text>
+          )}
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
-            {fishHistory.map((fish, idx) => (
+            {fishHistory.map((fish) => (
               <Box
-                key={idx}
+                key={fish.tokenId || `fish-${fish.randomness}`}
                 p={4}
                 bg={bgColor}
                 borderRadius="md"
