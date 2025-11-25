@@ -64,6 +64,7 @@ export function getSRANDContract(
     "function approve(address spender, uint256 amount) external returns (bool)",
     "function allowance(address owner, address spender) external view returns (uint256)",
     "function balanceOf(address account) external view returns (uint256)",
+    "event Approval(address indexed owner, address indexed spender, uint256 value)",
   ];
 
   return new ethers.Contract(address, abi, signer);
@@ -257,19 +258,70 @@ export async function ensureSRANDApproval(
     console.log('✅ SRAND approval confirmed! Block:', approveReceipt.blockNumber);
     console.log('Gas used:', approveReceipt.gasUsed.toString());
     
-    // Wait a moment for state to update
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Verify approval via event logs (more reliable than querying allowance immediately)
+    const approvalEvent = approveReceipt.logs.find((log: any) => {
+      try {
+        const parsed = srand.interface.parseLog(log);
+        return parsed?.name === 'Approval';
+      } catch {
+        return false;
+      }
+    });
     
-    // Re-check allowance after approval
-    // Wait a bit longer for state to propagate
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    if (approvalEvent) {
+      const parsed = srand.interface.parseLog(approvalEvent);
+      const approvedAmount = parsed?.args[2]; // Third arg is amount
+      console.log('✅ Approval event found in receipt:', ethers.formatEther(approvedAmount), 'SRAND');
+      
+      // If event shows sufficient approval, we're good (even if RPC query is stale)
+      if (approvedAmount >= requiredAmount) {
+        console.log('✅ Approval confirmed via event - sufficient amount approved');
+        return; // Success - don't need to query allowance
+      }
+    }
     
-    const newAllowance = await srand.allowance(address, feeCollector);
-    console.log('New allowance:', ethers.formatEther(newAllowance), 'SRAND');
+    // Fallback: Query allowance with retries (RPC might be stale)
+    let newAllowance = BigInt(0);
+    let retries = 0;
+    const maxRetries = 5;
     
-    // Check if we have at least the required amount (not the full requested amount)
+    while (retries < maxRetries && newAllowance < requiredAmount) {
+      // Wait progressively longer for state to propagate
+      const waitTime = Math.min(1000 * Math.pow(2, retries), 5000); // 1s, 2s, 4s, 5s, 5s
+      if (retries > 0) {
+        console.log(`⏳ Retrying allowance check (attempt ${retries + 1}/${maxRetries}) after ${waitTime}ms...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      }
+      
+      try {
+        // Query allowance (RPC may be stale, so we retry)
+        newAllowance = await srand.allowance(address, feeCollector);
+        console.log(`Allowance check (attempt ${retries + 1}):`, ethers.formatEther(newAllowance), 'SRAND');
+        
+        if (newAllowance >= requiredAmount) {
+          console.log('✅ Allowance verified:', ethers.formatEther(newAllowance), 'SRAND');
+          break;
+        }
+      } catch (queryError: any) {
+        console.warn(`Allowance query failed (attempt ${retries + 1}):`, queryError.message);
+      }
+      
+      retries++;
+    }
+    
+    // Final check - if still insufficient, throw error
     if (newAllowance < requiredAmount) {
-      throw new Error(`Approval completed but allowance is still insufficient. Expected at least ${ethers.formatEther(requiredAmount)} SRAND for transactions, got ${ethers.formatEther(newAllowance)} SRAND.`);
+      // If we saw the approval event with sufficient amount, trust that over RPC query
+      if (approvalEvent) {
+        const parsed = srand.interface.parseLog(approvalEvent);
+        const approvedAmount = parsed?.args[2];
+        if (approvedAmount >= requiredAmount) {
+          console.log('⚠️ RPC query shows 0 but Approval event confirms sufficient amount - trusting event');
+          return; // Trust the event over stale RPC data
+        }
+      }
+      
+      throw new Error(`Approval completed but allowance is still insufficient. Expected at least ${ethers.formatEther(requiredAmount)} SRAND for transactions, got ${ethers.formatEther(newAllowance)} SRAND. This may be due to RPC caching - please try again in a few seconds.`);
     }
     
     // If we got less than requested but enough for transactions, that's fine
