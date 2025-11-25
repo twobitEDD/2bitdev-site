@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
 import { ethers } from "ethers";
 
 interface WalletContextType {
@@ -27,25 +27,16 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [signer, setSigner] = useState<ethers.JsonRpcSigner | null>(null);
   const [chainId, setChainId] = useState<number | null>(null);
 
-  // Check if already connected on mount
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.ethereum) {
-      checkConnection();
-      // Listen for account changes
-      window.ethereum.on("accountsChanged", handleAccountsChanged);
-      window.ethereum.on("chainChanged", handleChainChanged);
-    }
-
-    return () => {
-      if (window.ethereum) {
-        window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
-        window.ethereum.removeListener("chainChanged", handleChainChanged);
-      }
-    };
+  const disconnectWallet = useCallback(() => {
+    setProvider(null);
+    setSigner(null);
+    setAddress(null);
+    setChainId(null);
+    setIsConnected(false);
   }, []);
 
-  const checkConnection = async () => {
-    if (!window.ethereum) return;
+  const checkConnection = useCallback(async () => {
+    if (typeof window === "undefined" || !window.ethereum) return;
 
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
@@ -61,23 +52,53 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         setAddress(accountAddress);
         setChainId(Number(network.chainId));
         setIsConnected(true);
+      } else {
+        // No accounts connected, reset state
+        setProvider(null);
+        setSigner(null);
+        setAddress(null);
+        setChainId(null);
+        setIsConnected(false);
       }
     } catch (error) {
       console.error("Error checking connection:", error);
+      // Reset state on error
+      setProvider(null);
+      setSigner(null);
+      setAddress(null);
+      setChainId(null);
+      setIsConnected(false);
     }
-  };
+  }, []);
 
-  const handleAccountsChanged = (accounts: string[]) => {
+  const handleAccountsChanged = useCallback((accounts: string[]) => {
     if (accounts.length === 0) {
       disconnectWallet();
     } else {
       checkConnection();
     }
-  };
+  }, [disconnectWallet, checkConnection]);
 
-  const handleChainChanged = () => {
+  const handleChainChanged = useCallback(() => {
     checkConnection();
-  };
+  }, [checkConnection]);
+
+  // Check if already connected on mount
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.ethereum) {
+      checkConnection();
+      // Listen for account changes
+      window.ethereum.on("accountsChanged", handleAccountsChanged);
+      window.ethereum.on("chainChanged", handleChainChanged);
+    }
+
+    return () => {
+      if (typeof window !== "undefined" && window.ethereum) {
+        window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
+        window.ethereum.removeListener("chainChanged", handleChainChanged);
+      }
+    };
+  }, [checkConnection, handleAccountsChanged, handleChainChanged]);
 
   const connectWallet = async () => {
     if (!window.ethereum) {
