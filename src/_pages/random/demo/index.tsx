@@ -40,6 +40,16 @@ interface VRFEntry {
   harmonyBlockHash: string;
 }
 
+interface FeeRequest {
+  requestId: string;
+  requester: string;
+  feeAmount: string;
+  timestamp: number;
+  fulfilled: boolean;
+  randomnessValue?: string;
+  network: string;
+}
+
 const DemoPage = () => {
   const bgColor = useColorModeValue("gray.50", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
@@ -55,9 +65,29 @@ const DemoPage = () => {
         });
         if (response.ok) {
           const data = await response.json();
-          if (data.recentRandomness) {
-            setVrfData(data.recentRandomness);
+          const combinedVRF: VRFEntry[] = [];
+          
+          // Add Harmony block VRF entries
+          if (data.recentRandomness && Array.isArray(data.recentRandomness)) {
+            combinedVRF.push(...data.recentRandomness);
           }
+          
+          // Add fulfilled game requests (they have randomnessValue)
+          if (data.feeRequests && Array.isArray(data.feeRequests)) {
+            const fulfilledRequests = data.feeRequests
+              .filter((req: FeeRequest) => req.fulfilled && req.randomnessValue)
+              .map((req: FeeRequest) => ({
+                blockNumber: 0, // Game requests don't have block numbers
+                timestamp: req.timestamp,
+                vrfValue: req.randomnessValue!,
+                harmonyBlockHash: "0x0000000000000000000000000000000000000000000000000000000000000000", // Not available for game requests
+              }));
+            combinedVRF.push(...fulfilledRequests);
+          }
+          
+          // Sort by timestamp (most recent first) and limit to 20
+          combinedVRF.sort((a, b) => b.timestamp - a.timestamp);
+          setVrfData(combinedVRF.slice(0, 20));
         }
       } catch (error) {
         console.error("Error fetching VRF data:", error);

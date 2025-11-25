@@ -14,7 +14,7 @@ import {
 
 interface VRFEntry {
   blockNumber: number;
-  timestamp: number;
+  timestamp: number; // Can be in seconds (from API) or milliseconds (from Date)
   vrfValue: string;
   harmonyBlockHash: string;
 }
@@ -99,11 +99,11 @@ export function VRFVisualization({ entries, maxEntries = 10 }: VRFVisualizationP
               }}
             >
               <Flex justify="space-between" align="start" mb={3}>
-                <Badge colorScheme="blue" fontSize="xs">
-                  Block #{entry.blockNumber.toLocaleString()}
+                <Badge colorScheme={entry.blockNumber > 0 ? "blue" : "green"} fontSize="xs">
+                  {entry.blockNumber > 0 ? `Block #${entry.blockNumber.toLocaleString()}` : "Game Request"}
                 </Badge>
                 <Text fontSize="xs" color="gray.500">
-                  {new Date(entry.timestamp).toLocaleTimeString()}
+                  {new Date(entry.timestamp > 1000000000000 ? entry.timestamp : entry.timestamp * 1000).toLocaleTimeString()}
                 </Text>
               </Flex>
 
