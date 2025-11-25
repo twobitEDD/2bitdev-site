@@ -427,28 +427,67 @@ export async function getSpinResult(
 }> {
   const address = contractsConfig[network]?.rouletteGame;
   if (!address) {
-    throw new Error(`RouletteGame not deployed on ${network}`);
+    throw new Error(`RouletteGame not deployed on ${network}. Please check contract configuration.`);
   }
+
+  console.log("Getting spin result", {
+    network,
+    address,
+    spinId: spinId.toString(),
+    providerNetwork: (await provider.getNetwork()).chainId.toString()
+  });
 
   const abi = [
     "function getSpin(uint256 _spinId) external view returns (address player, uint8 result, string memory color, bool isEven, bytes32 vrfSeed, uint256 timestamp)",
   ];
 
-  const contract = new ethers.Contract(address, abi, provider);
-  const spin = await contract.getSpin(spinId);
+  try {
+    const contract = new ethers.Contract(address, abi, provider);
+    const spin = await contract.getSpin(spinId);
 
-  // Check if spin is completed (result != 255)
-  // Also check if vrfSeed is zero (not set yet)
-  if (spin.result === 255 || spin.vrfSeed === ethers.ZeroHash || spin.vrfSeed === "0x0000000000000000000000000000000000000000000000000000000000000000") {
-    throw new Error("Spin not yet completed");
+    console.log("Spin data from contract:", {
+      player: spin.player,
+      result: Number(spin.result),
+      color: spin.color,
+      vrfSeed: spin.vrfSeed,
+      isEven: spin.isEven,
+      timestamp: spin.timestamp.toString()
+    });
+
+    // Check if spin is completed (result != 255)
+    // Also check if vrfSeed is zero (not set yet)
+    if (spin.result === 255 || spin.vrfSeed === ethers.ZeroHash || spin.vrfSeed === "0x0000000000000000000000000000000000000000000000000000000000000000") {
+      console.log("Spin not yet completed", {
+        result: Number(spin.result),
+        vrfSeed: spin.vrfSeed,
+        isZeroHash: spin.vrfSeed === ethers.ZeroHash
+      });
+      throw new Error("Spin not yet completed");
+    }
+
+    return {
+      result: Number(spin.result),
+      color: spin.color,
+      vrfSeed: spin.vrfSeed,
+      isEven: spin.isEven,
+    };
+  } catch (error: any) {
+    console.error("Error getting spin result:", {
+      error: error.message,
+      code: error.code,
+      data: error.data,
+      network,
+      address,
+      spinId: spinId.toString()
+    });
+    
+    // Re-throw with more context
+    if (error.message?.includes("not yet completed")) {
+      throw error; // Re-throw as-is
+    }
+    
+    throw new Error(`Failed to get spin result: ${error.message || error.toString()}`);
   }
-
-  return {
-    result: Number(spin.result),
-    color: spin.color,
-    vrfSeed: spin.vrfSeed,
-    isEven: spin.isEven,
-  };
 }
 
 /**
@@ -466,20 +505,37 @@ export async function pollForSpinCompletion(
   vrfSeed: string;
   isEven: boolean;
 }> {
+  console.log("Starting poll for spin completion", {
+    spinId: spinId.toString(),
+    network,
+    maxAttempts,
+    intervalMs,
+    totalTimeoutSeconds: (maxAttempts * intervalMs) / 1000
+  });
+
   for (let i = 0; i < maxAttempts; i++) {
     try {
       const spin = await getSpinResult(provider, spinId, network);
+      console.log(`Spin completed on attempt ${i + 1}/${maxAttempts}`, spin);
       return spin;
     } catch (error: any) {
       if (error.message?.includes("not yet completed")) {
         // Still waiting, continue polling
+        if (i % 5 === 0) { // Log every 5th attempt
+          console.log(`Polling attempt ${i + 1}/${maxAttempts} - spin not yet completed`);
+        }
         await new Promise((resolve) => setTimeout(resolve, intervalMs));
         continue;
       }
+      
+      // Non-timeout error - log and throw
+      console.error(`Error polling for spin (attempt ${i + 1}/${maxAttempts}):`, error);
       throw error;
     }
   }
-  throw new Error("Spin not completed within timeout");
+  
+  console.error(`Spin not completed after ${maxAttempts} attempts (${(maxAttempts * intervalMs) / 1000}s timeout)`);
+  throw new Error(`Spin not completed within ${(maxAttempts * intervalMs) / 1000} seconds. The server may still be processing.`);
 }
 
 /**

@@ -89,6 +89,27 @@ export function RouletteGameDemo() {
           return;
         }
 
+        // Validate provider for real contract mode
+        if (!isPlaytestMode && !provider) {
+          console.error("Provider is null in real contract mode");
+          toast({
+            title: "Error",
+            description: "Wallet provider not available. Please reconnect your wallet.",
+            status: "error",
+            duration: 5000,
+          });
+          setLoading(false);
+          return;
+        }
+
+        console.log("Starting poll for spin completion", {
+          isPlaytestMode,
+          hasProvider: !!provider,
+          spinId: result.spinId,
+          requestId: result.requestId,
+          network
+        });
+
         try {
           // Poll the RouletteGame contract directly to check if spin is completed
           const spinResultData = await getSpinResultHelper(
@@ -98,6 +119,8 @@ export function RouletteGameDemo() {
             result.requestId,
             network
           );
+
+          console.log("Spin result received:", spinResultData);
 
           // Update current spin with result
           const completedSpin: SpinResult = {
