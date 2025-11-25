@@ -32,7 +32,7 @@ import {
 } from "@chakra-ui/react";
 import { PageAnimation } from "@components/motion/PageAnimation";
 import { siteConfig } from "@config/site";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
 interface RequestData {
@@ -68,7 +68,7 @@ const ExplorerPage = () => {
     setMounted(true);
   }, []);
 
-  const loadRequests = async () => {
+  const loadRequests = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -100,7 +100,7 @@ const ExplorerPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedNetwork]);
 
   useEffect(() => {
     // Load requests when network changes (only after mount)
@@ -110,7 +110,7 @@ const ExplorerPage = () => {
       const interval = setInterval(loadRequests, 30000);
       return () => clearInterval(interval);
     }
-  }, [selectedNetwork, mounted]);
+  }, [selectedNetwork, mounted, loadRequests]);
 
   const filteredRequests = requests.filter((req) => {
     if (!searchQuery) return true;
