@@ -32,6 +32,7 @@ import { siteConfig } from "@config/site";
 import { contractsConfig } from "@config/contracts";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { ethers } from "ethers";
 
 interface VRFEntry {
   blockNumber: number;
@@ -58,6 +59,79 @@ const DemoPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Helper function to fetch RouletteGame spins
+    const fetchRouletteGameSpins = async (network: "base" | "baseSepolia" = "baseSepolia"): Promise<VRFEntry[]> => {
+      try {
+        const rouletteAddress = contractsConfig[network]?.rouletteGame;
+        if (!rouletteAddress) {
+          console.log(`RouletteGame not deployed on ${network}`);
+          return [];
+        }
+
+        // Use public RPC endpoints
+        const rpcUrls: Record<string, string> = {
+          baseSepolia: "https://sepolia.base.org",
+          base: "https://mainnet.base.org",
+        };
+        const rpcUrl = rpcUrls[network];
+        if (!rpcUrl) {
+          console.log(`No RPC URL for network ${network}`);
+          return [];
+        }
+
+        const provider = new ethers.JsonRpcProvider(rpcUrl);
+        const rouletteAbi = [
+          "function getRecentSpins(uint256 count) external view returns (uint256[])",
+          "function getSpin(uint256 _spinId) external view returns (address player, uint8 result, string memory color, bool isEven, bytes32 vrfSeed, uint256 timestamp)",
+        ];
+
+        const contract = new ethers.Contract(rouletteAddress, rouletteAbi, provider);
+        
+        // Get recent spins (last 10)
+        const recentSpinIds = await contract.getRecentSpins(10);
+        
+        if (!recentSpinIds || recentSpinIds.length === 0) {
+          return [];
+        }
+
+        const spins: VRFEntry[] = [];
+        
+        // Fetch each spin's details
+        for (const spinId of recentSpinIds) {
+          try {
+            const spin = await contract.getSpin(spinId);
+            
+            // Check if spin is completed (result != 255 and vrfSeed is not zero)
+            if (spin.result !== 255 && 
+                spin.vrfSeed !== ethers.ZeroHash && 
+                spin.vrfSeed !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+              // Convert timestamp from seconds to milliseconds
+              let timestamp = Number(spin.timestamp);
+              if (timestamp < 1000000000000) {
+                timestamp = timestamp * 1000;
+              }
+              
+              spins.push({
+                blockNumber: 0, // Game requests don't have block numbers
+                timestamp: timestamp || Date.now(),
+                vrfValue: spin.vrfSeed,
+                harmonyBlockHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+              });
+            }
+          } catch (error) {
+            console.warn(`Error fetching spin ${spinId.toString()}:`, error);
+            // Continue with next spin
+          }
+        }
+        
+        console.log(`Fetched ${spins.length} RouletteGame spins from ${network}`);
+        return spins;
+      } catch (error) {
+        console.error(`Error fetching RouletteGame spins from ${network}:`, error);
+        return [];
+      }
+    };
+
     const fetchVRFData = async () => {
       try {
         const response = await fetch(siteConfig.servRandomStatusUrl, {
@@ -118,6 +192,15 @@ const DemoPage = () => {
             console.log('Fulfilled requests found:', fulfilledRequests.length);
             combinedVRF.push(...fulfilledRequests);
           }
+          
+          // Fetch RouletteGame spins from both networks
+          const [baseSepoliaSpins, baseSpins] = await Promise.all([
+            fetchRouletteGameSpins("baseSepolia"),
+            fetchRouletteGameSpins("base"),
+          ]);
+          
+          console.log(`RouletteGame spins: baseSepolia=${baseSepoliaSpins.length}, base=${baseSpins.length}`);
+          combinedVRF.push(...baseSepoliaSpins, ...baseSpins);
           
           // Sort by timestamp (most recent first) and limit to 20
           combinedVRF.sort((a, b) => b.timestamp - a.timestamp);
