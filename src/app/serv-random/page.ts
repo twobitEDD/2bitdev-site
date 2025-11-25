@@ -1,4 +1,6 @@
-import ServRandom from "@_pages/serv-random";
+import { redirect } from "next/navigation";
 
-export default ServRandom;
-
+// Redirect old /serv-random to new /random explorer
+export default function ServRandomRedirect() {
+  redirect("/random");
+}

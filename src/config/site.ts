@@ -6,6 +6,10 @@ const navItems = [
     href: "https://serv.services",
   },
   {
+    label: "SERV.random",
+    href: "/random",
+  },
+  {
     label: "Features",
     href: "/#/page1",
   },
@@ -38,4 +42,8 @@ export const siteConfig = {
   },
   maxHeaderWidth: "xl",
   maxContentWidth: "max-w-[1280]",
+  // SERV.random server status endpoint (configurable via env var)
+  servRandomStatusUrl: process.env.NEXT_PUBLIC_SERV_RANDOM_STATUS_URL || "https://serv-random-production.up.railway.app/status",
+  // SERV.random requests API endpoint (fetches from serv-random server)
+  servRandomRequestsUrl: process.env.NEXT_PUBLIC_SERV_RANDOM_REQUESTS_URL || "https://serv-random-production.up.railway.app/api/requests",
 };

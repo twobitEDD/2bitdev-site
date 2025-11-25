@@ -338,12 +338,21 @@ const ServRandom = () => {
               <Stack direction={{ base: "column", sm: "row" }} spacing={4}>
                 <Button
                   as={Link}
-                  href="https://docs.serv.services"
+                  href="/random"
                   size="lg"
                   colorScheme="brand"
                   rightIcon={<Icons.arrowRight />}
                 >
-                  View Documentation
+                  Explore SERV.random
+                </Button>
+                <Button
+                  as={Link}
+                  href="/random/docs"
+                  size="lg"
+                  colorScheme="brand"
+                  variant="outline"
+                >
+                  Developer Guide
                 </Button>
                 <Button
                   as={Link}

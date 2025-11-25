@@ -91,7 +91,7 @@ const stats = [
   },
   {
     title: "ServRandom",
-    link: "/serv-random",
+    link: "/random",
     content: (
       <>
         <StatsText>ServRandom</StatsText> provides production-ready
