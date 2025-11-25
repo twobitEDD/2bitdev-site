@@ -65,29 +65,67 @@ const DemoPage = () => {
         });
         if (response.ok) {
           const data = await response.json();
+          console.log('VRF Data Debug:', {
+            hasRecentRandomness: !!data.recentRandomness,
+            recentRandomnessLength: data.recentRandomness?.length || 0,
+            hasFeeRequests: !!data.feeRequests,
+            feeRequestsLength: data.feeRequests?.length || 0,
+            feeRequestsSample: data.feeRequests?.slice(0, 3),
+          });
+          
           const combinedVRF: VRFEntry[] = [];
           
           // Add Harmony block VRF entries
           if (data.recentRandomness && Array.isArray(data.recentRandomness)) {
-            combinedVRF.push(...data.recentRandomness);
+            data.recentRandomness.forEach((entry: any) => {
+              combinedVRF.push({
+                blockNumber: entry.blockNumber || 0,
+                timestamp: entry.timestamp || Date.now(),
+                vrfValue: entry.vrfValue || entry.randomness || '0x0',
+                harmonyBlockHash: entry.harmonyBlockHash || entry.blockHash || '0x0',
+              });
+            });
           }
           
           // Add fulfilled game requests (they have randomnessValue)
           if (data.feeRequests && Array.isArray(data.feeRequests)) {
             const fulfilledRequests = data.feeRequests
-              .filter((req: FeeRequest) => req.fulfilled && req.randomnessValue)
-              .map((req: FeeRequest) => ({
-                blockNumber: 0, // Game requests don't have block numbers
-                timestamp: req.timestamp,
-                vrfValue: req.randomnessValue!,
-                harmonyBlockHash: "0x0000000000000000000000000000000000000000000000000000000000000000", // Not available for game requests
-              }));
+              .filter((req: FeeRequest) => {
+                const isFulfilled = req.fulfilled === true;
+                const hasRandomness = req.randomnessValue && 
+                  req.randomnessValue !== '0x0000000000000000000000000000000000000000000000000000000000000000' &&
+                  req.randomnessValue !== '0x0';
+                return isFulfilled && hasRandomness;
+              })
+              .map((req: FeeRequest) => {
+                // Normalize timestamp - handle both seconds and milliseconds
+                let timestamp = req.timestamp;
+                if (typeof timestamp === 'string') {
+                  timestamp = parseInt(timestamp, 10);
+                }
+                // If timestamp is in seconds (less than 1e12), convert to milliseconds
+                if (timestamp < 1000000000000) {
+                  timestamp = timestamp * 1000;
+                }
+                
+                return {
+                  blockNumber: 0, // Game requests don't have block numbers
+                  timestamp: timestamp || Date.now(),
+                  vrfValue: req.randomnessValue!,
+                  harmonyBlockHash: "0x0000000000000000000000000000000000000000000000000000000000000000", // Not available for game requests
+                };
+              });
+            console.log('Fulfilled requests found:', fulfilledRequests.length);
             combinedVRF.push(...fulfilledRequests);
           }
           
           // Sort by timestamp (most recent first) and limit to 20
           combinedVRF.sort((a, b) => b.timestamp - a.timestamp);
-          setVrfData(combinedVRF.slice(0, 20));
+          const limitedVRF = combinedVRF.slice(0, 20);
+          console.log('Final VRF data count:', limitedVRF.length);
+          setVrfData(limitedVRF);
+        } else {
+          console.error('Failed to fetch VRF data:', response.status, response.statusText);
         }
       } catch (error) {
         console.error("Error fetching VRF data:", error);
@@ -97,8 +135,9 @@ const DemoPage = () => {
     };
 
     fetchVRFData();
-    const interval = setInterval(fetchVRFData, 30000); // Refresh every 30s
-    return () => clearInterval(interval);
+    // Refresh every 10 seconds
+    const refreshInterval = setInterval(fetchVRFData, 10000);
+    return () => clearInterval(refreshInterval);
   }, []);
 
   return (

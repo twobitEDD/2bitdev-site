@@ -97,16 +97,19 @@ export async function ensureSRANDApproval(
   network: "base" | "baseSepolia" = "baseSepolia",
   amount: bigint = ethers.parseEther("10") // Approve 10 SRAND by default (enough for multiple requests)
 ): Promise<void> {
-  const srand = getSRANDContract(signer, network);
   const feeCollector = contractsConfig[network]?.feeCollector;
   if (!feeCollector) {
     throw new Error(`FeeCollector not configured for ${network}`);
   }
 
+  const srandAddress = contractsConfig[network]?.srand;
+  if (!srandAddress) {
+    throw new Error(`SRAND contract address not configured for ${network}. Please check contracts config.`);
+  }
+
   const address = await signer.getAddress();
   
   // Log contract addresses for debugging
-  const srandAddress = contractsConfig[network]?.srand;
   console.log('SRAND Approval Debug:', {
     network,
     srandAddress,
@@ -115,10 +118,19 @@ export async function ensureSRANDApproval(
     amount: ethers.formatEther(amount),
   });
   
-  // Verify SRAND address is set
-  if (!srandAddress) {
-    throw new Error(`SRAND contract address not configured for ${network}. Please check contracts config.`);
+  // Verify contract exists by checking code
+  try {
+    const provider = signer.provider;
+    const code = await provider.getCode(srandAddress);
+    if (code === '0x' || code === '0x0') {
+      throw new Error(`SRAND contract does not exist at ${srandAddress} on ${network}. Please verify the contract address.`);
+    }
+    console.log('✅ SRAND contract verified at:', srandAddress);
+  } catch (codeError: any) {
+    throw new Error(`Failed to verify SRAND contract: ${codeError.message}. Contract address: ${srandAddress}`);
   }
+
+  const srand = getSRANDContract(signer, network);
   
   // Check current allowance
   let allowance;
@@ -187,9 +199,24 @@ export async function ensureSRANDApproval(
             const reason = ethers.AbiCoder.defaultAbiCoder().decode(['string'], '0x' + revertData.slice(10));
             revertReason = ` Revert reason: ${reason[0]}`;
           } else {
-            // Custom error - show first 10 bytes (selector + some data)
-            revertReason = ` Custom error selector: ${revertData.slice(0, 10)}`;
+            // Custom error - try to decode common ERC20 errors
+            const errorSelector = revertData.slice(0, 10);
+            let customErrorMsg = '';
+            
+            // Common ERC20 custom errors (first 4 bytes)
+            if (errorSelector === '0xfb8f41b2') {
+              customErrorMsg = ' (likely InsufficientBalance or InsufficientAllowance)';
+            } else if (errorSelector === '0x1e4fbdf7') {
+              customErrorMsg = ' (TransferFromZeroAddress)';
+            } else if (errorSelector === '0x90b8ec18') {
+              customErrorMsg = ' (TransferToZeroAddress)';
+            } else {
+              customErrorMsg = ` (custom error selector: ${errorSelector})`;
+            }
+            
+            revertReason = customErrorMsg;
             console.log('Custom error data:', revertData);
+            console.log('Custom error selector:', errorSelector);
           }
         }
       } catch (decodeError) {
