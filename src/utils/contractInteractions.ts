@@ -449,31 +449,90 @@ export async function realRequestSpin(
   }
 
   // Check for Transfer event (SRAND transfer from user to FeeCollector)
+  // The Transfer event is emitted by the SRAND ERC20 contract
+  console.log('Step 5: Checking for SRAND Transfer events...');
+  console.log('SRAND contract address:', srandAddress);
+  console.log('FeeCollector address:', feeCollector);
+  console.log('Total logs in receipt:', receipt.logs.length);
+  
+  // Create SRAND contract interface to parse Transfer events
   const srandContract = new ethers.Contract(srandAddress!, [
     "event Transfer(address indexed from, address indexed to, uint256 value)"
   ], signer.provider);
   
-  const transferEvents = receipt.logs
+  // Filter logs that match the SRAND contract address
+  const srandTransferEvents = receipt.logs
+    .filter((log: any) => {
+      // Check if log is from SRAND contract
+      return log.address.toLowerCase() === srandAddress!.toLowerCase();
+    })
     .map((log: any) => {
       try {
-        return srandContract.interface.parseLog(log);
-      } catch {
+        const parsed = srandContract.interface.parseLog(log);
+        return parsed;
+      } catch (parseError) {
+        console.warn('Failed to parse log:', log.address, parseError);
         return null;
       }
     })
     .filter((parsed: any) => parsed && parsed.name === "Transfer");
   
-  if (transferEvents.length > 0) {
-    console.log('✅ SRAND Transfer event found:', transferEvents.length, 'transfer(s)');
-    transferEvents.forEach((event: any, idx: number) => {
+  if (srandTransferEvents.length > 0) {
+    console.log('✅ SRAND Transfer event(s) found:', srandTransferEvents.length);
+    srandTransferEvents.forEach((event: any, idx: number) => {
+      const from = event.args.from;
+      const to = event.args.to;
+      const amount = ethers.formatEther(event.args.value);
       console.log(`  Transfer ${idx + 1}:`, {
-        from: event.args.from,
-        to: event.args.to,
-        amount: ethers.formatEther(event.args.value),
+        from,
+        to,
+        amount: `${amount} SRAND`,
+        isToFeeCollector: to.toLowerCase() === feeCollector!.toLowerCase(),
+        isFromUser: from.toLowerCase() === address.toLowerCase(),
       });
+      
+      // Verify this is the expected transfer
+      if (to.toLowerCase() === feeCollector!.toLowerCase() && 
+          from.toLowerCase() === address.toLowerCase()) {
+        console.log(`  ✅ Confirmed: User transferred ${amount} SRAND to FeeCollector`);
+      }
     });
   } else {
     console.warn('⚠️ No SRAND Transfer event found in transaction logs');
+    const uniqueAddresses = Array.from(new Set(receipt.logs.map((log: any) => log.address)));
+    console.log('Available log addresses:', uniqueAddresses);
+    console.log('Looking for SRAND at:', srandAddress);
+    
+    // Try to find any Transfer events regardless of contract
+    const erc20TransferAbi = ["event Transfer(address indexed from, address indexed to, uint256 value)"];
+    const allTransferEvents = receipt.logs
+      .map((log: any) => {
+        try {
+          const iface = new ethers.Interface(erc20TransferAbi);
+          return iface.parseLog(log);
+        } catch {
+          return null;
+        }
+      })
+      .filter((parsed: any) => parsed && parsed.name === "Transfer");
+    
+    if (allTransferEvents.length > 0) {
+      console.log('Found Transfer events from other contracts:', allTransferEvents.length);
+      allTransferEvents.forEach((event: any, idx: number) => {
+        console.log(`  Transfer ${idx + 1} (from contract ${receipt.logs.find((l: any) => {
+          try {
+            const iface = new ethers.Interface(erc20TransferAbi);
+            return iface.parseLog(l) === event;
+          } catch {
+            return false;
+          }
+        })?.address}):`, {
+          from: event.args.from,
+          to: event.args.to,
+          amount: ethers.formatEther(event.args.value),
+        });
+      });
+    }
   }
 
   // Get spinId and requestId from SpinRequested event
