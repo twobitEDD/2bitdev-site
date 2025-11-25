@@ -376,16 +376,108 @@ export async function realRequestSpin(
   signer: ethers.JsonRpcSigner,
   network: "base" | "baseSepolia" = "baseSepolia"
 ): Promise<ContractRequestResult> {
+  const address = await signer.getAddress();
+  const feeCollector = contractsConfig[network]?.feeCollector;
+  const srandAddress = contractsConfig[network]?.srand;
+  
+  console.log('🎰 RouletteGame.requestSpin() - Starting', {
+    network,
+    userAddress: address,
+    feeCollector,
+    srandAddress,
+  });
+
   // Ensure SRAND approval (approve 10 SRAND, but only need 1 SRAND per spin)
-  await ensureSRANDApproval(signer, network, ethers.parseEther("10"), ethers.parseEther("1"));
+  console.log('Step 1: Ensuring SRAND approval...');
+  try {
+    await ensureSRANDApproval(signer, network, ethers.parseEther("10"), ethers.parseEther("1"));
+    console.log('✅ SRAND approval verified');
+  } catch (approvalError: any) {
+    console.error('❌ SRAND approval failed:', approvalError);
+    throw new Error(`SRAND approval failed: ${approvalError.message}`);
+  }
+
+  // Verify SRAND balance before proceeding
+  const srand = getSRANDContract(signer, network);
+  const balance = await srand.balanceOf(address);
+  console.log('SRAND balance:', ethers.formatEther(balance), 'SRAND');
+  
+  if (balance < ethers.parseEther("1")) {
+    throw new Error(`Insufficient SRAND balance. You have ${ethers.formatEther(balance)} SRAND, but need at least 1 SRAND.`);
+  }
+
+  // Verify allowance
+  const allowance = await srand.allowance(address, feeCollector!);
+  console.log('SRAND allowance for FeeCollector:', ethers.formatEther(allowance), 'SRAND');
+  
+  if (allowance < ethers.parseEther("1")) {
+    throw new Error(`Insufficient SRAND allowance. You have ${ethers.formatEther(allowance)} SRAND approved, but need at least 1 SRAND.`);
+  }
 
   const rouletteGame = getRouletteGameContract(signer, network);
+  const rouletteGameAddress = contractsConfig[network]?.rouletteGame;
+  console.log('Step 2: Calling RouletteGame.requestSpin()', {
+    rouletteGameAddress,
+    contractAddress: rouletteGame.target,
+  });
   
-  // Call requestSpin()
-  const tx = await rouletteGame.requestSpin();
-  const receipt = await tx.wait();
+  // Call requestSpin() - this will internally call FeeCollector.requestRandomnessFor()
+  // which transfers 1 SRAND from the user
+  let tx;
+  try {
+    tx = await rouletteGame.requestSpin();
+    console.log('✅ Transaction sent:', tx.hash);
+  } catch (txError: any) {
+    console.error('❌ Transaction failed:', txError);
+    const errorMsg = txError.reason || txError.shortMessage || txError.message || txError.toString();
+    throw new Error(`Failed to request spin: ${errorMsg}`);
+  }
 
-  // Get spinId and requestId from event
+  console.log('Step 3: Waiting for transaction confirmation...');
+  let receipt;
+  try {
+    receipt = await tx.wait();
+    console.log('✅ Transaction confirmed:', receipt.hash);
+    console.log('Transaction status:', receipt.status === 1 ? 'Success' : 'Failed');
+    
+    if (receipt.status !== 1) {
+      throw new Error('Transaction reverted. Check the transaction on block explorer for details.');
+    }
+  } catch (receiptError: any) {
+    console.error('❌ Transaction receipt error:', receiptError);
+    throw new Error(`Transaction failed: ${receiptError.message || receiptError.toString()}`);
+  }
+
+  // Check for Transfer event (SRAND transfer from user to FeeCollector)
+  const srandContract = new ethers.Contract(srandAddress!, [
+    "event Transfer(address indexed from, address indexed to, uint256 value)"
+  ], signer.provider);
+  
+  const transferEvents = receipt.logs
+    .map((log: any) => {
+      try {
+        return srandContract.interface.parseLog(log);
+      } catch {
+        return null;
+      }
+    })
+    .filter((parsed: any) => parsed && parsed.name === "Transfer");
+  
+  if (transferEvents.length > 0) {
+    console.log('✅ SRAND Transfer event found:', transferEvents.length, 'transfer(s)');
+    transferEvents.forEach((event: any, idx: number) => {
+      console.log(`  Transfer ${idx + 1}:`, {
+        from: event.args.from,
+        to: event.args.to,
+        amount: ethers.formatEther(event.args.value),
+      });
+    });
+  } else {
+    console.warn('⚠️ No SRAND Transfer event found in transaction logs');
+  }
+
+  // Get spinId and requestId from SpinRequested event
+  console.log('Step 4: Parsing SpinRequested event...');
   const event = receipt.logs.find((log: any) => {
     try {
       const parsed = rouletteGame.interface.parseLog(log);
@@ -396,12 +488,25 @@ export async function realRequestSpin(
   });
 
   if (!event) {
-    throw new Error("SpinRequested event not found");
+    console.error('❌ SpinRequested event not found in logs');
+    console.log('Available events:', receipt.logs.map((log: any) => {
+      try {
+        return rouletteGame.interface.parseLog(log)?.name || 'unknown';
+      } catch {
+        return 'unparseable';
+      }
+    }));
+    throw new Error("SpinRequested event not found in transaction receipt");
   }
 
   const parsed = rouletteGame.interface.parseLog(event);
   const spinId = parsed?.args[1]; // Second arg is spinId
   const requestId = parsed?.args[2]; // Third arg is requestId
+
+  console.log('✅ SpinRequested event parsed:', {
+    spinId: spinId.toString(),
+    requestId: requestId.toString(),
+  });
 
   return {
     spinId: spinId.toString(),
