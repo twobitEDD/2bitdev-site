@@ -294,12 +294,32 @@ const DemoPage = () => {
           }
           
           // Fetch game-specific VRF data from contracts
-          const [baseSepoliaSpins, baseSpins, baseSepoliaDungeon, baseDungeon] = await Promise.all([
+          // Use Promise.allSettled to continue even if some queries fail
+          const [baseSepoliaSpinsResult, baseSpinsResult, baseSepoliaDungeonResult, baseDungeonResult] = await Promise.allSettled([
             fetchRouletteGameSpins("baseSepolia"),
             fetchRouletteGameSpins("base"),
             fetchDungeonCrawlerVRF("baseSepolia"),
             fetchDungeonCrawlerVRF("base"),
           ]);
+          
+          const baseSepoliaSpins = baseSepoliaSpinsResult.status === 'fulfilled' ? baseSepoliaSpinsResult.value : [];
+          const baseSpins = baseSpinsResult.status === 'fulfilled' ? baseSpinsResult.value : [];
+          const baseSepoliaDungeon = baseSepoliaDungeonResult.status === 'fulfilled' ? baseSepoliaDungeonResult.value : [];
+          const baseDungeon = baseDungeonResult.status === 'fulfilled' ? baseDungeonResult.value : [];
+          
+          // Log any failures
+          if (baseSepoliaSpinsResult.status === 'rejected') {
+            console.error('Failed to fetch RouletteGame spins from baseSepolia:', baseSepoliaSpinsResult.reason);
+          }
+          if (baseSpinsResult.status === 'rejected') {
+            console.error('Failed to fetch RouletteGame spins from base:', baseSpinsResult.reason);
+          }
+          if (baseSepoliaDungeonResult.status === 'rejected') {
+            console.error('Failed to fetch DungeonCrawler VRF from baseSepolia:', baseSepoliaDungeonResult.reason);
+          }
+          if (baseDungeonResult.status === 'rejected') {
+            console.error('Failed to fetch DungeonCrawler VRF from base:', baseDungeonResult.reason);
+          }
           
           console.log(`Game VRF data: RouletteGame baseSepolia=${baseSepoliaSpins.length}, base=${baseSpins.length}, DungeonCrawler baseSepolia=${baseSepoliaDungeon.length}, base=${baseDungeon.length}`);
           combinedVRF.push(...baseSepoliaSpins, ...baseSpins, ...baseSepoliaDungeon, ...baseDungeon);
