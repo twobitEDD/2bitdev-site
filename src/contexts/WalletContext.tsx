@@ -100,8 +100,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     };
   }, [checkConnection, handleAccountsChanged, handleChainChanged]);
 
-  const connectWallet = async () => {
-    if (!window.ethereum) {
+  const connectWallet = useCallback(async () => {
+    if (typeof window === "undefined" || !window.ethereum) {
       throw new Error("MetaMask or other wallet not found. Please install MetaMask.");
     }
 
@@ -122,17 +122,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       console.error("Error connecting wallet:", error);
       throw error;
     }
-  };
+  }, []);
 
-  const disconnectWallet = () => {
-    setProvider(null);
-    setSigner(null);
-    setAddress(null);
-    setChainId(null);
-    setIsConnected(false);
-  };
-
-  const switchToBaseSepolia = async () => {
+  const switchToBaseSepolia = useCallback(async () => {
     if (!window.ethereum) {
       throw new Error("MetaMask not found");
     }
@@ -168,7 +160,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
     // Refresh connection after switching
     await checkConnection();
-  };
+  }, [checkConnection]);
 
   const isBaseSepolia = chainId === BASE_SEPOLIA_CHAIN_ID;
 
