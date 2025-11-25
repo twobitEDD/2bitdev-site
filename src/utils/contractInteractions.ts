@@ -845,9 +845,18 @@ export async function realFinalizeCharacter(
 }> {
   const dungeonCrawler = getDungeonCrawlerContract(signer, network);
   
+  console.log("Calling finalizeCharacter with requestId:", requestId);
+  
   // Call finalizeCharacter()
   const tx = await dungeonCrawler.finalizeCharacter(requestId);
+  console.log("Transaction sent:", tx.hash);
+  
   const receipt = await tx.wait();
+  console.log("Transaction confirmed:", receipt.status === 1 ? "Success" : "Failed");
+  
+  if (receipt.status !== 1) {
+    throw new Error("Transaction reverted. Check the transaction on block explorer for details.");
+  }
 
   // Get character details from event
   const event = receipt.logs.find((log: any) => {
@@ -860,20 +869,40 @@ export async function realFinalizeCharacter(
   });
 
   if (!event) {
-    throw new Error("CharacterCreated event not found");
+    throw new Error("CharacterCreated event not found in transaction receipt");
   }
 
   const parsed = dungeonCrawler.interface.parseLog(event);
-  const characterId = Number(parsed?.args[1]); // characterId
-  const classNum = Number(parsed?.args[2]); // class
-  const strength = Number(parsed?.args[3]);
-  const dexterity = Number(parsed?.args[4]);
-  const intelligence = Number(parsed?.args[5]);
-  const health = Number(parsed?.args[6]);
-  const wealth = Number(parsed?.args[7]);
-
-  // Get full character details from contract
-  const character = await dungeonCrawler.getCharacter(characterId);
+  
+  if (!parsed) {
+    throw new Error("Failed to parse CharacterCreated event");
+  }
+  
+  // Event structure: CharacterCreated(address indexed player, uint256 indexed characterId, uint8 class, uint8 strength, uint8 dexterity, uint8 intelligence, uint256 health, uint256 wealth, uint256 createdAt)
+  // Indexed params come first in args array, then non-indexed
+  // For indexed params, we can access by name or position
+  // parsed.args[0] = player (indexed)
+  // parsed.args[1] = characterId (indexed) 
+  // parsed.args[2] = class (non-indexed)
+  // parsed.args[3] = strength (non-indexed)
+  // etc.
+  
+  // Try to get characterId from indexed args or by name
+  let characterId: number;
+  if (parsed.args.characterId !== undefined) {
+    characterId = Number(parsed.args.characterId);
+  } else if (parsed.args[1] !== undefined) {
+    characterId = Number(parsed.args[1]);
+  } else {
+    throw new Error("Could not extract characterId from CharacterCreated event");
+  }
+  
+  const classNum = Number(parsed.args.class ?? parsed.args[2] ?? 0);
+  const strength = Number(parsed.args.strength ?? parsed.args[3] ?? 0);
+  const dexterity = Number(parsed.args.dexterity ?? parsed.args[4] ?? 0);
+  const intelligence = Number(parsed.args.intelligence ?? parsed.args[5] ?? 0);
+  const health = Number(parsed.args.health ?? parsed.args[6] ?? 0);
+  const wealth = Number(parsed.args.wealth ?? parsed.args[7] ?? 0);
 
   // Get creationSeed from FeeCollector request (the randomness value used to create the character)
   const feeCollectorAddress = contractsConfig[network]?.feeCollector;
@@ -887,17 +916,56 @@ export async function realFinalizeCharacter(
   const requestData = await feeCollector.requests(requestId);
   const creationSeed = requestData[7]; // randomnessValue is at index 7
 
+  // Try to get full character details from contract (with fallback to event data)
+  let wisdom = 0;
+  let constitution = 0;
+  let charisma = 0;
+  let maxHealth = health; // Default to health from event
+  
+  try {
+    // Wait a moment for state to update
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const character = await dungeonCrawler.getCharacter(characterId);
+    
+    // Check if character exists (player address should not be zero)
+    if (character && character[0] && character[0] !== ethers.ZeroAddress) {
+      wisdom = Number(character.wisdom ?? character[5] ?? 0);
+      constitution = Number(character.constitution ?? character[6] ?? 0);
+      charisma = Number(character.charisma ?? character[7] ?? 0);
+      maxHealth = Number(character.maxHealth ?? character[10] ?? health);
+    } else {
+      // Character doesn't exist yet or getCharacter failed - use defaults from event
+      console.warn(`Character ${characterId} not found in contract yet, using event data only`);
+      // Calculate defaults based on class (these are approximate)
+      wisdom = 10; // Default value
+      constitution = 10; // Default value
+      charisma = 10; // Default value
+      maxHealth = health; // Use health from event as maxHealth
+    }
+  } catch (getCharError: any) {
+    // If getCharacter fails, use event data and defaults
+    console.warn(`Failed to get character details from contract: ${getCharError.message}`);
+    console.warn(`Using event data only. CharacterId: ${characterId}`);
+    
+    // Use defaults - these will be approximate but allow the character to be created
+    wisdom = 10;
+    constitution = 10;
+    charisma = 10;
+    maxHealth = health;
+  }
+
   return {
     characterId,
     class: classNum,
     strength,
     dexterity,
     intelligence,
-    wisdom: Number(character.wisdom),
-    constitution: Number(character.constitution),
-    charisma: Number(character.charisma),
+    wisdom,
+    constitution,
+    charisma,
     health,
-    maxHealth: Number(character.maxHealth),
+    maxHealth,
     wealth,
     creationSeed: creationSeed || "0x0000000000000000000000000000000000000000000000000000000000000000",
   };

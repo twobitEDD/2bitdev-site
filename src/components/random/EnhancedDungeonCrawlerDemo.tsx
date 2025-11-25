@@ -216,7 +216,14 @@ export function EnhancedDungeonCrawlerDemo() {
         return;
       }
 
+      console.log("Finalizing character with requestId:", characterRequestId);
       const charData = await finalizeCharacter(isPlaytestMode, signer, characterRequestId, network);
+      console.log("Character data received:", charData);
+      
+      // Validate character data
+      if (!charData || charData.characterId === undefined) {
+        throw new Error("Invalid character data received from contract");
+      }
       
       // Create new character with unique ID
       // In real contract, characterId comes from CharacterCreationStarted event
@@ -232,16 +239,16 @@ export function EnhancedDungeonCrawlerDemo() {
         contractCharacterId, // Store contract's characterId for use with startInteraction
         requestId: characterRequestId, // Store requestId for reference
         class: className,
-        strength: charData.strength,
-        dexterity: charData.dexterity,
-        intelligence: charData.intelligence,
-        wisdom: charData.wisdom,
-        constitution: charData.constitution,
-        charisma: charData.charisma,
+        strength: charData.strength || 10,
+        dexterity: charData.dexterity || 10,
+        intelligence: charData.intelligence || 10,
+        wisdom: charData.wisdom || 10,
+        constitution: charData.constitution || 10,
+        charisma: charData.charisma || 10,
         level: 1,
-        health: charData.health,
-        maxHealth: charData.maxHealth,
-        wealth: charData.wealth,
+        health: charData.health || charData.maxHealth || 20,
+        maxHealth: charData.maxHealth || charData.health || 20,
+        wealth: charData.wealth || 0,
         alive: true,
         actionCount: 0,
         status: "active",
@@ -249,7 +256,12 @@ export function EnhancedDungeonCrawlerDemo() {
         createdAt: Date.now(),
       };
 
-      setCharacters(prev => [...prev, newCharacter]);
+      console.log("Adding character to state:", newCharacter);
+      setCharacters(prev => {
+        const updated = [...prev, newCharacter];
+        console.log("Updated characters array:", updated);
+        return updated;
+      });
       setSelectedCharacterId(characterId);
       setCharacterRequestId(null);
 
@@ -260,11 +272,14 @@ export function EnhancedDungeonCrawlerDemo() {
         duration: 5000,
       });
     } catch (error) {
+      console.error("Error finalizing character:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to finalize character";
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to finalize character",
+        title: "Error Finalizing Character",
+        description: errorMessage,
         status: "error",
-        duration: 5000,
+        duration: 7000,
+        isClosable: true,
       });
     } finally {
       setLoading(false);
