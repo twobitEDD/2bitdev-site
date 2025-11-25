@@ -80,85 +80,94 @@ export function RouletteGameDemo() {
         duration: 3000,
       });
 
-      // Automatically poll for fulfillment and complete spin when VRF is received
+      // For Pattern 1 (automatic callback), poll RouletteGame contract directly
+      // This is more reliable than polling FeeCollector since the callback processes automatically
       const pollAndComplete = async () => {
+        if (!result.spinId) {
+          console.error("No spin ID returned from request");
+          setLoading(false);
+          return;
+        }
+
         try {
-          const status = await pollForFulfillmentStatus(
+          // Poll the RouletteGame contract directly to check if spin is completed
+          const spinResultData = await getSpinResultHelper(
             isPlaytestMode,
             provider,
+            result.spinId,
             result.requestId,
             network
           );
-          
-          if (status.fulfilled && status.randomnessValue) {
-            // Get spin result from contract or generate from VRF
-            const spinResultData = await getSpinResultHelper(
-              isPlaytestMode,
-              provider,
-              result.spinId,
-              result.requestId,
-              network
-            );
 
-            // Update current spin with result
-            const completedSpin: SpinResult = {
-              ...newSpin,
-              result: spinResultData.result,
-              color: spinResultData.color,
-              vrfSeed: spinResultData.vrfSeed,
-            };
-            setCurrentSpin(completedSpin);
+          // Update current spin with result
+          const completedSpin: SpinResult = {
+            ...newSpin,
+            result: spinResultData.result,
+            color: spinResultData.color,
+            vrfSeed: spinResultData.vrfSeed,
+          };
+          setCurrentSpin(completedSpin);
 
-            // Trigger wheel spinning animation
-            setTimeout(() => {
-              setIsWheelSpinning(true);
-            }, 100);
+          // Trigger wheel spinning animation
+          setTimeout(() => {
+            setIsWheelSpinning(true);
+          }, 100);
 
-            // Add to recent spins
-            setRecentSpins((prev) => {
-              const updated = [completedSpin, ...prev].slice(0, 20);
-              return updated;
-            });
+          // Add to recent spins
+          setRecentSpins((prev) => {
+            const updated = [completedSpin, ...prev].slice(0, 20);
+            return updated;
+          });
 
-            // Update statistics
-            setStatistics((prev) => ({
-              totalSpins: prev.totalSpins + 1,
-              redCount: spinResultData.color === "red" ? prev.redCount + 1 : prev.redCount,
-              blackCount: spinResultData.color === "black" ? prev.blackCount + 1 : prev.blackCount,
-              greenCount: spinResultData.color === "green" ? prev.greenCount + 1 : prev.greenCount,
-            }));
+          // Update statistics
+          setStatistics((prev) => ({
+            totalSpins: prev.totalSpins + 1,
+            redCount: spinResultData.color === "red" ? prev.redCount + 1 : prev.redCount,
+            blackCount: spinResultData.color === "black" ? prev.blackCount + 1 : prev.blackCount,
+            greenCount: spinResultData.color === "green" ? prev.greenCount + 1 : prev.greenCount,
+          }));
 
-            toast({
-              title: "VRF Received!",
-              description: `Spin result: ${spinResultData.result} (${spinResultData.color.toUpperCase()})`,
-              status: "success",
-              duration: 5000,
-            });
-
-            // Reset for next spin after animation completes
-            setTimeout(() => {
-              setRequestId(null);
-              setSpinId(null);
-              setIsWheelSpinning(false);
-              setLoading(false);
-            }, 4500); // Slightly longer than animation duration (4s + buffer)
-          } else {
-            // Continue polling if not yet fulfilled
-            setTimeout(pollAndComplete, 1000);
-          }
-        } catch (error) {
-          console.error("Error polling:", error);
           toast({
-            title: "Error",
-            description: error instanceof Error ? error.message : "Failed to get VRF result",
-            status: "error",
+            title: "VRF Received!",
+            description: `Spin result: ${spinResultData.result} (${spinResultData.color.toUpperCase()})`,
+            status: "success",
             duration: 5000,
           });
+
+          // Reset for next spin after animation completes
+          setTimeout(() => {
+            setRequestId(null);
+            setSpinId(null);
+            setIsWheelSpinning(false);
+            setLoading(false);
+          }, 4500); // Slightly longer than animation duration (4s + buffer)
+        } catch (error: any) {
+          // pollForSpinCompletion already does internal polling (30 attempts, 2s intervals = 60s total)
+          // If it throws, it means the spin didn't complete within timeout
+          console.error("Error polling for spin result:", error);
+          
+          // Check if it's a timeout (spin not completed within 60 seconds)
+          if (error.message?.includes("not completed within timeout") || error.message?.includes("Spin not completed")) {
+            toast({
+              title: "Timeout",
+              description: "Spin did not complete within 60 seconds. The server may still be processing. Check the contract directly or try again.",
+              status: "warning",
+              duration: 8000,
+            });
+          } else {
+            toast({
+              title: "Error",
+              description: error instanceof Error ? error.message : "Failed to get spin result",
+              status: "error",
+              duration: 5000,
+            });
+          }
+          
           setLoading(false);
         }
       };
 
-      // Start polling after a short delay
+      // Start polling after a short delay (give server time to process)
       setTimeout(pollAndComplete, 2000);
     } catch (error) {
       console.error("Error requesting spin:", error);
