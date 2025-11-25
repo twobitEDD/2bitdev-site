@@ -38,7 +38,7 @@ export const contractsConfig: ContractsConfig = {
     randomnessAccess: "0xFfcBE939F8Aa8fd26E932E2327cD622B8cb148fA",
     fishingGame: "0x524EAA18bCF37c9De3a475a29616F2DFeeC924BD",
     fishingGameNFT: "0x974DC14df9316013455521A2Fa83B6ca9e8B2Fc3",
-    rouletteGame: "0x58E320956a158F8554F316468B643c6CD9060e55",
+    rouletteGame: "0x76649078c51459d5D9bd8aE111ba6Bec0b199786", // Updated with authorized server fallback
     dungeonCrawler: "0x11a0336e0CF4952A7851Adf4498e1383775C892D",
   },
   avalanche: {
