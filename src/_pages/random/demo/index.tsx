@@ -159,9 +159,17 @@ const DemoPage = () => {
             <PlaytestModeToggle />
 
           {/* Live VRF Data */}
-          <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
-            <VRFVisualization entries={vrfData} maxEntries={6} />
-          </Box>
+          {loading ? (
+            <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+              <Text color="gray.400" textAlign="center">
+                Loading VRF data...
+              </Text>
+            </Box>
+          ) : (
+            <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+              <VRFVisualization entries={vrfData} maxEntries={6} />
+            </Box>
+          )}
 
           {/* Demo Options */}
           <Tabs>

@@ -336,7 +336,7 @@ export function getRouletteGameContract(
 
   const abi = [
     "function requestSpin() external returns (uint256)",
-    "function getSpin(uint256 _spinId) external view returns (uint256 spinId, address player, uint256 requestId, bytes32 vrfSeed, uint8 result, string memory color, bool isEven, uint256 timestamp)",
+    "function getSpin(uint256 _spinId) external view returns (address player, uint8 result, string memory color, bool isEven, bytes32 vrfSeed, uint256 timestamp)",
     "function spinCounter() external view returns (uint256)",
     "event SpinRequested(address indexed player, uint256 indexed spinId, uint256 requestId)",
     "event SpinCompleted(uint256 indexed spinId, address indexed player, uint8 result, string color, bytes32 vrfSeed)",
@@ -408,14 +408,15 @@ export async function getSpinResult(
   }
 
   const abi = [
-    "function getSpin(uint256 _spinId) external view returns (uint256 spinId, address player, uint256 requestId, bytes32 vrfSeed, uint8 result, string memory color, bool isEven, uint256 timestamp)",
+    "function getSpin(uint256 _spinId) external view returns (address player, uint8 result, string memory color, bool isEven, bytes32 vrfSeed, uint256 timestamp)",
   ];
 
   const contract = new ethers.Contract(address, abi, provider);
   const spin = await contract.getSpin(spinId);
 
   // Check if spin is completed (result != 255)
-  if (spin.result === 255) {
+  // Also check if vrfSeed is zero (not set yet)
+  if (spin.result === 255 || spin.vrfSeed === ethers.ZeroHash || spin.vrfSeed === "0x0000000000000000000000000000000000000000000000000000000000000000") {
     throw new Error("Spin not yet completed");
   }
 
