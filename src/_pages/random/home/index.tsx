@@ -23,14 +23,20 @@ import { Icons } from "@components/icons";
 import { PageAnimation } from "@components/motion/PageAnimation";
 import { Description, SuperTitle, Title } from "@components/landing-page/Section";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 const RandomHomePage = () => {
   const bgColor = useColorModeValue("gray.50", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
   const borderColor = useColorModeValue("gray.200", "gray.600");
+  const [mounted, setMounted] = useState(false);
 
   // Prevent hydration issues
-  if (typeof window === "undefined") {
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
     return null;
   }
 
@@ -63,6 +69,15 @@ const RandomHomePage = () => {
                 rightIcon={<Icons.arrowRight />}
               >
                 Explore Requests
+              </Button>
+              <Button
+                as={Link}
+                href="/random/demo"
+                size="lg"
+                variant="outline"
+                colorScheme="brand"
+              >
+                Interactive Demo
               </Button>
               <Button
                 as={Link}
@@ -121,7 +136,36 @@ const RandomHomePage = () => {
         <Container maxW={"7xl"} py={{ base: 8, md: 16 }}>
           <Stack spacing={8} align="center">
             <SuperTitle>Explore SERV.random</SuperTitle>
-            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8} w="full">
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={8} w="full">
+              <Box
+                bg={cardBg}
+                p={6}
+                borderRadius="lg"
+                borderWidth="1px"
+                borderColor={borderColor}
+                _hover={{
+                  borderColor: "brand.400",
+                  transform: "translateY(-4px)",
+                  transition: "all 0.2s",
+                }}
+              >
+                <Heading size="md" mb={2} color="white">
+                  🎮 Interactive Demo
+                </Heading>
+                <Text fontSize="sm" color="gray.400" mb={4}>
+                  Try SERV.random with interactive game demos. Play Roulette, Dungeon Crawler, and Fishing Game to see VRF in action.
+                </Text>
+                <Button
+                  as={Link}
+                  href="/random/demo"
+                  size="sm"
+                  colorScheme="brand"
+                  variant="outline"
+                >
+                  Try Demo →
+                </Button>
+              </Box>
+
               <Box
                 bg={cardBg}
                 p={6}
