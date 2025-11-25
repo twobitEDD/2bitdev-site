@@ -434,9 +434,12 @@ export async function realRequestSpin(
   }
 
   console.log('Step 3: Waiting for transaction confirmation...');
-  let receipt;
+  let receipt: ethers.TransactionReceipt | null = null;
   try {
     receipt = await tx.wait();
+    if (!receipt) {
+      throw new Error('Transaction receipt is null');
+    }
     console.log('✅ Transaction confirmed:', receipt.hash);
     console.log('Transaction status:', receipt.status === 1 ? 'Success' : 'Failed');
     
@@ -446,6 +449,11 @@ export async function realRequestSpin(
   } catch (receiptError: any) {
     console.error('❌ Transaction receipt error:', receiptError);
     throw new Error(`Transaction failed: ${receiptError.message || receiptError.toString()}`);
+  }
+  
+  // TypeScript guard: receipt is guaranteed to be non-null after try-catch
+  if (!receipt) {
+    throw new Error('Transaction receipt is null after waiting');
   }
 
   // Check for Transfer event (SRAND transfer from user to FeeCollector)
