@@ -789,37 +789,95 @@ export async function realCreateCharacter(
   signer: ethers.JsonRpcSigner,
   network: "base" | "baseSepolia" = "baseSepolia"
 ): Promise<ContractRequestResult> {
-  // Ensure SRAND approval (approve 10 SRAND, but only need 1 SRAND per spin)
-  await ensureSRANDApproval(signer, network, ethers.parseEther("10"), ethers.parseEther("1"));
-
-  const dungeonCrawler = getDungeonCrawlerContract(signer, network);
+  console.log("🎮 Starting character creation", { network, address: await signer.getAddress() });
   
-  // Call createCharacter()
-  const tx = await dungeonCrawler.createCharacter();
-  const receipt = await tx.wait();
+  try {
+    // Ensure SRAND approval (approve 10 SRAND, but only need 1 SRAND per character)
+    console.log("Step 1: Ensuring SRAND approval...");
+    await ensureSRANDApproval(signer, network, ethers.parseEther("10"), ethers.parseEther("1"));
+    console.log("✅ SRAND approval verified");
 
-  // Get characterId and requestId from event
-  const event = receipt.logs.find((log: any) => {
-    try {
-      const parsed = dungeonCrawler.interface.parseLog(log);
-      return parsed?.name === "CharacterCreationStarted";
-    } catch {
-      return false;
+    const dungeonCrawler = getDungeonCrawlerContract(signer, network);
+    const contractAddress = contractsConfig[network]?.dungeonCrawler;
+    console.log("Step 2: Calling createCharacter()", { contractAddress });
+    
+    // Call createCharacter()
+    const tx = await dungeonCrawler.createCharacter();
+    console.log("✅ Transaction sent:", tx.hash);
+    
+    console.log("Step 3: Waiting for transaction confirmation...");
+    const receipt = await tx.wait();
+    console.log("✅ Transaction confirmed:", receipt.hash);
+    console.log("Transaction status:", receipt.status === 1 ? "Success" : "Failed");
+    
+    if (receipt.status !== 1) {
+      throw new Error("Transaction reverted. Check the transaction on block explorer for details.");
     }
-  });
 
-  if (!event) {
-    throw new Error("CharacterCreationStarted event not found");
+    // Get characterId and requestId from event
+    console.log("Step 4: Parsing CharacterCreationStarted event...");
+    console.log("Total logs:", receipt.logs.length);
+    
+    const event = receipt.logs.find((log: any) => {
+      try {
+        const parsed = dungeonCrawler.interface.parseLog(log);
+        const isMatch = parsed?.name === "CharacterCreationStarted";
+        if (isMatch) {
+          console.log("✅ Found CharacterCreationStarted event:", {
+            player: parsed.args[0],
+            characterId: parsed.args[1]?.toString(),
+            requestId: parsed.args[2]?.toString(),
+          });
+        }
+        return isMatch;
+      } catch (parseError) {
+        return false;
+      }
+    });
+
+    if (!event) {
+      console.error("❌ CharacterCreationStarted event not found in receipt");
+      console.error("Available logs:", receipt.logs.map((log: any, idx: number) => {
+        try {
+          const parsed = dungeonCrawler.interface.parseLog(log);
+          return { index: idx, name: parsed?.name, args: parsed?.args };
+        } catch {
+          return { index: idx, address: log.address, topics: log.topics };
+        }
+      }));
+      throw new Error("CharacterCreationStarted event not found in transaction receipt");
+    }
+
+    const parsed = dungeonCrawler.interface.parseLog(event);
+    if (!parsed) {
+      throw new Error("Failed to parse CharacterCreationStarted event");
+    }
+    
+    // Event structure: CharacterCreationStarted(address indexed player, uint256 indexed characterId, uint256 requestId)
+    // Indexed params: player (args[0]), characterId (args[1])
+    // Non-indexed params: requestId (args[2])
+    const requestId = parsed.args.requestId ?? parsed.args[2];
+    const characterId = parsed.args.characterId ?? parsed.args[1];
+    
+    if (!requestId) {
+      throw new Error("RequestId not found in CharacterCreationStarted event");
+    }
+
+    console.log("✅ Character creation successful:", {
+      requestId: requestId.toString(),
+      characterId: characterId?.toString(),
+      txHash: receipt.hash,
+    });
+
+    return {
+      requestId: requestId.toString(),
+      txHash: receipt.hash,
+    };
+  } catch (error: any) {
+    console.error("❌ Error in realCreateCharacter:", error);
+    const errorMessage = error.message || error.toString();
+    throw new Error(`Failed to create character: ${errorMessage}`);
   }
-
-  const parsed = dungeonCrawler.interface.parseLog(event);
-  const requestId = parsed?.args[2]; // Third arg is requestId
-  const characterId = parsed?.args[1]; // Second arg is characterId
-
-  return {
-    requestId: requestId.toString(),
-    txHash: receipt.hash,
-  };
 }
 
 /**
@@ -843,26 +901,36 @@ export async function realFinalizeCharacter(
   wealth: number;
   creationSeed: string;
 }> {
+  console.log("🎮 Finalizing character", { requestId, network });
+  
   const dungeonCrawler = getDungeonCrawlerContract(signer, network);
   
-  console.log("Calling finalizeCharacter with requestId:", requestId);
-  
   // Call finalizeCharacter()
+  console.log("Step 1: Calling finalizeCharacter()...");
   const tx = await dungeonCrawler.finalizeCharacter(requestId);
-  console.log("Transaction sent:", tx.hash);
+  console.log("✅ Transaction sent:", tx.hash);
   
+  console.log("Step 2: Waiting for transaction confirmation...");
   const receipt = await tx.wait();
-  console.log("Transaction confirmed:", receipt.status === 1 ? "Success" : "Failed");
+  console.log("✅ Transaction confirmed:", receipt.hash);
+  console.log("Transaction status:", receipt.status === 1 ? "Success" : "Failed");
   
   if (receipt.status !== 1) {
     throw new Error("Transaction reverted. Check the transaction on block explorer for details.");
   }
 
   // Get character details from event
+  console.log("Step 3: Parsing CharacterCreated event...");
+  console.log("Total logs:", receipt.logs.length);
+  
   const event = receipt.logs.find((log: any) => {
     try {
       const parsed = dungeonCrawler.interface.parseLog(log);
-      return parsed?.name === "CharacterCreated";
+      const isMatch = parsed?.name === "CharacterCreated";
+      if (isMatch) {
+        console.log("✅ Found CharacterCreated event");
+      }
+      return isMatch;
     } catch {
       return false;
     }

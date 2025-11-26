@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SpinningRouletteWheel } from "./SpinningRouletteWheel";
 import { requestSpin, getSpinResultHelper, pollForFulfillmentStatus } from "@utils/contractHelpers";
 import { useToast, Box, Button, Stack, Text, useColorModeValue, Code, Badge, SimpleGrid, Heading, Flex } from "@chakra-ui/react";
 import { usePlaytestMode } from "@contexts/PlaytestModeContext";
 import { useWallet } from "@contexts/WalletContext";
+import { contractsConfig } from "@config/contracts";
+import { ethers } from "ethers";
 
 interface SpinResult {
   spinId: number;
@@ -205,6 +207,122 @@ export function RouletteGameDemo() {
   };
 
   // handleCompleteSpin is no longer needed - spin completes automatically when VRF is received
+
+  // Load past spins on mount
+  useEffect(() => {
+    // Skip during build/SSR - only run on client
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const loadPastSpins = async () => {
+      try {
+        // Skip if in playtest mode (no contract to query)
+        if (isPlaytestMode) {
+          return;
+        }
+
+        const rouletteAddress = contractsConfig[network]?.rouletteGame;
+        if (!rouletteAddress) {
+          console.log(`RouletteGame not deployed on ${network}`);
+          return;
+        }
+
+        // Use provider from WalletContext if available, otherwise create one from window.ethereum
+        // This ensures we use the same RPC configuration throughout the app
+        let rpcProvider: ethers.Provider | null = null;
+        if (provider) {
+          // Use existing provider from wallet context (uses user's configured RPC)
+          rpcProvider = provider;
+        } else if (typeof window !== 'undefined' && window.ethereum) {
+          // Fallback to window.ethereum (uses user's configured RPC)
+          rpcProvider = new ethers.BrowserProvider(window.ethereum);
+        }
+        
+        if (!rpcProvider) {
+          console.log("No provider available to load past spins");
+          return;
+        }
+        const rouletteAbi = [
+          "function getRecentSpins(uint256 count) external view returns (uint256[])",
+          "function getSpin(uint256 _spinId) external view returns (address player, uint8 result, string memory color, bool isEven, bytes32 vrfSeed, uint256 timestamp)",
+        ];
+
+        const contract = new ethers.Contract(rouletteAddress, rouletteAbi, rpcProvider);
+        
+        // Get recent spins (last 20) with timeout
+        const recentSpinIds = await Promise.race([
+          contract.getRecentSpins(20),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error(`Timeout fetching spins from ${network}`)), 5000)
+          )
+        ]) as bigint[];
+        
+        if (!recentSpinIds || recentSpinIds.length === 0) {
+          console.log("No past spins found");
+          return;
+        }
+
+        const loadedSpins: SpinResult[] = [];
+        
+        // Fetch each spin's details with timeout protection
+        for (const spinId of recentSpinIds) {
+          try {
+            const spin = await Promise.race([
+              contract.getSpin(spinId),
+              new Promise((_, reject) => 
+                setTimeout(() => reject(new Error(`Timeout fetching spin ${spinId.toString()}`)), 3000)
+              )
+            ]) as any;
+            
+            // Only include completed spins (result != 255 and vrfSeed is not zero)
+            if (spin.result !== 255 && 
+                spin.vrfSeed !== ethers.ZeroHash && 
+                spin.vrfSeed !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+              // Convert timestamp from seconds to milliseconds
+              let timestamp = Number(spin.timestamp);
+              if (timestamp < 1000000000000) {
+                timestamp = timestamp * 1000;
+              }
+              
+              loadedSpins.push({
+                spinId: Number(spinId),
+                result: Number(spin.result),
+                color: spin.color,
+                vrfSeed: spin.vrfSeed,
+                timestamp: timestamp || Date.now(),
+              });
+            }
+          } catch (error) {
+            console.warn(`Error fetching spin ${spinId.toString()}:`, error);
+            // Continue with next spin
+          }
+        }
+        
+        // Sort by timestamp (most recent first) and update state
+        loadedSpins.sort((a, b) => b.timestamp - a.timestamp);
+        
+        if (loadedSpins.length > 0) {
+          console.log(`Loaded ${loadedSpins.length} past spins from ${network}`);
+          setRecentSpins(loadedSpins);
+          
+          // Update statistics
+          const stats = {
+            totalSpins: loadedSpins.length,
+            redCount: loadedSpins.filter(s => s.color === "red").length,
+            blackCount: loadedSpins.filter(s => s.color === "black").length,
+            greenCount: loadedSpins.filter(s => s.color === "green").length,
+          };
+          setStatistics(stats);
+        }
+      } catch (error) {
+        console.error(`Error loading past spins from ${network}:`, error);
+        // Don't show error toast - this is a background operation
+      }
+    };
+
+    loadPastSpins();
+  }, [isPlaytestMode, network]); // Removed provider dependency - we use public RPC
 
   const cardBg = useColorModeValue("white", "gray.700");
   const borderColor = useColorModeValue("gray.200", "gray.600");

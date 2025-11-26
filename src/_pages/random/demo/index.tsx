@@ -27,7 +27,7 @@ import { EnhancedDungeonCrawlerDemo } from "@components/random/EnhancedDungeonCr
 import { FishingGameDemo } from "@components/random/FishingGameDemo";
 import { PlaytestModeToggle } from "@components/random/PlaytestModeToggle";
 import { PlaytestModeProvider } from "@contexts/PlaytestModeContext";
-import { WalletProvider } from "@contexts/WalletContext";
+import { WalletProvider, useWallet } from "@contexts/WalletContext";
 import { siteConfig } from "@config/site";
 import { contractsConfig } from "@config/contracts";
 import Link from "next/link";
@@ -52,11 +52,31 @@ interface FeeRequest {
 }
 
 const DemoPage = () => {
+  const { provider } = useWallet();
   const bgColor = useColorModeValue("gray.50", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
   const borderColor = useColorModeValue("gray.200", "gray.600");
   const [vrfData, setVrfData] = useState<VRFEntry[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Helper to get a provider for read-only queries (uses WalletContext provider if available)
+  const getReadOnlyProvider = (): ethers.Provider | null => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+    
+    // Prefer provider from WalletContext (uses user's configured RPC)
+    if (provider) {
+      return provider;
+    }
+    
+    // Fallback to window.ethereum if available
+    if (window.ethereum) {
+      return new ethers.BrowserProvider(window.ethereum);
+    }
+    
+    return null;
+  };
 
   useEffect(() => {
     // Skip during build/SSR - only run on client
@@ -74,19 +94,12 @@ const DemoPage = () => {
           return [];
         }
 
-        // Use public RPC endpoints
-        const rpcUrls: Record<string, string> = {
-          baseSepolia: "https://sepolia.base.org",
-          base: "https://mainnet.base.org",
-        };
-        const rpcUrl = rpcUrls[network];
-        if (!rpcUrl) {
-          console.log(`No RPC URL for network ${network}`);
+        // Use centralized provider helper (uses WalletContext provider if available)
+        const provider = getReadOnlyProvider();
+        if (!provider) {
+          console.log(`No ethereum provider available for ${network}`);
           return [];
         }
-
-        // Create provider with timeout to prevent hanging
-        const provider = new ethers.JsonRpcProvider(rpcUrl);
         const rouletteAbi = [
           "function getRecentSpins(uint256 count) external view returns (uint256[])",
           "function getSpin(uint256 _spinId) external view returns (address player, uint8 result, string memory color, bool isEven, bytes32 vrfSeed, uint256 timestamp)",
@@ -158,16 +171,12 @@ const DemoPage = () => {
           return [];
         }
 
-        const rpcUrls: Record<string, string> = {
-          baseSepolia: "https://sepolia.base.org",
-          base: "https://mainnet.base.org",
-        };
-        const rpcUrl = rpcUrls[network];
-        if (!rpcUrl) {
+        // Use centralized provider helper (uses WalletContext provider if available)
+        const provider = getReadOnlyProvider();
+        if (!provider) {
+          console.log(`No ethereum provider available for ${network}`);
           return [];
         }
-
-        const provider = new ethers.JsonRpcProvider(rpcUrl);
         const dungeonAbi = [
           "function characterCounter() external view returns (uint256)",
           "function interactionCounter() external view returns (uint256)",

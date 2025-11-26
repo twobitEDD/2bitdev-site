@@ -155,7 +155,15 @@ export function EnhancedDungeonCrawlerDemo() {
         return;
       }
 
+      console.log("🎮 Creating character...", { isPlaytestMode, network, hasSigner: !!signer });
+      
       const result = await createCharacter(isPlaytestMode, signer, network);
+      console.log("✅ Character creation request successful:", result);
+      
+      if (!result || !result.requestId) {
+        throw new Error("Invalid response from createCharacter - missing requestId");
+      }
+      
       setCharacterRequestId(result.requestId);
       
       // In real contract, createCharacter() returns requestId and emits CharacterCreationStarted with characterId
@@ -163,19 +171,22 @@ export function EnhancedDungeonCrawlerDemo() {
         title: "Character Creation Started",
         description: `Request ID: ${result.requestId.slice(0, 10)}...`,
         status: "info",
-        duration: 3000,
+        duration: 5000,
       });
 
       // Poll for fulfillment after initial delay
       // Note: pollForFulfillmentStatus already has built-in delays, so we don't need a long delay here
       setTimeout(async () => {
         try {
+          console.log("🔍 Polling for VRF fulfillment...", { requestId: result.requestId });
           const status = await pollForFulfillmentStatus(
             isPlaytestMode,
             provider,
             result.requestId,
             network
           );
+          console.log("📊 Polling result:", { fulfilled: status.fulfilled, hasRandomness: !!status.randomnessValue });
+          
           // Only show toast if actually fulfilled with randomness value
           if (status.fulfilled && status.randomnessValue) {
             toast({
@@ -191,11 +202,14 @@ export function EnhancedDungeonCrawlerDemo() {
         }
       }, 1000); // Reduced delay since pollForRealFulfillment now waits before first check
     } catch (error) {
+      console.error("❌ Error creating character:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to create character";
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to create character",
+        title: "Error Creating Character",
+        description: errorMessage,
         status: "error",
-        duration: 5000,
+        duration: 7000,
+        isClosable: true,
       });
     } finally {
       setLoading(false);
