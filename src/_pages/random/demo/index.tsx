@@ -59,7 +59,13 @@ const DemoPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Helper function to fetch RouletteGame spins
+    // Skip during build/SSR - only run on client
+    if (typeof window === 'undefined') {
+      setLoading(false);
+      return;
+    }
+
+    // Helper function to fetch RouletteGame spins with timeout
     const fetchRouletteGameSpins = async (network: "base" | "baseSepolia" = "baseSepolia"): Promise<VRFEntry[]> => {
       try {
         const rouletteAddress = contractsConfig[network]?.rouletteGame;
@@ -79,6 +85,7 @@ const DemoPage = () => {
           return [];
         }
 
+        // Create provider with timeout to prevent hanging
         const provider = new ethers.JsonRpcProvider(rpcUrl);
         const rouletteAbi = [
           "function getRecentSpins(uint256 count) external view returns (uint256[])",
@@ -87,8 +94,13 @@ const DemoPage = () => {
 
         const contract = new ethers.Contract(rouletteAddress, rouletteAbi, provider);
         
-        // Get recent spins (last 10)
-        const recentSpinIds = await contract.getRecentSpins(10);
+        // Get recent spins (last 10) with timeout
+        const recentSpinIds = await Promise.race([
+          contract.getRecentSpins(10),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error(`Timeout fetching spins from ${network}`)), 5000)
+          )
+        ]) as bigint[];
         
         if (!recentSpinIds || recentSpinIds.length === 0) {
           return [];
@@ -96,10 +108,15 @@ const DemoPage = () => {
 
         const spins: VRFEntry[] = [];
         
-        // Fetch each spin's details
+        // Fetch each spin's details with timeout protection
         for (const spinId of recentSpinIds) {
           try {
-            const spin = await contract.getSpin(spinId);
+            const spin = await Promise.race([
+              contract.getSpin(spinId),
+              new Promise((_, reject) => 
+                setTimeout(() => reject(new Error(`Timeout fetching spin ${spinId.toString()}`)), 3000)
+              )
+            ]) as any;
             
             // Check if spin is completed (result != 255 and vrfSeed is not zero)
             if (spin.result !== 255 && 
@@ -294,12 +311,22 @@ const DemoPage = () => {
           }
           
           // Fetch game-specific VRF data from contracts
-          // Use Promise.allSettled to continue even if some queries fail
+          // Use Promise.allSettled with timeout to prevent hanging during build
+          // Wrap each call with a timeout to ensure they fail fast
+          const withTimeout = <T,>(promise: Promise<T>, timeoutMs: number = 8000): Promise<T> => {
+            return Promise.race([
+              promise,
+              new Promise<T>((_, reject) => 
+                setTimeout(() => reject(new Error('Request timeout')), timeoutMs)
+              )
+            ]);
+          };
+          
           const [baseSepoliaSpinsResult, baseSpinsResult, baseSepoliaDungeonResult, baseDungeonResult] = await Promise.allSettled([
-            fetchRouletteGameSpins("baseSepolia"),
-            fetchRouletteGameSpins("base"),
-            fetchDungeonCrawlerVRF("baseSepolia"),
-            fetchDungeonCrawlerVRF("base"),
+            withTimeout(fetchRouletteGameSpins("baseSepolia"), 8000),
+            withTimeout(fetchRouletteGameSpins("base"), 8000),
+            withTimeout(fetchDungeonCrawlerVRF("baseSepolia"), 8000),
+            withTimeout(fetchDungeonCrawlerVRF("base"), 8000),
           ]);
           
           const baseSepoliaSpins = baseSepoliaSpinsResult.status === 'fulfilled' ? baseSepoliaSpinsResult.value : [];
