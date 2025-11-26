@@ -1278,7 +1278,7 @@ export async function realCatchFish(
       
       if (catchCount > 0) {
         // Get the most recent catch (last index)
-        const lastCatch = await fishingGame.getPlayerCatch(playerAddress, catchCount - 1n);
+        const lastCatch = await fishingGame.getPlayerCatch(playerAddress, catchCount - BigInt(1));
         const fishType = Number(lastCatch.fishType);
         const size = Number(lastCatch.size);
         const value = Number(lastCatch.value);
