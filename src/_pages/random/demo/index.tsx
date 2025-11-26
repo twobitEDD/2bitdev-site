@@ -52,9 +52,31 @@ interface FeeRequest {
 }
 
 const DemoPage = () => {
+  const { provider } = useWallet();
   const bgColor = useColorModeValue("gray.50", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
   const borderColor = useColorModeValue("gray.200", "gray.600");
+  const [vrfData, setVrfData] = useState<VRFEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Helper to get a provider for read-only queries (uses WalletContext provider if available)
+  const getReadOnlyProvider = (): ethers.Provider | null => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+    
+    // Prefer provider from WalletContext (uses user's configured RPC)
+    if (provider) {
+      return provider;
+    }
+    
+    // Fallback to window.ethereum if available
+    if (window.ethereum) {
+      return new ethers.BrowserProvider(window.ethereum);
+    }
+    
+    return null;
+  };
 
   useEffect(() => {
     // Skip during build/SSR - only run on client
@@ -73,7 +95,11 @@ const DemoPage = () => {
         }
 
         // Use centralized provider helper (uses WalletContext provider if available)
-        const provider = getReadOnlyProvider();
+        const rpcProvider = getReadOnlyProvider();
+        if (!rpcProvider) {
+          console.log(`No ethereum provider available for ${network}`);
+          return [];
+        }
         if (!provider) {
           console.log(`No ethereum provider available for ${network}`);
           return [];
@@ -83,7 +109,7 @@ const DemoPage = () => {
           "function getSpin(uint256 _spinId) external view returns (address player, uint8 result, string memory color, bool isEven, bytes32 vrfSeed, uint256 timestamp)",
         ];
 
-        const contract = new ethers.Contract(rouletteAddress, rouletteAbi, provider);
+        const contract = new ethers.Contract(rouletteAddress, rouletteAbi, rpcProvider);
         
         // Get recent spins (last 10) with timeout
         const recentSpinIds = await Promise.race([
@@ -150,8 +176,8 @@ const DemoPage = () => {
         }
 
         // Use centralized provider helper (uses WalletContext provider if available)
-        const provider = getReadOnlyProvider();
-        if (!provider) {
+        const rpcProvider = getReadOnlyProvider();
+        if (!rpcProvider) {
           console.log(`No ethereum provider available for ${network}`);
           return [];
         }
@@ -162,7 +188,7 @@ const DemoPage = () => {
           "function getInteraction(uint256 interactionId) external view returns (uint256 characterId, uint8 interactionType, bool completed, bool success, uint256 healthChange, uint256 wealthChange, string memory outcome, bytes32 vrfSeed)",
         ];
 
-        const contract = new ethers.Contract(dungeonAddress, dungeonAbi, provider);
+        const contract = new ethers.Contract(dungeonAddress, dungeonAbi, rpcProvider);
         const vrfEntries: VRFEntry[] = [];
         
         // Fetch recent characters (last 10)
@@ -357,19 +383,19 @@ const DemoPage = () => {
     // Refresh every 10 seconds
     const refreshInterval = setInterval(fetchVRFData, 10000);
     return () => clearInterval(refreshInterval);
-  }, []);
+  }, [provider]); // Include provider dependency to re-fetch when provider changes
 
   return (
     <PlaytestModeProvider>
       <WalletProvider>
         <PageAnimation>
-        <Container maxW={"7xl"} py={{ base: 8, md: 16 }}>
+        <Container maxW={"7xl"} py={{ base: 4, md: 8 }} px={{ base: 4, md: 6 }}>
           <Stack spacing={8}>
             <Box>
-              <Heading size="2xl" mb={2} color="white">
+              <Heading size={{ base: "xl", md: "2xl" }} mb={2} color="white">
                 🎮 Interactive Demo & Examples
               </Heading>
-              <Text color="gray.400">
+              <Text color="gray.400" fontSize={{ base: "sm", md: "md" }}>
                 Explore SERV.random in action. See real VRF data, understand the flow, and try interactive examples.
               </Text>
             </Box>
@@ -379,29 +405,33 @@ const DemoPage = () => {
 
           {/* Live VRF Data */}
           {loading ? (
-            <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
-              <Text color="gray.400" textAlign="center">
+            <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+              <Text color="gray.400" textAlign="center" fontSize={{ base: "sm", md: "md" }}>
                 Loading VRF data...
               </Text>
             </Box>
           ) : (
-            <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+            <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor} overflowX="auto">
               <VRFVisualization entries={vrfData} maxEntries={6} />
             </Box>
           )}
 
           {/* Demo Options */}
           <Tabs>
-            <TabList>
-              <Tab>FishingGame</Tab>
-              <Tab>Roulette</Tab>
-              <Tab>Dungeon Crawler</Tab>
-              <Tab>Integration Examples</Tab>
+            <TabList overflowX="auto" overflowY="hidden" css={{
+              '&::-webkit-scrollbar': { display: 'none' },
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            }}>
+              <Tab whiteSpace="nowrap" fontSize={{ base: "sm", md: "md" }}>FishingGame</Tab>
+              <Tab whiteSpace="nowrap" fontSize={{ base: "sm", md: "md" }}>Roulette</Tab>
+              <Tab whiteSpace="nowrap" fontSize={{ base: "sm", md: "md" }}>Dungeon Crawler</Tab>
+              <Tab whiteSpace="nowrap" fontSize={{ base: "sm", md: "md" }}>Integration Examples</Tab>
             </TabList>
 
             <TabPanels>
               <TabPanel>
-                <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor} overflowX="auto">
                   <FishingGameDemo />
                 </Box>
                 <Alert status="info" borderRadius="lg" mt={4}>
@@ -431,7 +461,7 @@ const DemoPage = () => {
               </TabPanel>
 
               <TabPanel>
-                <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor} overflowX="auto">
                   <RouletteGameDemo />
                 </Box>
                 <Alert status="info" borderRadius="lg" mt={4}>
@@ -453,7 +483,7 @@ const DemoPage = () => {
               </TabPanel>
 
               <TabPanel>
-                <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor} overflowX="auto">
                   <EnhancedDungeonCrawlerDemo />
                 </Box>
                 <Alert status="info" borderRadius="lg" mt={4}>
@@ -476,7 +506,7 @@ const DemoPage = () => {
 
               <TabPanel>
                 <Stack spacing={4}>
-                  <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                  <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor} overflowX="auto">
                     <Heading size="lg" mb={4} color="white">
                       💻 Code Examples
                     </Heading>
@@ -531,7 +561,7 @@ const DemoPage = () => {
                     </SimpleGrid>
                   </Box>
 
-                  <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                  <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor} overflowX="auto">
                     <Heading size="lg" mb={4} color="white">
                       🔗 Integration Patterns
                     </Heading>
@@ -563,7 +593,7 @@ const DemoPage = () => {
               </TabPanel>
 
               <TabPanel>
-                <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+                <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor} overflowX="auto">
                   <Heading size="lg" mb={4} color="white">
                     🔄 Complete Flow
                   </Heading>
