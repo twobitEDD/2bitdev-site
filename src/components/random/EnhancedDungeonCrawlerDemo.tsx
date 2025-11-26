@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -37,6 +37,8 @@ import {
   completeInteraction,
   pollForFulfillmentStatus,
 } from "@utils/contractHelpers";
+import { contractsConfig } from "@config/contracts";
+import { ethers } from "ethers";
 
 interface Character {
   id: string; // Local unique identifier for the character
@@ -138,6 +140,138 @@ export function EnhancedDungeonCrawlerDemo() {
     Rogue: "purple",
     Cleric: "green",
   };
+
+  // Load past characters from contract on mount
+  useEffect(() => {
+    // Skip during build/SSR - only run on client
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const loadPastCharacters = async () => {
+      try {
+        // Skip if in playtest mode (no contract to query)
+        if (isPlaytestMode) {
+          return;
+        }
+
+        // Skip if no provider or address
+        if (!provider || !address) {
+          return;
+        }
+
+        const dungeonCrawlerAddress = contractsConfig[network]?.dungeonCrawler;
+        if (!dungeonCrawlerAddress) {
+          console.log(`DungeonCrawler not deployed on ${network}`);
+          return;
+        }
+
+        // Create read-only provider (use provider from WalletContext if available, otherwise window.ethereum)
+        let rpcProvider: ethers.Provider;
+        if (provider) {
+          rpcProvider = provider;
+        } else if (window.ethereum) {
+          rpcProvider = new ethers.BrowserProvider(window.ethereum);
+        } else {
+          console.log("No provider available");
+          return;
+        }
+
+        const dungeonCrawlerAbi = [
+          "function playerCharacters(address player) external view returns (uint256[] memory)",
+          "function getCharacter(uint256 characterId) external view returns (address player, uint8 class, uint8 strength, uint8 dexterity, uint8 intelligence, uint8 wisdom, uint8 constitution, uint8 charisma, uint256 level, uint256 health, uint256 maxHealth, uint256 wealth, bool alive, uint256 actionCount, uint8 status, uint256 createdAt)",
+        ];
+
+        const contract = new ethers.Contract(dungeonCrawlerAddress, dungeonCrawlerAbi, rpcProvider);
+        
+        // Get user's character IDs with timeout
+        const characterIds = await Promise.race([
+          contract.playerCharacters(address),
+          new Promise((_, reject) => 
+            setTimeout(() => reject(new Error(`Timeout fetching characters from ${network}`)), 5000)
+          )
+        ]) as bigint[];
+        
+        if (!characterIds || characterIds.length === 0) {
+          console.log("No past characters found");
+          return;
+        }
+
+        console.log(`Found ${characterIds.length} characters for address ${address}`);
+
+        // Fetch each character's data
+        const loadedCharacters: Character[] = [];
+        const classNames = ["Warrior", "Mage", "Rogue", "Cleric"];
+
+        for (const characterId of characterIds) {
+          try {
+            const charData = await Promise.race([
+              contract.getCharacter(characterId),
+              new Promise((_, reject) => 
+                setTimeout(() => reject(new Error(`Timeout fetching character ${characterId.toString()}`)), 3000)
+              )
+            ]) as any;
+
+            // Check if character exists (player address should not be zero)
+            const playerAddress = charData[0] || charData.player;
+            if (!charData || !playerAddress || playerAddress === ethers.ZeroAddress || playerAddress === "0x0000000000000000000000000000000000000000") {
+              console.warn(`Character ${characterId.toString()} does not exist`);
+              continue;
+            }
+
+            const contractCharacterId = Number(characterId);
+            const characterIdLocal = `char_${contractCharacterId}_${Date.now()}`;
+            const className = classNames[Number(charData.class)] || "Unknown";
+            
+            // Map status: 0=active, 1=legendary, 2=early_death
+            const statusMap: Character["status"][] = ["active", "legendary", "early_death"];
+            const status = statusMap[Number(charData.status)] || "active";
+
+            const character: Character = {
+              id: characterIdLocal,
+              contractCharacterId,
+              class: className,
+              strength: Number(charData.strength),
+              dexterity: Number(charData.dexterity),
+              intelligence: Number(charData.intelligence),
+              wisdom: Number(charData.wisdom),
+              constitution: Number(charData.constitution),
+              charisma: Number(charData.charisma),
+              level: Number(charData.level),
+              health: Number(charData.health),
+              maxHealth: Number(charData.maxHealth),
+              wealth: Number(charData.wealth),
+              alive: charData.alive,
+              actionCount: Number(charData.actionCount),
+              status,
+              createdAt: Number(charData.createdAt) * 1000, // Convert from seconds to milliseconds
+            };
+
+            loadedCharacters.push(character);
+          } catch (error) {
+            console.warn(`Failed to load character ${characterId.toString()}:`, error);
+            // Continue loading other characters even if one fails
+          }
+        }
+
+        if (loadedCharacters.length > 0) {
+          console.log(`Loaded ${loadedCharacters.length} characters from contract`);
+          // Sort by creation time (newest first)
+          loadedCharacters.sort((a, b) => b.createdAt - a.createdAt);
+          setCharacters(loadedCharacters);
+          // Select the first (newest) character
+          if (loadedCharacters.length > 0) {
+            setSelectedCharacterId(loadedCharacters[0].id);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading past characters:", error);
+        // Don't show error toast - this is a background operation
+      }
+    };
+
+    loadPastCharacters();
+  }, [isPlaytestMode, network, provider, address]); // Re-fetch when provider or address changes
 
   const handleCreateCharacter = async () => {
     try {
