@@ -26,6 +26,8 @@ import { getRpcUrl } from "@config/rpc";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
+import RouletteGameABI from "@abis/RouletteGame.json";
+import DungeonCrawlerABI from "@abis/DungeonCrawler.json";
 
 interface VRFEntry {
   blockNumber: number;
@@ -82,12 +84,8 @@ const DemoPageContent = () => {
 
         // Use Alchemy RPC for reliable data access
         const rpcProvider = getReadOnlyProvider(network);
-        const rouletteAbi = [
-          "function getRecentSpins(uint256 count) external view returns (uint256[])",
-          "function getSpin(uint256 _spinId) external view returns (address player, uint8 result, string memory color, bool isEven, bytes32 vrfSeed, uint256 timestamp)",
-        ];
-
-        const contract = new ethers.Contract(rouletteAddress, rouletteAbi, rpcProvider);
+        // Use full ABI from JSON file
+        const contract = new ethers.Contract(rouletteAddress, RouletteGameABI.abi, rpcProvider);
         
         // Get recent spins (last 10) with timeout
         const recentSpinIds = await Promise.race([
@@ -113,32 +111,43 @@ const DemoPageContent = () => {
               )
             ]) as any;
             
+            // Safely access spin properties
+            const result = spin?.result ?? spin?.[1] ?? 255;
+            const vrfSeed = spin?.vrfSeed ?? spin?.[4] ?? null;
+            const timestamp = spin?.timestamp ?? spin?.[5] ?? null;
+            
             // Check if spin is completed (result != 255 and vrfSeed is not zero)
-            if (spin.result !== 255 && 
-                spin.vrfSeed !== ethers.ZeroHash && 
-                spin.vrfSeed !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+            if (result !== 255 && 
+                vrfSeed && 
+                vrfSeed !== ethers.ZeroHash && 
+                vrfSeed !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
               // Convert timestamp from seconds to milliseconds
-              let timestamp = Number(spin.timestamp);
-              if (timestamp < 1000000000000) {
-                timestamp = timestamp * 1000;
+              let ts = timestamp ? Number(timestamp) : Date.now();
+              if (ts < 1000000000000) {
+                ts = ts * 1000;
               }
               
               spins.push({
                 blockNumber: 0, // Game requests don't have block numbers
-                timestamp: timestamp || Date.now(),
-                vrfValue: spin.vrfSeed,
+                timestamp: ts || Date.now(),
+                vrfValue: vrfSeed,
                 harmonyBlockHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
                 gameSource: "RouletteGame",
                 network: network,
                 metadata: {
                   spinId: spinId.toString(),
-                  result: spin.result,
-                  color: spin.color,
+                  result: result,
+                  color: spin?.color ?? spin?.[2] ?? "unknown",
                 },
               });
             }
-          } catch (error) {
-            console.warn(`Error fetching spin ${spinId.toString()}:`, error);
+          } catch (error: any) {
+            // Skip spins that don't exist or fail to load
+            if (error?.code === 'CALL_EXCEPTION' || error?.message?.includes('revert') || error?.message?.includes('Timeout') || error?.message?.includes('RangeError')) {
+              // Spin doesn't exist or timed out, skip silently
+            } else {
+              console.warn(`Error fetching spin ${spinId.toString()}:`, error?.message || error);
+            }
             // Continue with next spin
           }
         }
@@ -162,14 +171,8 @@ const DemoPageContent = () => {
 
         // Use Alchemy RPC for reliable data access
         const rpcProvider = getReadOnlyProvider(network);
-        const dungeonAbi = [
-          "function characterCounter() external view returns (uint256)",
-          "function interactionCounter() external view returns (uint256)",
-          "function characters(uint256) external view returns (address player, uint8 class, uint8 strength, uint8 dexterity, uint8 intelligence, uint8 wisdom, uint8 constitution, uint8 charisma, uint256 level, uint256 health, uint256 maxHealth, uint256 wealth, bytes32 creationSeed, bool alive, uint256 actionCount, uint8 status, uint256 createdAt)",
-          "function getInteraction(uint256 interactionId) external view returns (uint256 characterId, uint8 interactionType, bool completed, bool success, uint256 healthChange, uint256 wealthChange, string memory outcome, bytes32 vrfSeed)",
-        ];
-
-        const contract = new ethers.Contract(dungeonAddress, dungeonAbi, rpcProvider);
+        // Use full ABI from JSON file
+        const contract = new ethers.Contract(dungeonAddress, DungeonCrawlerABI.abi, rpcProvider);
         const vrfEntries: VRFEntry[] = [];
         
         // Fetch recent characters (last 10)
@@ -179,14 +182,37 @@ const DemoPageContent = () => {
           
           for (let charId = startId; charId <= characterCounter; charId++) {
             try {
-              const character = await contract.characters(charId);
-              const creationSeed = character.creationSeed || character[13];
-              const createdAt = character.createdAt || character[17];
+              const character = await Promise.race([
+                contract.characters(charId),
+                new Promise((_, reject) => 
+                  setTimeout(() => reject(new Error('Timeout')), 2000)
+                )
+              ]) as any;
+              
+                    // Safely access creationSeed - try named first, then indexed
+                    // Mapping structure: 0=player, 1=class, 2=strength, 3=dexterity, 4=intelligence, 
+                    // 5=wisdom, 6=constitution, 7=charisma, 8=level, 9=experience, 10=health, 
+                    // 11=maxHealth, 12=wealth, 13=creationSeed, 14=alive, 15=actionCount, 16=status, 17=createdAt
+                    let creationSeed: string | null = null;
+                    try {
+                      creationSeed = character?.creationSeed || character?.[13] || null;
+                    } catch (e) {
+                      // Skip if we can't access creationSeed
+                      continue;
+                    }
+                    
+                    // Safely access createdAt - try named first, then indexed (index 17)
+                    let createdAt: number | bigint | null = null;
+                    try {
+                      createdAt = character?.createdAt || character?.[17] || null;
+                    } catch (e) {
+                      createdAt = null;
+                    }
               
               if (creationSeed && 
                   creationSeed !== ethers.ZeroHash && 
                   creationSeed !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
-                let timestamp = Number(createdAt);
+                let timestamp = createdAt ? Number(createdAt) : Date.now();
                 if (timestamp < 1000000000000) {
                   timestamp = timestamp * 1000;
                 }
@@ -204,8 +230,13 @@ const DemoPageContent = () => {
                   },
                 });
               }
-            } catch (error) {
-              console.warn(`Error fetching character ${charId.toString()}:`, error);
+            } catch (error: any) {
+              // Skip characters that don't exist or fail to load
+              if (error?.code === 'CALL_EXCEPTION' || error?.message?.includes('revert') || error?.message?.includes('RangeError') || error?.message?.includes('Timeout')) {
+                // Character doesn't exist, skip silently
+              } else {
+                console.warn(`Error fetching character ${charId.toString()}:`, error?.message || error);
+              }
             }
           }
         } catch (error) {
@@ -219,9 +250,21 @@ const DemoPageContent = () => {
           
           for (let interactionId = startId; interactionId <= interactionCounter; interactionId++) {
             try {
-              const interaction = await contract.getInteraction(interactionId);
-              const vrfSeed = interaction.vrfSeed || interaction[7];
-              const completed = interaction.completed !== undefined ? interaction.completed : interaction[2];
+              const interaction = await Promise.race([
+                contract.getInteraction(interactionId),
+                new Promise((_, reject) => 
+                  setTimeout(() => reject(new Error('Timeout')), 2000)
+                )
+              ]) as any;
+              
+              // Safely access interaction properties
+              const vrfSeed = interaction?.vrfSeed || interaction?.[7] || null;
+              let completed = false;
+              try {
+                completed = interaction?.completed ?? interaction?.[2] ?? false;
+              } catch (e) {
+                completed = false;
+              }
               
               if (completed && vrfSeed && 
                   vrfSeed !== ethers.ZeroHash && 
@@ -239,8 +282,13 @@ const DemoPageContent = () => {
                   },
                 });
               }
-            } catch (error) {
-              console.warn(`Error fetching interaction ${interactionId.toString()}:`, error);
+            } catch (error: any) {
+              // Skip interactions that don't exist or fail to load
+              if (error?.code === 'CALL_EXCEPTION' || error?.message?.includes('revert') || error?.message?.includes('RangeError') || error?.message?.includes('Timeout')) {
+                // Interaction doesn't exist, skip silently
+              } else {
+                console.warn(`Error fetching interaction ${interactionId.toString()}:`, error?.message || error);
+              }
             }
           }
         } catch (error) {

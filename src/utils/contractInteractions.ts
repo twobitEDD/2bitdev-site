@@ -7,6 +7,9 @@
 
 import { ethers } from "ethers";
 import { contractsConfig } from "@config/contracts";
+import FishingGameABI from "@abis/FishingGame.json";
+import RouletteGameABI from "@abis/RouletteGame.json";
+import DungeonCrawlerABI from "@abis/DungeonCrawler.json";
 
 export interface ContractRequestResult {
   requestId: string;
@@ -35,18 +38,8 @@ export function getFishingGameContract(
     throw new Error(`FishingGame not deployed on ${network}`);
   }
 
-  // Minimal ABI for FishingGame functions we need
-  const abi = [
-    "function goFishing() external returns (uint256)",
-    "function catchFish(uint256 _requestId) external",
-    "function getPlayerCatchCount(address player) external view returns (uint256)",
-    "function getPlayerCatch(address player, uint256 index) external view returns (uint8 fishType, uint256 size, uint256 value, uint256 timestamp, string memory fishName)",
-    "event FishingTripStarted(address indexed player, uint256 requestId)",
-    "event FishCaught(address indexed player, uint8 fishType, uint256 size, uint256 value)",
-    "event RandomnessReceived(uint256 requestId, bytes32 randomness)",
-  ];
-
-  return new ethers.Contract(address, abi, signer);
+  // Use full ABI from JSON file
+  return new ethers.Contract(address, FishingGameABI.abi, signer);
 }
 
 /**
@@ -410,15 +403,8 @@ export function getRouletteGameContract(
     throw new Error(`RouletteGame not deployed on ${network}`);
   }
 
-  const abi = [
-    "function requestSpin() external returns (uint256)",
-    "function getSpin(uint256 _spinId) external view returns (address player, uint8 result, string memory color, bool isEven, bytes32 vrfSeed, uint256 timestamp)",
-    "function spinCounter() external view returns (uint256)",
-    "event SpinRequested(address indexed player, uint256 indexed spinId, uint256 requestId)",
-    "event SpinCompleted(uint256 indexed spinId, address indexed player, uint8 result, string color, bytes32 vrfSeed)",
-  ];
-
-  return new ethers.Contract(address, abi, signer);
+  // Use full ABI from JSON file
+  return new ethers.Contract(address, RouletteGameABI.abi, signer);
 }
 
 /**
@@ -652,12 +638,9 @@ export async function getSpinResult(
     providerNetwork: (await provider.getNetwork()).chainId.toString()
   });
 
-  const abi = [
-    "function getSpin(uint256 _spinId) external view returns (address player, uint8 result, string memory color, bool isEven, bytes32 vrfSeed, uint256 timestamp)",
-  ];
-
   try {
-    const contract = new ethers.Contract(address, abi, provider);
+    // Use full ABI from JSON file
+    const contract = new ethers.Contract(address, RouletteGameABI.abi, provider);
     const spin = await contract.getSpin(spinId);
 
     console.log("Spin data from contract:", {
@@ -765,22 +748,8 @@ export function getDungeonCrawlerContract(
     throw new Error(`DungeonCrawler not deployed on ${network}`);
   }
 
-  const abi = [
-    "function createCharacter() external returns (uint256)",
-    "function finalizeCharacter(uint256 _requestId) external",
-    "function startInteraction(uint256 _characterId, uint8 _interactionType) external returns (uint256)",
-    "function completeInteraction(uint256 _interactionId) external",
-    "function getCharacter(uint256 characterId) external view returns (address player, uint8 class, uint8 strength, uint8 dexterity, uint8 intelligence, uint8 wisdom, uint8 constitution, uint8 charisma, uint256 level, uint256 health, uint256 maxHealth, uint256 wealth, bool alive, uint256 actionCount, uint8 status, uint256 createdAt)",
-    "function getInteraction(uint256 _interactionId) external view returns (address player, uint256 characterId, uint256 requestId, uint8 interactionType, bytes32 vrfSeed, bool completed, bool success, uint256 healthChange, uint256 wealthChange, string memory outcome, uint256 timestamp)",
-    "function playerCharacters(address player) external view returns (uint256[] memory)",
-    "function characterCounter() external view returns (uint256)",
-    "event CharacterCreationStarted(address indexed player, uint256 indexed characterId, uint256 requestId)",
-    "event CharacterCreated(address indexed player, uint256 indexed characterId, uint8 class, uint8 strength, uint8 dexterity, uint8 intelligence, uint256 health, uint256 wealth, uint256 createdAt)",
-    "event InteractionStarted(address indexed player, uint256 indexed characterId, uint256 indexed interactionId, uint8 interactionType, uint256 requestId)",
-    "event InteractionCompleted(uint256 indexed interactionId, address indexed player, uint256 indexed characterId, uint8 interactionType, bool success, uint256 healthChange, uint256 wealthChange, uint256 actionCount, string outcome, bytes32 vrfSeed)",
-  ];
-
-  return new ethers.Contract(address, abi, signer);
+  // Use full ABI from JSON file
+  return new ethers.Contract(address, DungeonCrawlerABI.abi, signer);
 }
 
 /**

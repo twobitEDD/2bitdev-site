@@ -24,6 +24,8 @@ import { getRpcUrl } from "@config/rpc";
 import { siteConfig } from "@config/site";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import RouletteGameABI from "@abis/RouletteGame.json";
+import DungeonCrawlerABI from "@abis/DungeonCrawler.json";
 
 interface VRFEntry {
   blockNumber: number;
@@ -156,11 +158,8 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
               const rouletteAddress = contractsConfig[network]?.rouletteGame;
               if (!rouletteAddress) return [];
               const rpcProvider = getReadOnlyProvider(network);
-              const rouletteAbi = [
-                "function getRecentSpins(uint256 count) external view returns (uint256[])",
-                "function getSpin(uint256 _spinId) external view returns (address player, uint8 result, string memory color, bool isEven, bytes32 vrfSeed, uint256 timestamp)",
-              ];
-              const contract = new ethers.Contract(rouletteAddress, rouletteAbi, rpcProvider);
+              // Use full ABI from JSON file
+              const contract = new ethers.Contract(rouletteAddress, RouletteGameABI.abi, rpcProvider);
               const recentSpinIds = await Promise.race([
                 contract.getRecentSpins(10),
                 new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
@@ -174,21 +173,36 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
                     contract.getSpin(spinId),
                     new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000))
                   ]) as any;
-                  if (spin.result !== 255 && spin.vrfSeed !== ethers.ZeroHash) {
-                    let timestamp = Number(spin.timestamp);
-                    if (timestamp < 1000000000000) timestamp = timestamp * 1000;
+                  
+                  // Safely access spin properties
+                  const result = spin?.result ?? spin?.[1] ?? 255;
+                  const vrfSeed = spin?.vrfSeed ?? spin?.[4] ?? null;
+                  const timestamp = spin?.timestamp ?? spin?.[5] ?? null;
+                  
+                  if (result !== 255 && vrfSeed && vrfSeed !== ethers.ZeroHash && vrfSeed !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+                    let ts = timestamp ? Number(timestamp) : Date.now();
+                    if (ts < 1000000000000) ts = ts * 1000;
                     spins.push({
                       blockNumber: 0,
-                      timestamp: timestamp || Date.now(),
-                      vrfValue: spin.vrfSeed,
+                      timestamp: ts || Date.now(),
+                      vrfValue: vrfSeed,
                       harmonyBlockHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
                       gameSource: "RouletteGame",
                       network: network,
-                      metadata: { spinId: spinId.toString(), result: spin.result, color: spin.color },
+                      metadata: { 
+                        spinId: spinId.toString(), 
+                        result: result,
+                        color: spin?.color ?? spin?.[2] ?? "unknown"
+                      },
                     });
                   }
-                } catch (error) {
-                  console.warn(`Error fetching spin ${spinId.toString()}:`, error);
+                } catch (error: any) {
+                  // Skip spins that don't exist or fail to load
+                  if (error?.code === 'CALL_EXCEPTION' || error?.message?.includes('revert') || error?.message?.includes('Timeout')) {
+                    // Spin doesn't exist or timed out, skip silently
+                  } else {
+                    console.warn(`Error fetching spin ${spinId.toString()}:`, error?.message || error);
+                  }
                 }
               }
               return spins;
@@ -204,23 +218,47 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
               const dungeonAddress = contractsConfig[network]?.dungeonCrawler;
               if (!dungeonAddress) return [];
               const rpcProvider = getReadOnlyProvider(network);
-              const dungeonAbi = [
-                "function characterCounter() external view returns (uint256)",
-                "function characters(uint256) external view returns (address player, uint8 class, uint8 strength, uint8 dexterity, uint8 intelligence, uint8 wisdom, uint8 constitution, uint8 charisma, uint256 level, uint256 health, uint256 maxHealth, uint256 wealth, bytes32 creationSeed, bool alive, uint256 actionCount, uint8 status, uint256 createdAt)",
-              ];
-              const contract = new ethers.Contract(dungeonAddress, dungeonAbi, rpcProvider);
+              // Use full ABI from JSON file
+              const contract = new ethers.Contract(dungeonAddress, DungeonCrawlerABI.abi, rpcProvider);
               const vrfEntries: VRFEntry[] = [];
               
               try {
                 const characterCounter = await contract.characterCounter();
+                if (!characterCounter || characterCounter === BigInt(0)) {
+                  return [];
+                }
                 const startId = characterCounter > BigInt(10) ? characterCounter - BigInt(10) : BigInt(1);
                 for (let charId = startId; charId <= characterCounter; charId++) {
                   try {
-                    const character = await contract.characters(charId);
-                    const creationSeed = character.creationSeed || character[13];
-                    const createdAt = character.createdAt || character[17];
-                    if (creationSeed && creationSeed !== ethers.ZeroHash) {
-                      let timestamp = Number(createdAt);
+                    const character = await Promise.race([
+                      contract.characters(charId),
+                      new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Timeout')), 2000)
+                      )
+                    ]) as any;
+                    
+                    // Safely access creationSeed - try named first, then indexed
+                    // Mapping structure: 0=player, 1=class, 2=strength, 3=dexterity, 4=intelligence, 
+                    // 5=wisdom, 6=constitution, 7=charisma, 8=level, 9=experience, 10=health, 
+                    // 11=maxHealth, 12=wealth, 13=creationSeed, 14=alive, 15=actionCount, 16=status, 17=createdAt
+                    let creationSeed: string | null = null;
+                    try {
+                      creationSeed = character?.creationSeed || character?.[13] || null;
+                    } catch (e) {
+                      // Skip if we can't access creationSeed
+                      continue;
+                    }
+                    
+                    // Safely access createdAt - try named first, then indexed (index 17)
+                    let createdAt: number | bigint | null = null;
+                    try {
+                      createdAt = character?.createdAt || character?.[17] || null;
+                    } catch (e) {
+                      createdAt = null;
+                    }
+                    
+                    if (creationSeed && creationSeed !== ethers.ZeroHash && creationSeed !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+                      let timestamp = createdAt ? Number(createdAt) : Date.now();
                       if (timestamp < 1000000000000) timestamp = timestamp * 1000;
                       vrfEntries.push({
                         blockNumber: 0,
@@ -232,8 +270,13 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
                         metadata: { characterId: charId.toString(), type: "character_creation" },
                       });
                     }
-                  } catch (error) {
-                    console.warn(`Error fetching character ${charId.toString()}:`, error);
+                  } catch (error: any) {
+                    // Skip characters that don't exist or fail to load
+                    if (error?.code === 'CALL_EXCEPTION' || error?.message?.includes('revert') || error?.message?.includes('RangeError')) {
+                      // Character doesn't exist, skip silently
+                    } else {
+                      console.warn(`Error fetching character ${charId.toString()}:`, error?.message || error);
+                    }
                   }
                 }
               } catch (error) {

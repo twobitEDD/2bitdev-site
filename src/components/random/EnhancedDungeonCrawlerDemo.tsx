@@ -40,6 +40,7 @@ import {
 import { contractsConfig } from "@config/contracts";
 import { getRpcUrl } from "@config/rpc";
 import { ethers } from "ethers";
+import DungeonCrawlerABI from "@abis/DungeonCrawler.json";
 
 interface Character {
   id: string; // Local unique identifier for the character
@@ -179,20 +180,29 @@ export function EnhancedDungeonCrawlerDemo() {
       const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
       console.log(`Using RPC for ${network}:`, rpcUrl.includes('alchemy') ? 'Alchemy' : 'Public');
 
-      const dungeonCrawlerAbi = [
-        "function playerCharacters(address player) external view returns (uint256[] memory)",
-        "function getCharacter(uint256 characterId) external view returns (address player, uint8 class, uint8 strength, uint8 dexterity, uint8 intelligence, uint8 wisdom, uint8 constitution, uint8 charisma, uint256 level, uint256 health, uint256 maxHealth, uint256 wealth, bool alive, uint256 actionCount, uint8 status, uint256 createdAt)",
-      ];
-
-      const contract = new ethers.Contract(dungeonCrawlerAddress, dungeonCrawlerAbi, rpcProvider);
+      // Use full ABI from JSON file for accurate function signatures
+      const contract = new ethers.Contract(dungeonCrawlerAddress, DungeonCrawlerABI.abi, rpcProvider);
       
       // Get user's character IDs with timeout
-      const characterIds = await Promise.race([
-        contract.playerCharacters(address),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error(`Timeout fetching characters from ${network}`)), 5000)
-        )
-      ]) as bigint[];
+      let characterIds: bigint[] = [];
+      try {
+        characterIds = await Promise.race([
+          contract.playerCharacters(address),
+          new Promise<bigint[]>((_, reject) => 
+            setTimeout(() => reject(new Error(`Timeout fetching characters from ${network}`)), 5000)
+          )
+        ]) as bigint[];
+      } catch (error: any) {
+        // If playerCharacters fails, it might mean the player has no characters
+        if (error?.code === 'CALL_EXCEPTION' || error?.message?.includes('revert') || error?.message?.includes('missing revert data')) {
+          console.log(`No characters found for address ${address} (contract call reverted)`);
+          setLoadingCharacters(false);
+          return;
+        }
+        console.error(`Error fetching character IDs:`, error?.message || error);
+        setLoadingCharacters(false);
+        return;
+      }
       
       if (!characterIds || characterIds.length === 0) {
         console.log("No past characters found");
@@ -200,7 +210,7 @@ export function EnhancedDungeonCrawlerDemo() {
         return;
       }
 
-      console.log(`Found ${characterIds.length} characters for address ${address}`);
+      console.log(`Found ${characterIds.length} character IDs for address ${address}`);
 
       // Fetch each character's data
       const loadedCharacters: Character[] = [];
@@ -215,44 +225,77 @@ export function EnhancedDungeonCrawlerDemo() {
             )
           ]) as any;
 
-          // Check if character exists (player address should not be zero)
-          const playerAddress = charData[0] || charData.player;
-          if (!charData || !playerAddress || playerAddress === ethers.ZeroAddress || playerAddress === "0x0000000000000000000000000000000000000000") {
-            console.warn(`Character ${characterId.toString()} does not exist`);
+          // Safely access player address - try both named and indexed access
+          let playerAddress: string | null = null;
+          try {
+            playerAddress = charData?.player || charData?.[0] || null;
+          } catch (e) {
+            // If accessing fails, character doesn't exist
+            console.warn(`Character ${characterId.toString()} data access failed:`, e);
             continue;
           }
 
+          // Check if character exists (player address should not be zero)
+          if (!playerAddress || playerAddress === ethers.ZeroAddress || playerAddress === "0x0000000000000000000000000000000000000000") {
+            console.warn(`Character ${characterId.toString()} does not exist (zero address)`);
+            continue;
+          }
+
+          // Safely access all character properties with fallbacks
           const contractCharacterId = Number(characterId);
           const characterIdLocal = `char_${contractCharacterId}_${Date.now()}`;
-          const className = classNames[Number(charData.class)] || "Unknown";
+          
+          // Safely get class - try named first, then indexed
+          let classValue = 0;
+          try {
+            classValue = Number(charData?.class ?? charData?.[1] ?? 0);
+          } catch (e) {
+            console.warn(`Failed to get class for character ${characterId.toString()}`);
+            continue;
+          }
+          const className = classNames[classValue] || "Unknown";
           
           // Map status: 0=active, 1=legendary, 2=early_death
           const statusMap: Character["status"][] = ["active", "legendary", "early_death"];
-          const status = statusMap[Number(charData.status)] || "active";
+          let statusValue = 0;
+          try {
+            statusValue = Number(charData?.status ?? charData?.[14] ?? 0);
+          } catch (e) {
+            statusValue = 0; // Default to active
+          }
+          const status = statusMap[statusValue] || "active";
 
+          // Safely extract all character properties
           const character: Character = {
             id: characterIdLocal,
             contractCharacterId,
             class: className,
-            strength: Number(charData.strength),
-            dexterity: Number(charData.dexterity),
-            intelligence: Number(charData.intelligence),
-            wisdom: Number(charData.wisdom),
-            constitution: Number(charData.constitution),
-            charisma: Number(charData.charisma),
-            level: Number(charData.level),
-            health: Number(charData.health),
-            maxHealth: Number(charData.maxHealth),
-            wealth: Number(charData.wealth),
-            alive: charData.alive,
-            actionCount: Number(charData.actionCount),
+            strength: Number(charData?.strength ?? charData?.[2] ?? 10),
+            dexterity: Number(charData?.dexterity ?? charData?.[3] ?? 10),
+            intelligence: Number(charData?.intelligence ?? charData?.[4] ?? 10),
+            wisdom: Number(charData?.wisdom ?? charData?.[5] ?? 10),
+            constitution: Number(charData?.constitution ?? charData?.[6] ?? 10),
+            charisma: Number(charData?.charisma ?? charData?.[7] ?? 10),
+            level: Number(charData?.level ?? charData?.[8] ?? 1),
+            health: Number(charData?.health ?? charData?.[9] ?? 20),
+            maxHealth: Number(charData?.maxHealth ?? charData?.[10] ?? 20),
+            wealth: Number(charData?.wealth ?? charData?.[11] ?? 0),
+            alive: charData?.alive ?? charData?.[12] ?? true,
+            actionCount: Number(charData?.actionCount ?? charData?.[13] ?? 0),
             status,
-            createdAt: Number(charData.createdAt) * 1000, // Convert from seconds to milliseconds
+            createdAt: Number(charData?.createdAt ?? charData?.[15] ?? Date.now() / 1000) * 1000, // Convert from seconds to milliseconds
           };
 
           loadedCharacters.push(character);
-        } catch (error) {
-          console.warn(`Failed to load character ${characterId.toString()}:`, error);
+        } catch (error: any) {
+          // More detailed error logging
+          if (error?.code === 'CALL_EXCEPTION' || error?.message?.includes('revert')) {
+            console.warn(`Character ${characterId.toString()} does not exist or contract call failed:`, error.message);
+          } else if (error?.message?.includes('RangeError') || error?.message?.includes('out of result range')) {
+            console.warn(`Character ${characterId.toString()} data access error (out of range):`, error.message);
+          } else {
+            console.warn(`Failed to load character ${characterId.toString()}:`, error?.message || error);
+          }
           // Continue loading other characters even if one fails
         }
       }
