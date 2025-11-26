@@ -85,6 +85,7 @@ export function FishingGameDemo() {
   const [loading, setLoading] = useState(false);
   const [loadingNFTs, setLoadingNFTs] = useState(false);
   const [vrfSeed, setVrfSeed] = useState<string | null>(null);
+  const [pattern, setPattern] = useState<"pattern1" | "pattern2">("pattern1");
 
   // Load user's NFTs from contract
   const loadUserNFTs = useCallback(async () => {
