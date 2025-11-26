@@ -16,6 +16,9 @@ import {
   SimpleGrid,
   Code,
   Flex,
+  Radio,
+  RadioGroup,
+  VStack,
 } from "@chakra-ui/react";
 import {
   mockGoFishing,
@@ -228,24 +231,45 @@ export function FishingGameDemo() {
         duration: 3000,
       });
 
-      // Poll for fulfillment
-      setTimeout(async () => {
-        try {
-          const status = await pollForFulfillmentStatus(isPlaytestMode, provider, result.requestId, "baseSepolia");
-          if (status.fulfilled && status.randomnessValue) {
-            setVrfSeed(status.randomnessValue);
-            setFishingStep("readyToCatch");
+      // Pattern 1: Poll for FishCaught event (automatic callback)
+      // Pattern 2: Poll for VRF fulfillment, then user clicks Catch Fish
+      if (pattern === "pattern1") {
+        // Pattern 1: Poll for FishCaught event directly
+        setTimeout(async () => {
+          try {
+            await pollForFishCaughtEvent(isPlaytestMode, provider, result.requestId, "baseSepolia");
+            // FishCaught event found - fish was automatically caught via callback
+            // The pollForFishCaughtEvent will update the state
+          } catch (error) {
+            console.error("Error polling for FishCaught event:", error);
             toast({
-              title: "VRF Received!",
-              description: "Randomness is ready. Click Catch Fish to see what you caught!",
-              status: "success",
+              title: "Error",
+              description: "Failed to detect fish catch. The callback may still be processing.",
+              status: "warning",
               duration: 5000,
             });
           }
-        } catch (error) {
-          console.error("Error polling:", error);
-        }
-      }, 2000);
+        }, 2000);
+      } else {
+        // Pattern 2: Poll for VRF fulfillment, then show Catch Fish button
+        setTimeout(async () => {
+          try {
+            const status = await pollForFulfillmentStatus(isPlaytestMode, provider, result.requestId, "baseSepolia");
+            if (status.fulfilled && status.randomnessValue) {
+              setVrfSeed(status.randomnessValue);
+              setFishingStep("readyToCatch");
+              toast({
+                title: "VRF Received!",
+                description: "Randomness is ready. Click Catch Fish to see what you caught!",
+                status: "success",
+                duration: 5000,
+              });
+            }
+          } catch (error) {
+            console.error("Error polling:", error);
+          }
+        }, 2000);
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -334,6 +358,121 @@ export function FishingGameDemo() {
     }
   };
 
+  // Poll for FishCaught event (Pattern 1 - automatic callback)
+  const pollForFishCaughtEvent = async (
+    isPlaytestMode: boolean,
+    provider: ethers.BrowserProvider | null,
+    requestId: string,
+    network: "base" | "baseSepolia"
+  ) => {
+    if (isPlaytestMode || !provider) {
+      // In playtest mode, simulate automatic catch
+      setTimeout(() => {
+        const mockFish: FishCatch = {
+          fishType: Math.floor(Math.random() * 6),
+          fishName: FISH_TYPES[Math.floor(Math.random() * 6)].name,
+          size: 50 + Math.floor(Math.random() * 251),
+          value: Math.floor(Math.random() * 1000),
+          rarity: "Common",
+          randomness: "0x" + Math.random().toString(16).substr(2, 64),
+        };
+        setCaughtFish(mockFish);
+        setFishingStep("caught");
+        toast({
+          title: `Caught a ${mockFish.fishName}!`,
+          description: `${getFishEmoji(mockFish.fishType)} ${mockFish.rarity} - Size: ${mockFish.size}cm, Value: ${mockFish.value} gold`,
+          status: "success",
+          duration: 5000,
+        });
+        setTimeout(() => {
+          setCurrentRequestId(null);
+          setFishingStep("idle");
+          setVrfSeed(null);
+        }, 3000);
+      }, 3000);
+      return;
+    }
+
+    const fishingAddress = contractsConfig[network]?.fishingGame;
+    if (!fishingAddress) {
+      throw new Error(`FishingGame not deployed on ${network}`);
+    }
+
+    const fishingAbi = [
+      "event FishCaught(address indexed player, uint8 fishType, uint256 size, uint256 value)",
+      "function getPlayerCatchCount(address player) external view returns (uint256)",
+      "function getPlayerCatch(address player, uint256 index) external view returns (uint8 fishType, uint256 size, uint256 value, uint256 timestamp, string memory fishName)",
+    ];
+
+    const fishingContract = new ethers.Contract(fishingAddress, fishingAbi, provider);
+    const userAddress = await signer?.getAddress();
+    
+    if (!userAddress) {
+      throw new Error("User address not available");
+    }
+
+    // Get initial catch count
+    const initialCatchCount = await fishingContract.getPlayerCatchCount(userAddress);
+    console.log("Initial catch count:", initialCatchCount.toString());
+
+    // Poll for new catch (check if catch count increased)
+    const maxAttempts = 30;
+    const intervalMs = 2000;
+    
+    for (let i = 0; i < maxAttempts; i++) {
+      await new Promise(resolve => setTimeout(resolve, intervalMs));
+      
+      try {
+        const currentCatchCount = await fishingContract.getPlayerCatchCount(userAddress);
+        
+        if (currentCatchCount > initialCatchCount) {
+          // New catch detected! Get the latest catch
+          const catchIndex = currentCatchCount - BigInt(1);
+          const catchData = await fishingContract.getPlayerCatch(userAddress, catchIndex);
+          
+          const fish: FishCatch = {
+            fishType: Number(catchData.fishType),
+            fishName: catchData.fishName,
+            size: Number(catchData.size),
+            value: Number(catchData.value),
+            rarity: getFishRarity(Number(catchData.fishType)),
+            randomness: requestId, // Use requestId as identifier
+          };
+
+          setCaughtFish(fish);
+          setFishingStep("caught");
+          
+          toast({
+            title: `Caught a ${fish.fishName}!`,
+            description: `${getFishEmoji(fish.fishType)} ${fish.rarity} - Size: ${fish.size}cm, Value: ${fish.value} gold`,
+            status: "success",
+            duration: 5000,
+          });
+
+          // Reload NFTs
+          if (isConnected && signer) {
+            setTimeout(() => {
+              loadUserNFTs();
+            }, 2000);
+          }
+
+          // Reset for next fishing trip
+          setTimeout(() => {
+            setCurrentRequestId(null);
+            setFishingStep("idle");
+            setVrfSeed(null);
+          }, 3000);
+
+          return;
+        }
+      } catch (error) {
+        console.warn(`Poll attempt ${i + 1} failed:`, error);
+      }
+    }
+
+    throw new Error("Fish catch not detected within timeout. The callback may still be processing.");
+  };
+
   return (
     <Box>
       <Flex align="center" justify="space-between" mb={4} flexWrap="wrap" gap={2}>
@@ -398,9 +537,24 @@ export function FishingGameDemo() {
 
       {/* Current Fishing Status */}
       <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor} mb={4}>
-        <Heading size="sm" mb={4} color="white">
-          Fishing Status
-        </Heading>
+        <Flex justify="space-between" align="center" mb={4}>
+          <Heading size="sm" color="white">
+            Fishing Status
+          </Heading>
+          <VStack spacing={2} align="flex-end">
+            <Text fontSize="xs" color="gray.400">Integration Pattern:</Text>
+            <RadioGroup value={pattern} onChange={(value) => setPattern(value as "pattern1" | "pattern2")} size="sm">
+              <Stack direction="row" spacing={4}>
+                <Radio value="pattern1" colorScheme="blue">
+                  <Text fontSize="xs">Pattern 1 (Auto)</Text>
+                </Radio>
+                <Radio value="pattern2" colorScheme="green">
+                  <Text fontSize="xs">Pattern 2 (Manual)</Text>
+                </Radio>
+              </Stack>
+            </RadioGroup>
+          </VStack>
+        </Flex>
 
         {fishingStep === "idle" && (
           <Stack spacing={4}>
@@ -408,8 +562,10 @@ export function FishingGameDemo() {
               <AlertIcon />
               <Box>
                 <Text fontWeight="bold">Ready to Fish!</Text>
-                <Text fontSize="sm">
-                  Click &quot;Go Fishing&quot; to request VRF randomness. Once the server fulfills the request, you can catch your fish!
+                <Text fontSize="sm" mt={1}>
+                  {pattern === "pattern1" 
+                    ? "Pattern 1 (Automatic): Click 'Go Fishing' and the fish will be automatically caught when VRF is fulfilled via callback."
+                    : "Pattern 2 (Manual): Click 'Go Fishing' to request VRF randomness. Once fulfilled, click 'Catch Fish' to see what you caught!"}
                 </Text>
               </Box>
             </Alert>
@@ -424,12 +580,16 @@ export function FishingGameDemo() {
             <Alert status="warning" borderRadius="lg">
               <AlertIcon />
               <Box>
-                <Text fontWeight="bold">Waiting for VRF...</Text>
+                <Text fontWeight="bold">
+                  {pattern === "pattern1" ? "Waiting for Automatic Catch..." : "Waiting for VRF..."}
+                </Text>
                 <Text fontSize="sm">
                   Request ID: {currentRequestId?.slice(0, 20)}...
                 </Text>
                 <Text fontSize="sm" mt={2}>
-                  The SERV.random server is processing your request. This usually takes 3-5 seconds.
+                  {pattern === "pattern1"
+                    ? "Pattern 1: The SERV.random server will automatically catch your fish via callback when VRF is fulfilled. This usually takes 3-5 seconds."
+                    : "Pattern 2: The SERV.random server is processing your request. Once fulfilled, you'll be able to catch your fish manually."}
                 </Text>
               </Box>
             </Alert>
@@ -574,7 +734,18 @@ export function FishingGameDemo() {
             <strong>Step 2:</strong> SERV.random server detects the request, fetches VRF from Harmony, and submits it to FeeCollector
           </Text>
           <Text>
-            <strong>Step 3:</strong> Click &quot;Catch Fish&quot; → Calls <Code fontSize="xs">FishingGame.catchFish()</Code> which retrieves VRF from FeeCollector and generates fish using weighted random selection (50% Goldfish, 30% Trout, 15% Salmon, 4% Tuna, 1% Shark, 0% Whale)
+            <strong>Step 3:</strong>{" "}
+            {pattern === "pattern1" ? (
+              <>
+                <Badge colorScheme="blue" fontSize="xs" mr={1}>Pattern 1</Badge>
+                Server automatically calls <Code fontSize="xs">FishingGame.receiveRandomness()</Code> callback → Fish is automatically caught and NFT minted
+              </>
+            ) : (
+              <>
+                <Badge colorScheme="green" fontSize="xs" mr={1}>Pattern 2</Badge>
+                Click &quot;Catch Fish&quot; → Calls <Code fontSize="xs">FishingGame.catchFish()</Code> which retrieves VRF from FeeCollector and generates fish using weighted random selection (50% Goldfish, 30% Trout, 15% Salmon, 4% Tuna, 1% Shark, 1% Whale)
+              </>
+            )}
           </Text>
           <Text>
             <strong>Step 4:</strong> An NFT is minted via <Code fontSize="xs">FishingGameNFT.mintFishNFT()</Code> with the VRF seed stored in its metadata for verifiability on block explorers
