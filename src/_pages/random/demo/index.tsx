@@ -52,31 +52,9 @@ interface FeeRequest {
 }
 
 const DemoPage = () => {
-  const { provider } = useWallet();
   const bgColor = useColorModeValue("gray.50", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
   const borderColor = useColorModeValue("gray.200", "gray.600");
-  const [vrfData, setVrfData] = useState<VRFEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // Helper to get a provider for read-only queries (uses WalletContext provider if available)
-  const getReadOnlyProvider = (): ethers.Provider | null => {
-    if (typeof window === 'undefined') {
-      return null;
-    }
-    
-    // Prefer provider from WalletContext (uses user's configured RPC)
-    if (provider) {
-      return provider;
-    }
-    
-    // Fallback to window.ethereum if available
-    if (window.ethereum) {
-      return new ethers.BrowserProvider(window.ethereum);
-    }
-    
-    return null;
-  };
 
   useEffect(() => {
     // Skip during build/SSR - only run on client
