@@ -15,8 +15,7 @@
     "format:write": "prettier --write \"**/*.{ts,tsx,mdx}\" --cache",
     "format:check": "prettier --check \"**/*.{ts,tsx,mdx}\" --cache",
     "--- utils --- ": "",
-    "del--.next": "rmdir .next /s/q",
-    "del--node_modules": "rmdir .next /s/q"
+    "postinstall": "echo 'Build dependencies installed successfully'"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.0",

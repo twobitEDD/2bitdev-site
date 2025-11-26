@@ -33,7 +33,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# package managers
 package-lock.json
-yarn.lock
+# NOTE: Keep yarn.lock - Railway needs it to detect yarn usage
+
+# vscode
 .vscode/settings.json
-yarn.lock
