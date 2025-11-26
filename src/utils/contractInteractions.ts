@@ -1176,11 +1176,19 @@ export async function checkRequestStatus(
   const contract = new ethers.Contract(feeCollector, abi, provider);
   const request = await contract.requests(requestId);
 
+  // Only consider fulfilled if randomnessValue is set and not zero hash
+  const randomnessValue = request.randomnessValue !== ethers.ZeroHash && request.randomnessValue !== "0x0000000000000000000000000000000000000000000000000000000000000000"
+    ? request.randomnessValue
+    : undefined;
+  
+  // Only mark as fulfilled if randomnessValue is actually set
+  const isFulfilled = request.fulfilled && !!randomnessValue;
+  
   return {
     id: request.id.toString(),
     requester: request.requester,
-    fulfilled: request.fulfilled,
-    randomnessValue: request.randomnessValue !== ethers.ZeroHash ? request.randomnessValue : undefined,
+    fulfilled: isFulfilled,
+    randomnessValue,
     timestamp: Number(request.timestamp),
   };
 }
@@ -1195,12 +1203,22 @@ export async function pollForRealFulfillment(
   maxAttempts: number = 30,
   intervalMs: number = 2000
 ): Promise<ContractRequestStatus> {
+  // Wait before first check to avoid false positives immediately after request creation
+  // This ensures the request has time to be processed by the server
+  await new Promise((resolve) => setTimeout(resolve, intervalMs));
+  
   for (let i = 0; i < maxAttempts; i++) {
     const status = await checkRequestStatus(provider, requestId, network);
-    if (status.fulfilled && status.randomnessValue) {
+    
+    // Only return if both fulfilled AND randomnessValue is set (not zero hash)
+    if (status.fulfilled && status.randomnessValue && status.randomnessValue !== ethers.ZeroHash) {
       return status;
     }
-    await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    
+    // Wait before next check (except on last iteration)
+    if (i < maxAttempts - 1) {
+      await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    }
   }
   throw new Error("Request not fulfilled within timeout");
 }

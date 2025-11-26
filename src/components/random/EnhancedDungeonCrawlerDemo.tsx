@@ -166,6 +166,8 @@ export function EnhancedDungeonCrawlerDemo() {
         duration: 3000,
       });
 
+      // Poll for fulfillment after initial delay
+      // Note: pollForFulfillmentStatus already has built-in delays, so we don't need a long delay here
       setTimeout(async () => {
         try {
           const status = await pollForFulfillmentStatus(
@@ -174,6 +176,7 @@ export function EnhancedDungeonCrawlerDemo() {
             result.requestId,
             network
           );
+          // Only show toast if actually fulfilled with randomness value
           if (status.fulfilled && status.randomnessValue) {
             toast({
               title: "VRF Received!",
@@ -183,9 +186,10 @@ export function EnhancedDungeonCrawlerDemo() {
             });
           }
         } catch (error) {
-          console.error("Error polling:", error);
+          console.error("Error polling for VRF fulfillment:", error);
+          // Don't show error toast - polling will continue in background
         }
-      }, 2000);
+      }, 1000); // Reduced delay since pollForRealFulfillment now waits before first check
     } catch (error) {
       toast({
         title: "Error",
@@ -350,6 +354,7 @@ export function EnhancedDungeonCrawlerDemo() {
         duration: 3000,
       });
 
+      // Poll for fulfillment after initial delay
       setTimeout(async () => {
         try {
           const status = await pollForFulfillmentStatus(
@@ -358,6 +363,7 @@ export function EnhancedDungeonCrawlerDemo() {
             result.requestId,
             network
           );
+          // Only show toast if actually fulfilled with randomness value
           if (status.fulfilled && status.randomnessValue) {
             toast({
               title: "VRF Received!",
@@ -367,9 +373,10 @@ export function EnhancedDungeonCrawlerDemo() {
             });
           }
         } catch (error) {
-          console.error("Error polling:", error);
+          console.error("Error polling for VRF fulfillment:", error);
+          // Don't show error toast - polling will continue in background
         }
-      }, 2000);
+      }, 1000); // Reduced delay since pollForRealFulfillment now waits before first check
     } catch (error) {
       toast({
         title: "Error",
