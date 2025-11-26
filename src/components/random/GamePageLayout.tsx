@@ -12,9 +12,7 @@ import {
   Code,
   Tabs,
   TabList,
-  TabPanels,
   Tab,
-  TabPanel,
 } from "@chakra-ui/react";
 import { PageAnimation } from "@components/motion/PageAnimation";
 import { VRFVisualization } from "@components/random/VRFVisualization";
@@ -308,47 +306,38 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
           </Link>
         </Flex>
 
-        <Tabs index={0} variant="line" colorScheme="brand">
-          <TabList>
-            <Tab>Game</Tab>
-            <Tab>Live VRF Feed</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel px={0}>
-              <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
-                {children}
-              </Box>
+        {/* VRF Visualization at the top */}
+        <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor} mb={6}>
+          {loading ? (
+            <Text color="gray.400" textAlign="center">
+              Loading VRF data...
+            </Text>
+          ) : (
+            <VRFVisualization entries={vrfData} maxEntries={50} />
+          )}
+        </Box>
 
-              <Alert status="info" borderRadius="lg" mt={4}>
-                <AlertIcon />
-                <Box>
-                  <Text fontWeight="bold">Contract Addresses</Text>
-                  <Stack spacing={1} fontSize="sm" mt={2}>
-                    <Text>
-                      <strong>Base Sepolia (Testnet):</strong>{" "}
-                      <Code fontSize="xs">{contractsConfig.baseSepolia?.[contractKey] || "Not deployed"}</Code>
-                    </Text>
-                    <Text>
-                      <strong>Base (Mainnet):</strong>{" "}
-                      <Code fontSize="xs">{contractsConfig.base[contractKey] || "Not deployed"}</Code>
-                    </Text>
-                  </Stack>
-                </Box>
-              </Alert>
-            </TabPanel>
-            <TabPanel px={0}>
-              <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
-                {loading ? (
-                  <Text color="gray.400" textAlign="center">
-                    Loading VRF data...
-                  </Text>
-                ) : (
-                  <VRFVisualization entries={vrfData} maxEntries={50} />
-                )}
-              </Box>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
+        {/* Game content */}
+        <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+          {children}
+        </Box>
+
+        <Alert status="info" borderRadius="lg" mt={4}>
+          <AlertIcon />
+          <Box>
+            <Text fontWeight="bold">Contract Addresses</Text>
+            <Stack spacing={1} fontSize="sm" mt={2}>
+              <Text>
+                <strong>Base Sepolia (Testnet):</strong>{" "}
+                <Code fontSize="xs">{contractsConfig.baseSepolia?.[contractKey] || "Not deployed"}</Code>
+              </Text>
+              <Text>
+                <strong>Base (Mainnet):</strong>{" "}
+                <Code fontSize="xs">{contractsConfig.base[contractKey] || "Not deployed"}</Code>
+              </Text>
+            </Stack>
+          </Box>
+        </Alert>
       </Container>
     </PageAnimation>
   );

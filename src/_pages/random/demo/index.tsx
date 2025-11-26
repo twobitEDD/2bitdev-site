@@ -403,10 +403,7 @@ const DemoPageContent = () => {
               </Text>
             </Box>
 
-            {/* Playtest Mode Toggle */}
-            <PlaytestModeToggle />
-
-          {/* Live VRF Data */}
+          {/* Live VRF Data - At the top */}
           {loading ? (
             <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
               <Text color="gray.400" textAlign="center" fontSize={{ base: "sm", md: "md" }}>
@@ -415,9 +412,12 @@ const DemoPageContent = () => {
             </Box>
           ) : (
             <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor} overflowX="auto">
-              <VRFVisualization entries={vrfData} maxEntries={6} />
+              <VRFVisualization entries={vrfData} maxEntries={50} />
             </Box>
           )}
+
+            {/* Playtest Mode Toggle */}
+            <PlaytestModeToggle />
 
           {/* Game Selection Cards */}
           <Box>
