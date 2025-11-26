@@ -26,6 +26,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import RouletteGameABI from "@abis/RouletteGame.json";
 import DungeonCrawlerABI from "@abis/DungeonCrawler.json";
+import { PlaytestModeToggle } from "@components/random/PlaytestModeToggle";
 
 interface VRFEntry {
   blockNumber: number;
@@ -342,11 +343,14 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
               ))}
             </TabList>
           </Tabs>
-          <Link href="/random/demo">
-            <Text color="blue.400" _hover={{ textDecoration: "underline" }} fontSize="sm">
-              ← Back to Demo Hub
-            </Text>
-          </Link>
+          <Flex align="center" gap={4} flexWrap="wrap">
+            <PlaytestModeToggle compact={true} />
+            <Link href="/random/demo">
+              <Text color="blue.400" _hover={{ textDecoration: "underline" }} fontSize="sm">
+                ← Back to Demo Hub
+              </Text>
+            </Link>
+          </Flex>
         </Flex>
 
         {/* VRF Visualization at the top */}

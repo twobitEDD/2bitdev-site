@@ -22,7 +22,11 @@ interface Particle {
   color: string;
 }
 
-export function PlaytestModeToggle() {
+interface PlaytestModeToggleProps {
+  compact?: boolean;
+}
+
+export function PlaytestModeToggle({ compact = false }: PlaytestModeToggleProps = {}) {
   const { isPlaytestMode, togglePlaytestMode } = usePlaytestMode();
   const [particles, setParticles] = useState<Particle[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -135,6 +139,33 @@ export function PlaytestModeToggle() {
     };
   }, [isPlaytestMode, particles]);
 
+  // Compact version for header
+  if (compact) {
+    return (
+      <Flex align="center" gap={2}>
+        <Button
+          onClick={togglePlaytestMode}
+          colorScheme={isPlaytestMode ? "yellow" : "gray"}
+          size="sm"
+          variant={isPlaytestMode ? "solid" : "outline"}
+          fontWeight="bold"
+          _hover={{
+            transform: "scale(1.05)",
+          }}
+          transition="all 0.2s"
+        >
+          {isPlaytestMode ? "🎮 PLAYTEST ON" : "🎮 PLAYTEST"}
+        </Button>
+        {isPlaytestMode && (
+          <Badge colorScheme="yellow" fontSize="xs" px={2} py={0.5}>
+            ACTIVE
+          </Badge>
+        )}
+      </Flex>
+    );
+  }
+
+  // Full version with particles
   return (
     <Box
       ref={containerRef}
