@@ -1188,29 +1188,83 @@ export async function realCatchFish(
   value: number;
 }> {
   const fishingGame = getFishingGameContract(signer, network);
+  const contractAddress = contractsConfig[network]?.fishingGame;
+  
+  if (!contractAddress) {
+    throw new Error(`FishingGame not deployed on ${network}`);
+  }
+  
+  console.log("🎣 Catching fish", { requestId, network, contractAddress });
   
   // Call catchFish()
   const tx = await fishingGame.catchFish(requestId);
+  console.log("✅ Transaction sent:", tx.hash);
+  
   const receipt = await tx.wait();
+  console.log("✅ Transaction confirmed:", receipt.hash);
+  console.log("Transaction status:", receipt.status === 1 ? "Success" : "Failed");
+  
+  if (receipt.status !== 1) {
+    throw new Error("Transaction reverted. Check the transaction on block explorer for details.");
+  }
 
   // Get fish details from event
-  const event = receipt.logs.find((log: any) => {
+  console.log("Step 1: Parsing FishCaught event...");
+  console.log("Total logs:", receipt.logs.length);
+  console.log("Contract address:", contractAddress);
+  
+  // Filter logs by contract address first, then parse
+  const contractLogs = receipt.logs.filter((log: any) => 
+    log.address.toLowerCase() === contractAddress.toLowerCase()
+  );
+  console.log(`Logs from FishingGame contract: ${contractLogs.length} out of ${receipt.logs.length}`);
+  
+  const event = contractLogs.find((log: any) => {
     try {
       const parsed = fishingGame.interface.parseLog(log);
-      return parsed?.name === "FishCaught";
-    } catch {
+      const isMatch = parsed?.name === "FishCaught";
+      if (isMatch) {
+        console.log("✅ Found FishCaught event:", {
+          player: parsed.args[0],
+          fishType: parsed.args[1]?.toString(),
+          size: parsed.args[2]?.toString(),
+          value: parsed.args[3]?.toString(),
+        });
+      }
+      return isMatch;
+    } catch (parseError) {
+      // Log parse errors for debugging
+      console.warn("Failed to parse log:", parseError);
       return false;
     }
   });
 
   if (!event) {
-    throw new Error("FishCaught event not found");
+    console.error("❌ FishCaught event not found in receipt");
+    console.error("Available logs:", receipt.logs.map((log: any, idx: number) => {
+      try {
+        const parsed = fishingGame.interface.parseLog(log);
+        return { index: idx, name: parsed?.name, args: parsed?.args };
+      } catch {
+        return { index: idx, address: log.address, topics: log.topics };
+      }
+    }));
+    throw new Error("FishCaught event not found in transaction receipt. The transaction may have reverted or the event signature doesn't match.");
   }
 
   const parsed = fishingGame.interface.parseLog(event);
-  const fishType = Number(parsed?.args[1]); // fishType
-  const size = Number(parsed?.args[2]); // size
-  const value = Number(parsed?.args[3]); // value
+  if (!parsed) {
+    throw new Error("Failed to parse FishCaught event");
+  }
+  
+  // Event structure: FishCaught(address indexed player, uint8 fishType, uint256 size, uint256 value)
+  // Indexed params: player (args[0])
+  // Non-indexed params: fishType (args[1]), size (args[2]), value (args[3])
+  const fishType = Number(parsed.args.fishType ?? parsed.args[1] ?? 0);
+  const size = Number(parsed.args.size ?? parsed.args[2] ?? 0);
+  const value = Number(parsed.args.value ?? parsed.args[3] ?? 0);
+  
+  console.log("✅ Fish caught successfully:", { fishType, size, value });
 
   // Map fish type to name
   const fishNames = ["Goldfish", "Trout", "Salmon", "Tuna", "Shark", "Whale"];
