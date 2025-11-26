@@ -43,6 +43,7 @@ export function getFishingGameContract(
     "function getPlayerCatch(address player, uint256 index) external view returns (uint8 fishType, uint256 size, uint256 value, uint256 timestamp, string memory fishName)",
     "event FishingTripStarted(address indexed player, uint256 requestId)",
     "event FishCaught(address indexed player, uint8 fishType, uint256 size, uint256 value)",
+    "event RandomnessReceived(uint256 requestId, bytes32 randomness)",
   ];
 
   return new ethers.Contract(address, abi, signer);
@@ -1209,7 +1210,7 @@ export async function realCatchFish(
   }
 
   // Get fish details from event
-  console.log("Step 1: Parsing FishCaught event...");
+  console.log("Step 1: Parsing events from transaction receipt...");
   console.log("Total logs:", receipt.logs.length);
   console.log("Contract address:", contractAddress);
   
@@ -1219,16 +1220,33 @@ export async function realCatchFish(
   );
   console.log(`Logs from FishingGame contract: ${contractLogs.length} out of ${receipt.logs.length}`);
   
+  // Check for RandomnessReceived event (emitted before FishCaught)
+  const randomnessReceivedEvent = contractLogs.find((log: any) => {
+    try {
+      const parsed = fishingGame.interface.parseLog(log);
+      return parsed?.name === "RandomnessReceived";
+    } catch {
+      return false;
+    }
+  });
+  
+  if (randomnessReceivedEvent) {
+    console.log("✅ Found RandomnessReceived event - catchFish() processed the request");
+  } else {
+    console.log("⚠️ RandomnessReceived event not found - fish may have already been caught");
+  }
+  
+  // Find FishCaught event
   const event = contractLogs.find((log: any) => {
     try {
       const parsed = fishingGame.interface.parseLog(log);
       const isMatch = parsed?.name === "FishCaught";
       if (isMatch) {
         console.log("✅ Found FishCaught event:", {
-          player: parsed.args[0],
-          fishType: parsed.args[1]?.toString(),
-          size: parsed.args[2]?.toString(),
-          value: parsed.args[3]?.toString(),
+          player: parsed.args.player ?? parsed.args[0],
+          fishType: parsed.args.fishType ?? parsed.args[1]?.toString(),
+          size: parsed.args.size ?? parsed.args[2]?.toString(),
+          value: parsed.args.value ?? parsed.args[3]?.toString(),
         });
       }
       return isMatch;
@@ -1240,8 +1258,8 @@ export async function realCatchFish(
   });
 
   if (!event) {
-    console.error("❌ FishCaught event not found in receipt");
-    console.error("Available logs:", receipt.logs.map((log: any, idx: number) => {
+    console.warn("⚠️ FishCaught event not found in receipt - fish may have already been caught");
+    console.log("Available logs:", receipt.logs.map((log: any, idx: number) => {
       try {
         const parsed = fishingGame.interface.parseLog(log);
         return { index: idx, name: parsed?.name, args: parsed?.args };
@@ -1249,7 +1267,40 @@ export async function realCatchFish(
         return { index: idx, address: log.address, topics: log.topics };
       }
     }));
-    throw new Error("FishCaught event not found in transaction receipt. The transaction may have reverted or the event signature doesn't match.");
+    
+    // Transaction succeeded but no event - this means the fish was already caught
+    // (contract returns early if pendingRequests[_requestId] is address(0))
+    // Try to get the most recent catch from the player's history
+    console.log("Checking if fish was already caught by querying player's catch history...");
+    try {
+      const playerAddress = await signer.getAddress();
+      const catchCount = await fishingGame.getPlayerCatchCount(playerAddress);
+      
+      if (catchCount > 0) {
+        // Get the most recent catch (last index)
+        const lastCatch = await fishingGame.getPlayerCatch(playerAddress, catchCount - 1n);
+        const fishType = Number(lastCatch.fishType);
+        const size = Number(lastCatch.size);
+        const value = Number(lastCatch.value);
+        const fishNames = ["Goldfish", "Trout", "Salmon", "Tuna", "Shark", "Whale"];
+        const fishName = fishNames[fishType] || "Unknown";
+        
+        console.log("✅ Found existing catch:", { fishType, fishName, size, value });
+        console.log("Note: Fish was already caught (likely via callback or previous catchFish call)");
+        
+        return {
+          fishType,
+          fishName,
+          size,
+          value,
+        };
+      }
+    } catch (historyError) {
+      console.error("Error checking catch history:", historyError);
+    }
+    
+    // If we can't find it in history, throw an error
+    throw new Error("FishCaught event not found in transaction receipt. The transaction succeeded but no event was emitted. This may happen if the fish was already caught via callback (Pattern 1) or a previous catchFish call.");
   }
 
   const parsed = fishingGame.interface.parseLog(event);

@@ -32,6 +32,10 @@ interface VRFEntry {
   timestamp: number;
   vrfValue: string;
   harmonyBlockHash: string;
+  gameSource?: string; // "RouletteGame", "DungeonCrawler", "FishingGame", "Harmony Block", "FeeRequest"
+  network?: string; // "base", "baseSepolia", "harmony"
+  requestId?: string; // Request ID if available
+  metadata?: Record<string, any>; // Additional metadata (spinId, characterId, etc.)
 }
 
 interface FeeRequest {
@@ -124,6 +128,13 @@ const DemoPageContent = () => {
                 timestamp: timestamp || Date.now(),
                 vrfValue: spin.vrfSeed,
                 harmonyBlockHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                gameSource: "RouletteGame",
+                network: network,
+                metadata: {
+                  spinId: spinId.toString(),
+                  result: spin.result,
+                  color: spin.color,
+                },
               });
             }
           } catch (error) {
@@ -185,6 +196,12 @@ const DemoPageContent = () => {
                   timestamp: timestamp || Date.now(),
                   vrfValue: creationSeed,
                   harmonyBlockHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  gameSource: "DungeonCrawler",
+                  network: network,
+                  metadata: {
+                    characterId: charId.toString(),
+                    type: "character_creation",
+                  },
                 });
               }
             } catch (error) {
@@ -214,6 +231,12 @@ const DemoPageContent = () => {
                   timestamp: Date.now(),
                   vrfValue: vrfSeed,
                   harmonyBlockHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  gameSource: "DungeonCrawler",
+                  network: network,
+                  metadata: {
+                    interactionId: interactionId.toString(),
+                    type: "interaction",
+                  },
                 });
               }
             } catch (error) {
@@ -257,6 +280,8 @@ const DemoPageContent = () => {
                 timestamp: entry.timestamp || Date.now(),
                 vrfValue: entry.vrfValue || entry.randomness || '0x0',
                 harmonyBlockHash: entry.harmonyBlockHash || entry.blockHash || '0x0',
+                gameSource: "Harmony Block",
+                network: "harmony",
               });
             });
           }
@@ -287,15 +312,24 @@ const DemoPageContent = () => {
                   timestamp: timestamp || Date.now(),
                   vrfValue: req.randomnessValue!,
                   harmonyBlockHash: "0x0000000000000000000000000000000000000000000000000000000000000000", // Not available for game requests
+                  gameSource: "FeeRequest",
+                  network: req.network || "unknown",
+                  requestId: req.requestId,
                 };
               });
             console.log('Fulfilled requests found:', fulfilledRequests.length);
             combinedVRF.push(...fulfilledRequests);
           }
           
-          // Fetch game-specific VRF data from contracts
-          // Use Promise.allSettled with timeout to prevent hanging during build
-          // Wrap each call with a timeout to ensure they fail fast
+          // Sort by timestamp (most recent first) and update UI immediately with API data
+          combinedVRF.sort((a, b) => b.timestamp - a.timestamp);
+          if (combinedVRF.length > 0) {
+            setVrfData([...combinedVRF]);
+            setLoading(false); // Show data immediately when API data is available
+          }
+          
+          // Fetch game-specific VRF data from contracts in parallel (non-blocking)
+          // Use Promise.allSettled with timeout to prevent hanging
           const withTimeout = <T,>(promise: Promise<T>, timeoutMs: number = 8000): Promise<T> => {
             return Promise.race([
               promise,
@@ -305,46 +339,47 @@ const DemoPageContent = () => {
             ]);
           };
           
-          const [baseSepoliaSpinsResult, baseSpinsResult, baseSepoliaDungeonResult, baseDungeonResult] = await Promise.allSettled([
+          // Fetch contract data asynchronously and update when ready
+          Promise.allSettled([
             withTimeout(fetchRouletteGameSpins("baseSepolia"), 8000),
             withTimeout(fetchRouletteGameSpins("base"), 8000),
             withTimeout(fetchDungeonCrawlerVRF("baseSepolia"), 8000),
             withTimeout(fetchDungeonCrawlerVRF("base"), 8000),
-          ]);
-          
-          const baseSepoliaSpins = baseSepoliaSpinsResult.status === 'fulfilled' ? baseSepoliaSpinsResult.value : [];
-          const baseSpins = baseSpinsResult.status === 'fulfilled' ? baseSpinsResult.value : [];
-          const baseSepoliaDungeon = baseSepoliaDungeonResult.status === 'fulfilled' ? baseSepoliaDungeonResult.value : [];
-          const baseDungeon = baseDungeonResult.status === 'fulfilled' ? baseDungeonResult.value : [];
-          
-          // Log any failures
-          if (baseSepoliaSpinsResult.status === 'rejected') {
-            console.error('Failed to fetch RouletteGame spins from baseSepolia:', baseSepoliaSpinsResult.reason);
-          }
-          if (baseSpinsResult.status === 'rejected') {
-            console.error('Failed to fetch RouletteGame spins from base:', baseSpinsResult.reason);
-          }
-          if (baseSepoliaDungeonResult.status === 'rejected') {
-            console.error('Failed to fetch DungeonCrawler VRF from baseSepolia:', baseSepoliaDungeonResult.reason);
-          }
-          if (baseDungeonResult.status === 'rejected') {
-            console.error('Failed to fetch DungeonCrawler VRF from base:', baseDungeonResult.reason);
-          }
-          
-          console.log(`Game VRF data: RouletteGame baseSepolia=${baseSepoliaSpins.length}, base=${baseSpins.length}, DungeonCrawler baseSepolia=${baseSepoliaDungeon.length}, base=${baseDungeon.length}`);
-          combinedVRF.push(...baseSepoliaSpins, ...baseSpins, ...baseSepoliaDungeon, ...baseDungeon);
-          
-          // Sort by timestamp (most recent first) and limit to 20
-          combinedVRF.sort((a, b) => b.timestamp - a.timestamp);
-          const limitedVRF = combinedVRF.slice(0, 20);
-          console.log('Final VRF data count:', limitedVRF.length);
-          setVrfData(limitedVRF);
+          ]).then((results) => {
+            const baseSepoliaSpins = results[0].status === 'fulfilled' ? results[0].value : [];
+            const baseSpins = results[1].status === 'fulfilled' ? results[1].value : [];
+            const baseSepoliaDungeon = results[2].status === 'fulfilled' ? results[2].value : [];
+            const baseDungeon = results[3].status === 'fulfilled' ? results[3].value : [];
+            
+            // Log any failures
+            if (results[0].status === 'rejected') {
+              console.error('Failed to fetch RouletteGame spins from baseSepolia:', results[0].reason);
+            }
+            if (results[1].status === 'rejected') {
+              console.error('Failed to fetch RouletteGame spins from base:', results[1].reason);
+            }
+            if (results[2].status === 'rejected') {
+              console.error('Failed to fetch DungeonCrawler VRF from baseSepolia:', results[2].reason);
+            }
+            if (results[3].status === 'rejected') {
+              console.error('Failed to fetch DungeonCrawler VRF from base:', results[3].reason);
+            }
+            
+            console.log(`Game VRF data: RouletteGame baseSepolia=${baseSepoliaSpins.length}, base=${baseSpins.length}, DungeonCrawler baseSepolia=${baseSepoliaDungeon.length}, base=${baseDungeon.length}`);
+            
+            // Combine all data and update
+            const allVRF = [...combinedVRF, ...baseSepoliaSpins, ...baseSpins, ...baseSepoliaDungeon, ...baseDungeon];
+            allVRF.sort((a, b) => b.timestamp - a.timestamp);
+            const limitedVRF = allVRF.slice(0, 50); // Increased limit for scrolling list
+            console.log('Final VRF data count:', limitedVRF.length);
+            setVrfData(limitedVRF);
+          });
         } else {
           console.error('Failed to fetch VRF data:', response.status, response.statusText);
+          setLoading(false);
         }
       } catch (error) {
         console.error("Error fetching VRF data:", error);
-      } finally {
         setLoading(false);
       }
     };
