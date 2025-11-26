@@ -14,17 +14,9 @@ import {
   SimpleGrid,
   Alert,
   AlertIcon,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
 } from "@chakra-ui/react";
 import { PageAnimation } from "@components/motion/PageAnimation";
 import { VRFVisualization } from "@components/random/VRFVisualization";
-import { RouletteGameDemo } from "@components/random/RouletteGameDemo";
-import { EnhancedDungeonCrawlerDemo } from "@components/random/EnhancedDungeonCrawlerDemo";
-import { FishingGameDemo } from "@components/random/FishingGameDemo";
 import { PlaytestModeToggle } from "@components/random/PlaytestModeToggle";
 import { PlaytestModeProvider } from "@contexts/PlaytestModeContext";
 import { WalletProvider, useWallet } from "@contexts/WalletContext";
@@ -51,7 +43,8 @@ interface FeeRequest {
   network: string;
 }
 
-const DemoPage = () => {
+// Inner component that uses WalletContext (must be inside WalletProvider)
+const DemoPageContent = () => {
   const { provider } = useWallet();
   const bgColor = useColorModeValue("gray.50", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
@@ -97,10 +90,6 @@ const DemoPage = () => {
         // Use centralized provider helper (uses WalletContext provider if available)
         const rpcProvider = getReadOnlyProvider();
         if (!rpcProvider) {
-          console.log(`No ethereum provider available for ${network}`);
-          return [];
-        }
-        if (!provider) {
           console.log(`No ethereum provider available for ${network}`);
           return [];
         }
@@ -386,10 +375,8 @@ const DemoPage = () => {
   }, [provider]); // Include provider dependency to re-fetch when provider changes
 
   return (
-    <PlaytestModeProvider>
-      <WalletProvider>
-        <PageAnimation>
-        <Container maxW={"7xl"} py={{ base: 4, md: 8 }} px={{ base: 4, md: 6 }}>
+    <PageAnimation>
+      <Container maxW={"7xl"} py={{ base: 4, md: 8 }} px={{ base: 4, md: 6 }}>
           <Stack spacing={8}>
             <Box>
               <Heading size={{ base: "xl", md: "2xl" }} mb={2} color="white">
@@ -416,103 +403,126 @@ const DemoPage = () => {
             </Box>
           )}
 
-          {/* Demo Options */}
-          <Tabs>
-            <TabList overflowX="auto" overflowY="hidden" css={{
-              '&::-webkit-scrollbar': { display: 'none' },
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-            }}>
-              <Tab whiteSpace="nowrap" fontSize={{ base: "sm", md: "md" }}>FishingGame</Tab>
-              <Tab whiteSpace="nowrap" fontSize={{ base: "sm", md: "md" }}>Roulette</Tab>
-              <Tab whiteSpace="nowrap" fontSize={{ base: "sm", md: "md" }}>Dungeon Crawler</Tab>
-              <Tab whiteSpace="nowrap" fontSize={{ base: "sm", md: "md" }}>Integration Examples</Tab>
-            </TabList>
-
-            <TabPanels>
-              <TabPanel>
-                <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor} overflowX="auto">
-                  <FishingGameDemo />
+          {/* Game Selection Cards */}
+          <Box>
+            <Heading size="lg" mb={6} color="white">
+              🎮 Interactive Game Demos
+            </Heading>
+            <Text color="gray.400" mb={6} fontSize={{ base: "sm", md: "md" }}>
+              Click on a game below to try it out. Each demo shows how SERV.random VRF is used in real smart contracts.
+            </Text>
+            
+            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+              {/* Fishing Game Card */}
+              <Link href="/random/demo/fishing">
+                <Box
+                  bg={cardBg}
+                  p={6}
+                  borderRadius="lg"
+                  borderWidth="2px"
+                  borderColor={borderColor}
+                  _hover={{ borderColor: "blue.400", transform: "translateY(-2px)" }}
+                  transition="all 0.2s"
+                  cursor="pointer"
+                  h="100%"
+                >
+                  <Heading size="md" mb={3} color="white">
+                    🎣 Fishing Game
+                  </Heading>
+                  <Text color="gray.400" mb={4} fontSize="sm">
+                    Catch fish using VRF randomness. Each catch is determined by on-chain randomness from SERV.random.
+                  </Text>
+                  <Badge colorScheme="blue" fontSize="xs">
+                    Pattern 1: Automatic Callback
+                  </Badge>
                 </Box>
-                <Alert status="info" borderRadius="lg" mt={4}>
-                  <AlertIcon />
-                  <Box>
-                    <Text fontWeight="bold">Contract Addresses</Text>
-                    <Stack spacing={1} fontSize="sm" mt={2}>
-                      <Text>
-                        <strong>Base Sepolia (Testnet):</strong>{" "}
-                        <Code fontSize="xs">{contractsConfig.baseSepolia?.fishingGame || "Not deployed"}</Code>
-                      </Text>
-                      <Text>
-                        <strong>Base (Mainnet):</strong>{" "}
-                        <Code fontSize="xs">{contractsConfig.base.fishingGame}</Code>
-                      </Text>
-                      <Text>
-                        <strong>Avalanche:</strong>{" "}
-                        <Code fontSize="xs">{contractsConfig.avalanche.fishingGame}</Code>
-                      </Text>
-                      <Text>
-                        <strong>Polygon:</strong>{" "}
-                        <Code fontSize="xs">{contractsConfig.polygon.fishingGame}</Code>
-                      </Text>
-                    </Stack>
-                  </Box>
-                </Alert>
-              </TabPanel>
+              </Link>
 
-              <TabPanel>
-                <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor} overflowX="auto">
-                  <RouletteGameDemo />
+              {/* Roulette Game Card */}
+              <Link href="/random/demo/roulette">
+                <Box
+                  bg={cardBg}
+                  p={6}
+                  borderRadius="lg"
+                  borderWidth="2px"
+                  borderColor={borderColor}
+                  _hover={{ borderColor: "red.400", transform: "translateY(-2px)" }}
+                  transition="all 0.2s"
+                  cursor="pointer"
+                  h="100%"
+                >
+                  <Heading size="md" mb={3} color="white">
+                    🎰 Roulette Game
+                  </Heading>
+                  <Text color="gray.400" mb={4} fontSize="sm">
+                    Spin the wheel and see VRF-powered randomness determine your result. Watch the VRF seed generate your spin outcome.
+                  </Text>
+                  <Badge colorScheme="red" fontSize="xs">
+                    Pattern 1: Automatic Callback
+                  </Badge>
                 </Box>
-                <Alert status="info" borderRadius="lg" mt={4}>
-                  <AlertIcon />
-                  <Box>
-                    <Text fontWeight="bold">Contract Addresses</Text>
-                    <Stack spacing={1} fontSize="sm" mt={2}>
-                      <Text>
-                        <strong>Base Sepolia (Testnet):</strong>{" "}
-                        <Code fontSize="xs">{contractsConfig.baseSepolia?.rouletteGame || "Not deployed"}</Code>
-                      </Text>
-                      <Text>
-                        <strong>Base (Mainnet):</strong>{" "}
-                        <Code fontSize="xs">{contractsConfig.base.rouletteGame || "Not deployed"}</Code>
-                      </Text>
-                    </Stack>
-                  </Box>
-                </Alert>
-              </TabPanel>
+              </Link>
 
-              <TabPanel>
-                <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor} overflowX="auto">
-                  <EnhancedDungeonCrawlerDemo />
+              {/* Dungeon Crawler Card */}
+              <Link href="/random/demo/dungeon-crawler">
+                <Box
+                  bg={cardBg}
+                  p={6}
+                  borderRadius="lg"
+                  borderWidth="2px"
+                  borderColor={borderColor}
+                  _hover={{ borderColor: "purple.400", transform: "translateY(-2px)" }}
+                  transition="all 0.2s"
+                  cursor="pointer"
+                  h="100%"
+                >
+                  <Heading size="md" mb={3} color="white">
+                    🐉 Dungeon Crawler
+                  </Heading>
+                  <Text color="gray.400" mb={4} fontSize="sm">
+                    Create characters and explore dungeons. Character stats and interaction outcomes are generated using VRF randomness.
+                  </Text>
+                  <Badge colorScheme="purple" fontSize="xs">
+                    Pattern 2: Manual Claim
+                  </Badge>
                 </Box>
-                <Alert status="info" borderRadius="lg" mt={4}>
-                  <AlertIcon />
-                  <Box>
-                    <Text fontWeight="bold">Contract Addresses</Text>
-                    <Stack spacing={1} fontSize="sm" mt={2}>
-                      <Text>
-                        <strong>Base Sepolia (Testnet):</strong>{" "}
-                        <Code fontSize="xs">{contractsConfig.baseSepolia?.dungeonCrawler || "Not deployed"}</Code>
-                      </Text>
-                      <Text>
-                        <strong>Base (Mainnet):</strong>{" "}
-                        <Code fontSize="xs">{contractsConfig.base.dungeonCrawler || "Not deployed"}</Code>
-                      </Text>
-                    </Stack>
-                  </Box>
-                </Alert>
-              </TabPanel>
+              </Link>
 
-              <TabPanel>
-                <Stack spacing={4}>
-                  <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor} overflowX="auto">
-                    <Heading size="lg" mb={4} color="white">
-                      💻 Code Examples
-                    </Heading>
-                    <Text color="gray.400" mb={4}>
-                      Quick examples showing how to use SERV.random randomness in your contracts:
-                    </Text>
+              {/* Integration Examples Card */}
+              <Link href="/random/demo/integration">
+                <Box
+                  bg={cardBg}
+                  p={6}
+                  borderRadius="lg"
+                  borderWidth="2px"
+                  borderColor={borderColor}
+                  _hover={{ borderColor: "green.400", transform: "translateY(-2px)" }}
+                  transition="all 0.2s"
+                  cursor="pointer"
+                  h="100%"
+                >
+                  <Heading size="md" mb={3} color="white">
+                    📊 Integration Examples
+                  </Heading>
+                  <Text color="gray.400" mb={4} fontSize="sm">
+                    View live VRF data from all games and see code examples for integrating SERV.random into your contracts.
+                  </Text>
+                  <Badge colorScheme="green" fontSize="xs">
+                    Live Data & Examples
+                  </Badge>
+                </Box>
+              </Link>
+            </SimpleGrid>
+          </Box>
+
+          {/* Code Examples Section */}
+          <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor}>
+            <Heading size="lg" mb={4} color="white">
+              💻 Quick Code Examples
+            </Heading>
+            <Text color="gray.400" mb={4} fontSize={{ base: "sm", md: "md" }}>
+              Quick examples showing how to use SERV.random randomness in your contracts:
+            </Text>
 
                     <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
                       <Box p={4} bg={bgColor} borderRadius="md">
@@ -561,7 +571,7 @@ const DemoPage = () => {
                     </SimpleGrid>
                   </Box>
 
-                  <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor} overflowX="auto">
+                  <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor} mt={4}>
                     <Heading size="lg" mb={4} color="white">
                       🔗 Integration Patterns
                     </Heading>
@@ -589,79 +599,6 @@ const DemoPage = () => {
                       View Full Integration Guide →
                     </Button>
                   </Box>
-                </Stack>
-              </TabPanel>
-
-              <TabPanel>
-                <Box bg={cardBg} p={{ base: 4, md: 6 }} borderRadius="lg" borderWidth="1px" borderColor={borderColor} overflowX="auto">
-                  <Heading size="lg" mb={4} color="white">
-                    🔄 Complete Flow
-                  </Heading>
-                  <Text color="gray.400" mb={4} fontSize="sm">
-                    Understanding how SERV.random integrates into your game:
-                  </Text>
-                  <Stack spacing={6}>
-                    <Box>
-                      <Flex align="center" mb={2}>
-                        <Badge colorScheme="blue" mr={3} fontSize="md" w="40px" textAlign="center">
-                          1
-                        </Badge>
-                        <Heading size="sm" color="white">
-                          User Action
-                        </Heading>
-                      </Flex>
-                      <Text fontSize="sm" color="gray.400" ml="60px">
-                        User clicks &quot;Go Fishing&quot; → Contract calls{" "}
-                        <Code fontSize="xs">FeeCollector.requestRandomnessFor()</Code> → SRAND token transferred
-                      </Text>
-                    </Box>
-
-                    <Box>
-                      <Flex align="center" mb={2}>
-                        <Badge colorScheme="purple" mr={3} fontSize="md" w="40px" textAlign="center">
-                          2
-                        </Badge>
-                        <Heading size="sm" color="white">
-                          Server Processing
-                        </Heading>
-                      </Flex>
-                      <Text fontSize="sm" color="gray.400" ml="60px">
-                        SERV.random server monitors Harmony blocks → Extracts VRF data → Submits to RandomnessAccess contract
-                      </Text>
-                    </Box>
-
-                    <Box>
-                      <Flex align="center" mb={2}>
-                        <Badge colorScheme="green" mr={3} fontSize="md" w="40px" textAlign="center">
-                          3
-                        </Badge>
-                        <Heading size="sm" color="white">
-                          Fulfillment
-                        </Heading>
-                      </Flex>
-                      <Text fontSize="sm" color="gray.400" ml="60px">
-                        FeeCollector.fulfillRandomness() called → Randomness stored on-chain → Request marked as fulfilled
-                      </Text>
-                    </Box>
-
-                    <Box>
-                      <Flex align="center" mb={2}>
-                        <Badge colorScheme="orange" mr={3} fontSize="md" w="40px" textAlign="center">
-                          4
-                        </Badge>
-                        <Heading size="sm" color="white">
-                          User Claims
-                        </Heading>
-                      </Flex>
-                      <Text fontSize="sm" color="gray.400" ml="60px">
-                        User calls <Code fontSize="xs">catchFish()</Code> → Contract verifies fulfillment → Uses randomness → Generates outcome → Mints NFT with VRF seed stored
-                      </Text>
-                    </Box>
-                  </Stack>
-                </Box>
-              </TabPanel>
-            </TabPanels>
-          </Tabs>
 
           {/* Resources */}
           <Box bg={bgColor} p={6} borderRadius="lg">
@@ -684,9 +621,18 @@ const DemoPage = () => {
             </Stack>
           </Box>
         </Stack>
-      </Container>
-    </PageAnimation>
-    </WalletProvider>
+        </Container>
+      </PageAnimation>
+  );
+};
+
+// Outer component that provides context
+const DemoPage = () => {
+  return (
+    <PlaytestModeProvider>
+      <WalletProvider>
+        <DemoPageContent />
+      </WalletProvider>
     </PlaytestModeProvider>
   );
 };
