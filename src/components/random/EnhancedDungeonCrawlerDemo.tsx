@@ -263,14 +263,29 @@ export function EnhancedDungeonCrawlerDemo() {
           if (loadedCharacters.length > 0) {
             setSelectedCharacterId(loadedCharacters[0].id);
           }
+        } else {
+          console.log("No characters found for this address");
         }
       } catch (error) {
         console.error("Error loading past characters:", error);
+        // Log more details for debugging
+        if (error instanceof Error) {
+          console.error("Error details:", {
+            message: error.message,
+            stack: error.stack,
+            network,
+            address,
+            dungeonCrawlerAddress: contractsConfig[network]?.dungeonCrawler
+          });
+        }
         // Don't show error toast - this is a background operation
       }
     };
 
-    loadPastCharacters();
+    // Only load if we have the required dependencies
+    if (!isPlaytestMode && provider && address) {
+      loadPastCharacters();
+    }
   }, [isPlaytestMode, network, provider, address]); // Re-fetch when provider or address changes
 
   const handleCreateCharacter = async () => {
