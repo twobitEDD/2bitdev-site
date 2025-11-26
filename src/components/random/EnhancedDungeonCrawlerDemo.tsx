@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Box,
   Button,
@@ -122,6 +122,8 @@ export function EnhancedDungeonCrawlerDemo() {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(null);
   const [characterRequestId, setCharacterRequestId] = useState<string | null>(null);
+  const [vrfReceived, setVrfReceived] = useState(false); // Track when VRF is actually received
+  const [loadingCharacters, setLoadingCharacters] = useState(false); // Track character loading state
   const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [currentInteractionId, setCurrentInteractionId] = useState<number | null>(null);
   const [currentInteractionContractId, setCurrentInteractionContractId] = useState<string | null>(null); // Contract's interactionId
@@ -142,6 +144,147 @@ export function EnhancedDungeonCrawlerDemo() {
     Cleric: "green",
   };
 
+  // Function to load characters from contract (can be called manually)
+  const loadCharactersFromContract = useCallback(async () => {
+    // Skip during build/SSR - only run on client
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    // Skip if in playtest mode (no contract to query)
+    if (isPlaytestMode) {
+      console.log("Skipping character load - playtest mode");
+      return;
+    }
+
+    // Skip if no address
+    if (!address) {
+      console.log("Skipping character load - no address");
+      return;
+    }
+
+    try {
+      setLoadingCharacters(true);
+      console.log("🔄 Loading characters from contract...", { network, address });
+
+      const dungeonCrawlerAddress = contractsConfig[network]?.dungeonCrawler;
+      if (!dungeonCrawlerAddress) {
+        console.log(`DungeonCrawler not deployed on ${network}`);
+        setLoadingCharacters(false);
+        return;
+      }
+
+      // Create read-only provider using Alchemy RPC for reliable data access
+      const rpcUrl = getRpcUrl(network);
+      const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
+      console.log(`Using RPC for ${network}:`, rpcUrl.includes('alchemy') ? 'Alchemy' : 'Public');
+
+      const dungeonCrawlerAbi = [
+        "function playerCharacters(address player) external view returns (uint256[] memory)",
+        "function getCharacter(uint256 characterId) external view returns (address player, uint8 class, uint8 strength, uint8 dexterity, uint8 intelligence, uint8 wisdom, uint8 constitution, uint8 charisma, uint256 level, uint256 health, uint256 maxHealth, uint256 wealth, bool alive, uint256 actionCount, uint8 status, uint256 createdAt)",
+      ];
+
+      const contract = new ethers.Contract(dungeonCrawlerAddress, dungeonCrawlerAbi, rpcProvider);
+      
+      // Get user's character IDs with timeout
+      const characterIds = await Promise.race([
+        contract.playerCharacters(address),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error(`Timeout fetching characters from ${network}`)), 5000)
+        )
+      ]) as bigint[];
+      
+      if (!characterIds || characterIds.length === 0) {
+        console.log("No past characters found");
+        setLoadingCharacters(false);
+        return;
+      }
+
+      console.log(`Found ${characterIds.length} characters for address ${address}`);
+
+      // Fetch each character's data
+      const loadedCharacters: Character[] = [];
+      const classNames = ["Warrior", "Mage", "Rogue", "Cleric"];
+
+      for (const characterId of characterIds) {
+        try {
+          const charData = await Promise.race([
+            contract.getCharacter(characterId),
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error(`Timeout fetching character ${characterId.toString()}`)), 3000)
+            )
+          ]) as any;
+
+          // Check if character exists (player address should not be zero)
+          const playerAddress = charData[0] || charData.player;
+          if (!charData || !playerAddress || playerAddress === ethers.ZeroAddress || playerAddress === "0x0000000000000000000000000000000000000000") {
+            console.warn(`Character ${characterId.toString()} does not exist`);
+            continue;
+          }
+
+          const contractCharacterId = Number(characterId);
+          const characterIdLocal = `char_${contractCharacterId}_${Date.now()}`;
+          const className = classNames[Number(charData.class)] || "Unknown";
+          
+          // Map status: 0=active, 1=legendary, 2=early_death
+          const statusMap: Character["status"][] = ["active", "legendary", "early_death"];
+          const status = statusMap[Number(charData.status)] || "active";
+
+          const character: Character = {
+            id: characterIdLocal,
+            contractCharacterId,
+            class: className,
+            strength: Number(charData.strength),
+            dexterity: Number(charData.dexterity),
+            intelligence: Number(charData.intelligence),
+            wisdom: Number(charData.wisdom),
+            constitution: Number(charData.constitution),
+            charisma: Number(charData.charisma),
+            level: Number(charData.level),
+            health: Number(charData.health),
+            maxHealth: Number(charData.maxHealth),
+            wealth: Number(charData.wealth),
+            alive: charData.alive,
+            actionCount: Number(charData.actionCount),
+            status,
+            createdAt: Number(charData.createdAt) * 1000, // Convert from seconds to milliseconds
+          };
+
+          loadedCharacters.push(character);
+        } catch (error) {
+          console.warn(`Failed to load character ${characterId.toString()}:`, error);
+          // Continue loading other characters even if one fails
+        }
+      }
+
+      if (loadedCharacters.length > 0) {
+        console.log(`Loaded ${loadedCharacters.length} characters from contract`);
+        // Sort by creation time (newest first)
+        loadedCharacters.sort((a, b) => b.createdAt - a.createdAt);
+        setCharacters(loadedCharacters);
+        // Select the first (newest) character if none selected
+        if (!selectedCharacterId && loadedCharacters.length > 0) {
+          setSelectedCharacterId(loadedCharacters[0].id);
+        }
+      } else {
+        console.log("No characters found for this address");
+      }
+    } catch (error) {
+      console.error("Error loading past characters:", error);
+      if (error instanceof Error) {
+        console.error("Error details:", {
+          message: error.message,
+          stack: error.stack,
+          network,
+          address,
+          dungeonCrawlerAddress: contractsConfig[network]?.dungeonCrawler
+        });
+      }
+    } finally {
+      setLoadingCharacters(false);
+    }
+  }, [isPlaytestMode, network, address]);
+
   // Load past characters from contract on mount
   useEffect(() => {
     // Skip during build/SSR - only run on client
@@ -149,140 +292,9 @@ export function EnhancedDungeonCrawlerDemo() {
       return;
     }
 
-    const loadPastCharacters = async () => {
-      try {
-        // Skip if in playtest mode (no contract to query)
-        if (isPlaytestMode) {
-          return;
-        }
-
-        // Skip if no provider or address
-        if (!provider || !address) {
-          return;
-        }
-
-        const dungeonCrawlerAddress = contractsConfig[network]?.dungeonCrawler;
-        if (!dungeonCrawlerAddress) {
-          console.log(`DungeonCrawler not deployed on ${network}`);
-          return;
-        }
-
-        // Create read-only provider using Alchemy RPC for reliable data access
-        // This ensures we always use Alchemy RPCs, not MetaMask's configured RPC
-        const rpcUrl = getRpcUrl(network);
-        const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
-        console.log(`Using RPC for ${network}:`, rpcUrl.includes('alchemy') ? 'Alchemy' : 'Public');
-
-        const dungeonCrawlerAbi = [
-          "function playerCharacters(address player) external view returns (uint256[] memory)",
-          "function getCharacter(uint256 characterId) external view returns (address player, uint8 class, uint8 strength, uint8 dexterity, uint8 intelligence, uint8 wisdom, uint8 constitution, uint8 charisma, uint256 level, uint256 health, uint256 maxHealth, uint256 wealth, bool alive, uint256 actionCount, uint8 status, uint256 createdAt)",
-        ];
-
-        const contract = new ethers.Contract(dungeonCrawlerAddress, dungeonCrawlerAbi, rpcProvider);
-        
-        // Get user's character IDs with timeout
-        const characterIds = await Promise.race([
-          contract.playerCharacters(address),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error(`Timeout fetching characters from ${network}`)), 5000)
-          )
-        ]) as bigint[];
-        
-        if (!characterIds || characterIds.length === 0) {
-          console.log("No past characters found");
-          return;
-        }
-
-        console.log(`Found ${characterIds.length} characters for address ${address}`);
-
-        // Fetch each character's data
-        const loadedCharacters: Character[] = [];
-        const classNames = ["Warrior", "Mage", "Rogue", "Cleric"];
-
-        for (const characterId of characterIds) {
-          try {
-            const charData = await Promise.race([
-              contract.getCharacter(characterId),
-              new Promise((_, reject) => 
-                setTimeout(() => reject(new Error(`Timeout fetching character ${characterId.toString()}`)), 3000)
-              )
-            ]) as any;
-
-            // Check if character exists (player address should not be zero)
-            const playerAddress = charData[0] || charData.player;
-            if (!charData || !playerAddress || playerAddress === ethers.ZeroAddress || playerAddress === "0x0000000000000000000000000000000000000000") {
-              console.warn(`Character ${characterId.toString()} does not exist`);
-              continue;
-            }
-
-            const contractCharacterId = Number(characterId);
-            const characterIdLocal = `char_${contractCharacterId}_${Date.now()}`;
-            const className = classNames[Number(charData.class)] || "Unknown";
-            
-            // Map status: 0=active, 1=legendary, 2=early_death
-            const statusMap: Character["status"][] = ["active", "legendary", "early_death"];
-            const status = statusMap[Number(charData.status)] || "active";
-
-            const character: Character = {
-              id: characterIdLocal,
-              contractCharacterId,
-              class: className,
-              strength: Number(charData.strength),
-              dexterity: Number(charData.dexterity),
-              intelligence: Number(charData.intelligence),
-              wisdom: Number(charData.wisdom),
-              constitution: Number(charData.constitution),
-              charisma: Number(charData.charisma),
-              level: Number(charData.level),
-              health: Number(charData.health),
-              maxHealth: Number(charData.maxHealth),
-              wealth: Number(charData.wealth),
-              alive: charData.alive,
-              actionCount: Number(charData.actionCount),
-              status,
-              createdAt: Number(charData.createdAt) * 1000, // Convert from seconds to milliseconds
-            };
-
-            loadedCharacters.push(character);
-          } catch (error) {
-            console.warn(`Failed to load character ${characterId.toString()}:`, error);
-            // Continue loading other characters even if one fails
-          }
-        }
-
-        if (loadedCharacters.length > 0) {
-          console.log(`Loaded ${loadedCharacters.length} characters from contract`);
-          // Sort by creation time (newest first)
-          loadedCharacters.sort((a, b) => b.createdAt - a.createdAt);
-          setCharacters(loadedCharacters);
-          // Select the first (newest) character
-          if (loadedCharacters.length > 0) {
-            setSelectedCharacterId(loadedCharacters[0].id);
-          }
-        } else {
-          console.log("No characters found for this address");
-        }
-      } catch (error) {
-        console.error("Error loading past characters:", error);
-        // Log more details for debugging
-        if (error instanceof Error) {
-          console.error("Error details:", {
-            message: error.message,
-            stack: error.stack,
-            network,
-            address,
-            dungeonCrawlerAddress: contractsConfig[network]?.dungeonCrawler
-          });
-        }
-        // Don't show error toast - this is a background operation
-      }
-    };
-
-    // Only load if we have the required dependencies
-    if (!isPlaytestMode && provider && address) {
-      loadPastCharacters();
-    }
-  }, [isPlaytestMode, network, provider, address]); // Re-fetch when provider or address changes
+    // Call the shared load function
+    loadCharactersFromContract();
+  }, [loadCharactersFromContract]); // Re-fetch when load function changes
 
   const handleCreateCharacter = async () => {
     try {
@@ -310,11 +322,12 @@ export function EnhancedDungeonCrawlerDemo() {
       }
       
       setCharacterRequestId(result.requestId);
+      setVrfReceived(false); // Reset VRF received state
       
       // In real contract, createCharacter() returns requestId and emits CharacterCreationStarted with characterId
       toast({
         title: "Character Creation Started",
-        description: `Request ID: ${result.requestId.slice(0, 10)}...`,
+        description: `Request ID: ${result.requestId.slice(0, 10)}... Waiting for VRF...`,
         status: "info",
         duration: 5000,
       });
@@ -332,8 +345,9 @@ export function EnhancedDungeonCrawlerDemo() {
           );
           console.log("📊 Polling result:", { fulfilled: status.fulfilled, hasRandomness: !!status.randomnessValue });
           
-          // Only show toast if actually fulfilled with randomness value
+          // Only show toast and set state if actually fulfilled with randomness value
           if (status.fulfilled && status.randomnessValue) {
+            setVrfReceived(true);
             toast({
               title: "VRF Received!",
               description: "Click Finalize to create your character.",
@@ -345,7 +359,7 @@ export function EnhancedDungeonCrawlerDemo() {
           console.error("Error polling for VRF fulfillment:", error);
           // Don't show error toast - polling will continue in background
         }
-      }, 1000); // Reduced delay since pollForRealFulfillment now waits before first check
+      }, 2000); // Wait 2 seconds before starting to poll
     } catch (error) {
       console.error("❌ Error creating character:", error);
       const errorMessage = error instanceof Error ? error.message : "Failed to create character";
@@ -427,6 +441,7 @@ export function EnhancedDungeonCrawlerDemo() {
       });
       setSelectedCharacterId(characterId);
       setCharacterRequestId(null);
+      setVrfReceived(false); // Reset VRF received state
 
       toast({
         title: "Character Created!",
@@ -434,6 +449,15 @@ export function EnhancedDungeonCrawlerDemo() {
         status: "success",
         duration: 5000,
       });
+
+      // Reload characters from contract to ensure persistence
+      // This ensures the newly created character is loaded from the contract
+      if (!isPlaytestMode && address) {
+        setTimeout(() => {
+          console.log("🔄 Reloading characters after creation...");
+          loadCharactersFromContract();
+        }, 3000); // Wait 3 seconds for the transaction to be mined
+      }
     } catch (error) {
       console.error("Error finalizing character:", error);
       const errorMessage = error instanceof Error ? error.message : "Failed to finalize character";
@@ -693,6 +717,9 @@ export function EnhancedDungeonCrawlerDemo() {
         <Flex justify="space-between" align="center" mb={4}>
           <Heading size="sm" color="white">
             Characters ({characters.length})
+            {loadingCharacters && (
+              <Spinner size="sm" ml={2} />
+            )}
           </Heading>
           <Stack direction="row" spacing={2}>
             {!characterRequestId && (
@@ -700,9 +727,14 @@ export function EnhancedDungeonCrawlerDemo() {
                 Create New Character
               </Button>
             )}
-            {characterRequestId && (
+            {characterRequestId && vrfReceived && (
               <Button onClick={handleFinalizeCharacter} colorScheme="green" size="sm" isLoading={loading}>
                 Finalize Character
+              </Button>
+            )}
+            {characterRequestId && !vrfReceived && (
+              <Button isDisabled colorScheme="gray" size="sm">
+                Waiting for VRF...
               </Button>
             )}
           </Stack>
@@ -733,11 +765,15 @@ export function EnhancedDungeonCrawlerDemo() {
         )}
 
         {characterRequestId && !character && (
-          <Alert status="info" borderRadius="lg" mb={4}>
+          <Alert status={vrfReceived ? "success" : "info"} borderRadius="lg" mb={4}>
             <AlertIcon />
             <Box flex={1}>
-              <Text fontWeight="bold">VRF Received!</Text>
-              <Text fontSize="sm">Click Finalize Character to create your character.</Text>
+              <Text fontWeight="bold">{vrfReceived ? "VRF Received!" : "Waiting for VRF..."}</Text>
+              <Text fontSize="sm">
+                {vrfReceived 
+                  ? "Click Finalize Character to create your character."
+                  : "Please wait for the VRF randomness to be fulfilled. This usually takes a few seconds."}
+              </Text>
             </Box>
           </Alert>
         )}
