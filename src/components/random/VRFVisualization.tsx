@@ -44,6 +44,7 @@ export function VRFVisualization({ entries, maxEntries = 50 }: VRFVisualizationP
   const cardBg = useColorModeValue("white", "gray.700");
   const borderColor = useColorModeValue("gray.200", "gray.600");
   const bgColor = useColorModeValue("gray.50", "gray.800");
+  const scrollbarThumbHover = useColorModeValue("gray.400", "gray.500");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [animatedEntries, setAnimatedEntries] = useState<Set<number>>(new Set());
 
@@ -170,7 +171,7 @@ export function VRFVisualization({ entries, maxEntries = 50 }: VRFVisualizationP
             background: borderColor,
             borderRadius: "4px",
             "&:hover": {
-              background: useColorModeValue("gray.400", "gray.500"),
+              background: scrollbarThumbHover,
             },
           },
         }}
