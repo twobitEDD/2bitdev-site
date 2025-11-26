@@ -161,10 +161,22 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
               const rpcProvider = getReadOnlyProvider(network);
               // Use full ABI from JSON file
               const contract = new ethers.Contract(rouletteAddress, RouletteGameABI.abi, rpcProvider);
-              const recentSpinIds = await Promise.race([
-                contract.getRecentSpins(10),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
-              ]) as bigint[];
+              
+              let recentSpinIds: bigint[] = [];
+              try {
+                recentSpinIds = await Promise.race([
+                  contract.getRecentSpins(10),
+                  new Promise<bigint[]>((_, reject) => setTimeout(() => reject(new Error('Timeout')), 8000))
+                ]) as bigint[];
+              } catch (error: any) {
+                // Handle network errors gracefully
+                if (error?.code === 'NETWORK_ERROR' || error?.message?.includes('NetworkError') || error?.message?.includes('fetch')) {
+                  console.warn(`Network error fetching spins from ${network}, skipping...`);
+                  return [];
+                }
+                throw error;
+              }
+              
               if (!recentSpinIds || recentSpinIds.length === 0) return [];
               
               const spins: VRFEntry[] = [];
@@ -224,7 +236,22 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
               const vrfEntries: VRFEntry[] = [];
               
               try {
-                const characterCounter = await contract.characterCounter();
+                let characterCounter: bigint;
+                try {
+                  characterCounter = await Promise.race([
+                    contract.characterCounter(),
+                    new Promise<bigint>((_, reject) => 
+                      setTimeout(() => reject(new Error('Timeout')), 5000)
+                    )
+                  ]) as bigint;
+                } catch (error: any) {
+                  if (error?.code === 'NETWORK_ERROR' || error?.message?.includes('NetworkError') || error?.message?.includes('fetch')) {
+                    console.warn(`Network error fetching characterCounter from ${network}, skipping...`);
+                    return [];
+                  }
+                  throw error;
+                }
+                
                 if (!characterCounter || characterCounter === BigInt(0)) {
                   return [];
                 }
@@ -234,7 +261,7 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
                     const character = await Promise.race([
                       contract.characters(charId),
                       new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('Timeout')), 2000)
+                        setTimeout(() => reject(new Error('Timeout')), 3000)
                       )
                     ]) as any;
                     

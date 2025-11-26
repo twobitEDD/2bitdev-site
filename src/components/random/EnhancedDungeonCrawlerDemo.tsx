@@ -184,10 +184,11 @@ export function EnhancedDungeonCrawlerDemo() {
       const contract = new ethers.Contract(dungeonCrawlerAddress, DungeonCrawlerABI.abi, rpcProvider);
       
       // Get user's character IDs with timeout
+      // Use getPlayerCharacters() function instead of playerCharacters mapping
       let characterIds: bigint[] = [];
       try {
         characterIds = await Promise.race([
-          contract.playerCharacters(address),
+          contract.getPlayerCharacters(address),
           new Promise<bigint[]>((_, reject) => 
             setTimeout(() => reject(new Error(`Timeout fetching characters from ${network}`)), 5000)
           )

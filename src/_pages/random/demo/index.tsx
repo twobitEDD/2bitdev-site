@@ -88,12 +88,22 @@ const DemoPageContent = () => {
         const contract = new ethers.Contract(rouletteAddress, RouletteGameABI.abi, rpcProvider);
         
         // Get recent spins (last 10) with timeout
-        const recentSpinIds = await Promise.race([
-          contract.getRecentSpins(10),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error(`Timeout fetching spins from ${network}`)), 5000)
-          )
-        ]) as bigint[];
+        let recentSpinIds: bigint[] = [];
+        try {
+          recentSpinIds = await Promise.race([
+            contract.getRecentSpins(10),
+            new Promise<bigint[]>((_, reject) => 
+              setTimeout(() => reject(new Error(`Timeout fetching spins from ${network}`)), 8000)
+            )
+          ]) as bigint[];
+        } catch (error: any) {
+          // Handle network errors gracefully
+          if (error?.code === 'NETWORK_ERROR' || error?.message?.includes('NetworkError') || error?.message?.includes('fetch')) {
+            console.warn(`Network error fetching spins from ${network}, skipping...`);
+            return [];
+          }
+          throw error;
+        }
         
         if (!recentSpinIds || recentSpinIds.length === 0) {
           return [];
@@ -177,7 +187,22 @@ const DemoPageContent = () => {
         
         // Fetch recent characters (last 10)
         try {
-          const characterCounter = await contract.characterCounter();
+          let characterCounter: bigint;
+          try {
+            characterCounter = await Promise.race([
+              contract.characterCounter(),
+              new Promise<bigint>((_, reject) => 
+                setTimeout(() => reject(new Error('Timeout')), 5000)
+              )
+            ]) as bigint;
+          } catch (error: any) {
+            if (error?.code === 'NETWORK_ERROR' || error?.message?.includes('NetworkError') || error?.message?.includes('fetch')) {
+              console.warn(`Network error fetching characterCounter from ${network}, skipping...`);
+              return [];
+            }
+            throw error;
+          }
+          
           const startId = characterCounter > BigInt(10) ? characterCounter - BigInt(10) : BigInt(1);
           
           for (let charId = startId; charId <= characterCounter; charId++) {
