@@ -38,6 +38,7 @@ import {
   pollForFulfillmentStatus,
 } from "@utils/contractHelpers";
 import { contractsConfig } from "@config/contracts";
+import { getRpcUrl } from "@config/rpc";
 import { ethers } from "ethers";
 
 interface Character {
@@ -166,16 +167,11 @@ export function EnhancedDungeonCrawlerDemo() {
           return;
         }
 
-        // Create read-only provider (use provider from WalletContext if available, otherwise window.ethereum)
-        let rpcProvider: ethers.Provider;
-        if (provider) {
-          rpcProvider = provider;
-        } else if (window.ethereum) {
-          rpcProvider = new ethers.BrowserProvider(window.ethereum);
-        } else {
-          console.log("No provider available");
-          return;
-        }
+        // Create read-only provider using Alchemy RPC for reliable data access
+        // This ensures we always use Alchemy RPCs, not MetaMask's configured RPC
+        const rpcUrl = getRpcUrl(network);
+        const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
+        console.log(`Using RPC for ${network}:`, rpcUrl.includes('alchemy') ? 'Alchemy' : 'Public');
 
         const dungeonCrawlerAbi = [
           "function playerCharacters(address player) external view returns (uint256[] memory)",

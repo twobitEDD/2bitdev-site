@@ -22,6 +22,7 @@ import { PlaytestModeProvider } from "@contexts/PlaytestModeContext";
 import { WalletProvider, useWallet } from "@contexts/WalletContext";
 import { siteConfig } from "@config/site";
 import { contractsConfig } from "@config/contracts";
+import { getRpcUrl } from "@config/rpc";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
@@ -45,30 +46,18 @@ interface FeeRequest {
 
 // Inner component that uses WalletContext (must be inside WalletProvider)
 const DemoPageContent = () => {
-  const { provider } = useWallet();
+  const { chainId } = useWallet();
   const bgColor = useColorModeValue("gray.50", "gray.800");
   const cardBg = useColorModeValue("white", "gray.700");
   const borderColor = useColorModeValue("gray.200", "gray.600");
   const [vrfData, setVrfData] = useState<VRFEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Helper to get a provider for read-only queries (uses WalletContext provider if available)
-  const getReadOnlyProvider = (): ethers.Provider | null => {
-    if (typeof window === 'undefined') {
-      return null;
-    }
-    
-    // Prefer provider from WalletContext (uses user's configured RPC)
-    if (provider) {
-      return provider;
-    }
-    
-    // Fallback to window.ethereum if available
-    if (window.ethereum) {
-      return new ethers.BrowserProvider(window.ethereum);
-    }
-    
-    return null;
+  // Helper to get a provider for read-only queries using Alchemy RPC
+  // Always uses Alchemy RPCs for reliable, fast access regardless of user's MetaMask configuration
+  const getReadOnlyProvider = (network: "base" | "baseSepolia" = "baseSepolia"): ethers.JsonRpcProvider => {
+    const rpcUrl = getRpcUrl(network);
+    return new ethers.JsonRpcProvider(rpcUrl);
   };
 
   useEffect(() => {
@@ -87,12 +76,8 @@ const DemoPageContent = () => {
           return [];
         }
 
-        // Use centralized provider helper (uses WalletContext provider if available)
-        const rpcProvider = getReadOnlyProvider();
-        if (!rpcProvider) {
-          console.log(`No ethereum provider available for ${network}`);
-          return [];
-        }
+        // Use Alchemy RPC for reliable data access
+        const rpcProvider = getReadOnlyProvider(network);
         const rouletteAbi = [
           "function getRecentSpins(uint256 count) external view returns (uint256[])",
           "function getSpin(uint256 _spinId) external view returns (address player, uint8 result, string memory color, bool isEven, bytes32 vrfSeed, uint256 timestamp)",
@@ -164,12 +149,8 @@ const DemoPageContent = () => {
           return [];
         }
 
-        // Use centralized provider helper (uses WalletContext provider if available)
-        const rpcProvider = getReadOnlyProvider();
-        if (!rpcProvider) {
-          console.log(`No ethereum provider available for ${network}`);
-          return [];
-        }
+        // Use Alchemy RPC for reliable data access
+        const rpcProvider = getReadOnlyProvider(network);
         const dungeonAbi = [
           "function characterCounter() external view returns (uint256)",
           "function interactionCounter() external view returns (uint256)",
@@ -372,7 +353,7 @@ const DemoPageContent = () => {
     // Refresh every 10 seconds
     const refreshInterval = setInterval(fetchVRFData, 10000);
     return () => clearInterval(refreshInterval);
-  }, [provider]); // Include provider dependency to re-fetch when provider changes
+  }, [chainId]); // Re-fetch when chainId changes (network switch)
 
   return (
     <PageAnimation>
