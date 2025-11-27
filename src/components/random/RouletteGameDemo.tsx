@@ -8,6 +8,8 @@ import { usePlaytestMode } from "@contexts/PlaytestModeContext";
 import { useWallet } from "@contexts/WalletContext";
 import { contractsConfig } from "@config/contracts";
 import { ethers } from "ethers";
+import RouletteGameABI from "@abis/RouletteGame.json";
+import { getRpcUrl } from "@config/rpc";
 
 interface SpinResult {
   spinId: number;
@@ -133,7 +135,8 @@ export function RouletteGameDemo() {
           };
           setCurrentSpin(completedSpin);
 
-          // Trigger wheel spinning animation
+          // Start spinning animation after result is set
+          // The SpinningRouletteWheel component will animate when isSpinning is true and result is set
           setTimeout(() => {
             setIsWheelSpinning(true);
           }, 100);
@@ -228,35 +231,31 @@ export function RouletteGameDemo() {
           return;
         }
 
-        // Use provider from WalletContext if available, otherwise create one from window.ethereum
-        // This ensures we use the same RPC configuration throughout the app
-        let rpcProvider: ethers.Provider | null = null;
-        if (provider) {
-          // Use existing provider from wallet context (uses user's configured RPC)
-          rpcProvider = provider;
-        } else if (typeof window !== 'undefined' && window.ethereum) {
-          // Fallback to window.ethereum (uses user's configured RPC)
-          rpcProvider = new ethers.BrowserProvider(window.ethereum);
-        }
+        // Use read-only provider with Alchemy RPC for reliable data access
+        const rpcUrl = getRpcUrl(network);
+        const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
+        console.log(`Using RPC for ${network}:`, rpcUrl.includes('alchemy') ? 'Alchemy' : 'Public');
         
-        if (!rpcProvider) {
-          console.log("No provider available to load past spins");
-          return;
-        }
-        const rouletteAbi = [
-          "function getRecentSpins(uint256 count) external view returns (uint256[])",
-          "function getSpin(uint256 _spinId) external view returns (address player, uint8 result, string memory color, bool isEven, bytes32 vrfSeed, uint256 timestamp)",
-        ];
-
-        const contract = new ethers.Contract(rouletteAddress, rouletteAbi, rpcProvider);
+        // Use full ABI from JSON file
+        const contract = new ethers.Contract(rouletteAddress, RouletteGameABI.abi, rpcProvider);
         
         // Get recent spins (last 20) with timeout
-        const recentSpinIds = await Promise.race([
-          contract.getRecentSpins(20),
-          new Promise((_, reject) => 
-            setTimeout(() => reject(new Error(`Timeout fetching spins from ${network}`)), 5000)
-          )
-        ]) as bigint[];
+        let recentSpinIds: bigint[] = [];
+        try {
+          recentSpinIds = await Promise.race([
+            contract.getRecentSpins(20),
+            new Promise<bigint[]>((_, reject) => 
+              setTimeout(() => reject(new Error(`Timeout fetching spins from ${network}`)), 8000)
+            )
+          ]) as bigint[];
+        } catch (error: any) {
+          // Handle network errors gracefully
+          if (error?.code === 'NETWORK_ERROR' || error?.message?.includes('NetworkError') || error?.message?.includes('fetch')) {
+            console.warn(`Network error fetching spins from ${network}, skipping...`);
+            return;
+          }
+          throw error;
+        }
         
         if (!recentSpinIds || recentSpinIds.length === 0) {
           console.log("No past spins found");
@@ -275,26 +274,38 @@ export function RouletteGameDemo() {
               )
             ]) as any;
             
+            // Safely access spin properties
+            const result = spin?.result ?? spin?.[1] ?? 255;
+            const vrfSeed = spin?.vrfSeed ?? spin?.[4] ?? null;
+            const timestamp = spin?.timestamp ?? spin?.[5] ?? null;
+            const color = spin?.color ?? spin?.[2] ?? "";
+            
             // Only include completed spins (result != 255 and vrfSeed is not zero)
-            if (spin.result !== 255 && 
-                spin.vrfSeed !== ethers.ZeroHash && 
-                spin.vrfSeed !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
+            if (result !== 255 && 
+                vrfSeed && 
+                vrfSeed !== ethers.ZeroHash && 
+                vrfSeed !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
               // Convert timestamp from seconds to milliseconds
-              let timestamp = Number(spin.timestamp);
-              if (timestamp < 1000000000000) {
-                timestamp = timestamp * 1000;
+              let ts = timestamp ? Number(timestamp) : Date.now();
+              if (ts < 1000000000000) {
+                ts = ts * 1000;
               }
               
               loadedSpins.push({
                 spinId: Number(spinId),
-                result: Number(spin.result),
-                color: spin.color,
-                vrfSeed: spin.vrfSeed,
-                timestamp: timestamp || Date.now(),
+                result: Number(result),
+                color: color,
+                vrfSeed: vrfSeed,
+                timestamp: ts || Date.now(),
               });
             }
-          } catch (error) {
-            console.warn(`Error fetching spin ${spinId.toString()}:`, error);
+          } catch (error: any) {
+            // Skip spins that don't exist or fail to load
+            if (error?.code === 'CALL_EXCEPTION' || error?.message?.includes('revert') || error?.message?.includes('Timeout') || error?.message?.includes('NetworkError')) {
+              // Spin doesn't exist or timed out, skip silently
+            } else {
+              console.warn(`Error fetching spin ${spinId.toString()}:`, error?.message || error);
+            }
             // Continue with next spin
           }
         }
@@ -343,10 +354,10 @@ export function RouletteGameDemo() {
 
       <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor} mb={4}>
         <SpinningRouletteWheel
-          result={currentSpin?.result !== 255 ? currentSpin?.result : undefined}
-          isSpinning={isWheelSpinning && currentSpin?.result !== undefined && currentSpin.result !== 255}
+          result={currentSpin && currentSpin.result !== 255 ? currentSpin.result : undefined}
+          isSpinning={isWheelSpinning}
           onSpinComplete={() => {
-            if (currentSpin?.result !== undefined && currentSpin.result !== 255) {
+            if (currentSpin && currentSpin.result !== 255) {
               const color = getColor(currentSpin.result);
               toast({
                 title: `Spin Result: ${currentSpin.result}`,
@@ -422,8 +433,8 @@ export function RouletteGameDemo() {
         </Box>
       )}
 
-      {/* Current Result */}
-      {currentSpin && currentSpin.result !== 255 && (
+      {/* Current Result - Always show if we have a valid result */}
+      {currentSpin && currentSpin.result !== undefined && currentSpin.result !== 255 && (
         <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor} mb={4}>
           <Heading size="sm" mb={4} color="white">
             Current Result
@@ -442,6 +453,11 @@ export function RouletteGameDemo() {
             <Text fontSize="lg" color="gray.200" mt={2}>
               {getColor(currentSpin.result).toUpperCase()} {currentSpin.result === 0 ? "(Zero)" : currentSpin.result % 2 === 0 ? "(Even)" : "(Odd)"}
             </Text>
+            {currentSpin.vrfSeed && (
+              <Text fontSize="xs" color="gray.300" mt={2}>
+                VRF Seed: {currentSpin.vrfSeed.slice(0, 16)}...
+              </Text>
+            )}
           </Box>
         </Box>
       )}
