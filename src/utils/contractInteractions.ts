@@ -1303,12 +1303,14 @@ export async function realCatchFish(
     });
     if (event) {
       const parsed = fishingGame.interface.parseLog(event);
-      console.log("✅ Found FishCaught event in other contract logs:", {
-        player: parsed.args.player ?? parsed.args[0],
-        fishType: parsed.args.fishType ?? parsed.args[1]?.toString(),
-        size: parsed.args.size ?? parsed.args[2]?.toString(),
-        value: parsed.args.value ?? parsed.args[3]?.toString(),
-      });
+      if (parsed) {
+        console.log("✅ Found FishCaught event in other contract logs:", {
+          player: parsed.args.player ?? parsed.args[0],
+          fishType: parsed.args.fishType ?? parsed.args[1]?.toString(),
+          size: parsed.args.size ?? parsed.args[2]?.toString(),
+          value: parsed.args.value ?? parsed.args[3]?.toString(),
+        });
+      }
     }
   }
 
