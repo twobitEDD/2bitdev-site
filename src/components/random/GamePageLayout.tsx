@@ -73,28 +73,77 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
 
     const fetchVRFData = async () => {
       try {
-        console.log('🔄 Fetching VRF data from:', siteConfig.servRandomStatusUrl);
-        const response = await fetch(siteConfig.servRandomStatusUrl, {
-          cache: "no-store",
-        });
+        // Try the configured URL first, then fallback to /api/status if needed
+        let apiUrl = siteConfig.servRandomStatusUrl;
+        
+        // If URL ends with /status, also try /api/status as fallback
+        const baseUrl = apiUrl.replace(/\/status$/, '').replace(/\/api\/status$/, '');
+        const possibleUrls = [
+          apiUrl,
+          `${baseUrl}/api/status`,
+          `${baseUrl}/status`,
+        ];
+        
+        let response: Response | null = null;
+        let lastError: Error | null = null;
+        
+        for (const url of possibleUrls) {
+          try {
+            console.log('🔄 Trying VRF data from:', url);
+            response = await fetch(url, {
+              cache: "no-store",
+            });
+            
+            if (response.ok) {
+              console.log('✅ Successfully fetched from:', url);
+              apiUrl = url;
+              break;
+            } else {
+              console.warn(`⚠️ ${url} returned status ${response.status}`);
+            }
+          } catch (err) {
+            console.warn(`⚠️ Failed to fetch from ${url}:`, err);
+            lastError = err as Error;
+            response = null;
+          }
+        }
+        
+        if (!response || !response.ok) {
+          throw lastError || new Error(`Failed to fetch VRF data from any endpoint. Last status: ${response?.status}`);
+        }
+        
+        console.log('📡 Response status:', response.status, response.statusText);
         
         if (response.ok) {
           const data = await response.json();
-          console.log('📊 API Response:', {
+          console.log('📊 Full API Response:', JSON.stringify(data, null, 2));
+          console.log('📊 API Response Summary:', {
             hasRecentRandomness: !!data.recentRandomness,
             recentRandomnessLength: data.recentRandomness?.length || 0,
+            recentRandomnessType: Array.isArray(data.recentRandomness) ? 'array' : typeof data.recentRandomness,
             hasFeeRequests: !!data.feeRequests,
             feeRequestsLength: data.feeRequests?.length || 0,
+            feeRequestsType: Array.isArray(data.feeRequests) ? 'array' : typeof data.feeRequests,
             feeRequestsSample: data.feeRequests?.slice(0, 3),
             fullDataKeys: Object.keys(data),
           });
+          
+          // Log sample entries to see structure
+          if (data.recentRandomness && Array.isArray(data.recentRandomness) && data.recentRandomness.length > 0) {
+            console.log('📋 Sample recentRandomness entry:', data.recentRandomness[0]);
+          }
+          if (data.feeRequests && Array.isArray(data.feeRequests) && data.feeRequests.length > 0) {
+            console.log('📋 Sample feeRequest entry:', data.feeRequests[0]);
+          }
           
           const combinedVRF: VRFEntry[] = [];
           
           // Add Harmony block VRF entries
           if (data.recentRandomness && Array.isArray(data.recentRandomness)) {
-            console.log(`✅ Adding ${data.recentRandomness.length} Harmony block entries`);
-            data.recentRandomness.forEach((entry: any) => {
+            console.log(`✅ Processing ${data.recentRandomness.length} Harmony block entries`);
+            let addedCount = 0;
+            let skippedCount = 0;
+            data.recentRandomness.forEach((entry: any, idx: number) => {
               const vrfValue = entry.vrfValue || entry.randomness;
               if (vrfValue && vrfValue !== '0x0' && vrfValue !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
                 combinedVRF.push({
@@ -105,19 +154,37 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
                   gameSource: "Harmony Block",
                   network: "harmony",
                 });
+                addedCount++;
+              } else {
+                skippedCount++;
+                console.warn(`⚠️ Skipped entry ${idx}: invalid vrfValue`, { vrfValue, entry });
               }
             });
+            console.log(`✅ Added ${addedCount} Harmony block entries, skipped ${skippedCount}`);
+          } else {
+            console.warn('⚠️ recentRandomness is not an array:', typeof data.recentRandomness, data.recentRandomness);
           }
           
           // Add fulfilled game requests
           if (data.feeRequests && Array.isArray(data.feeRequests)) {
+            console.log(`📋 Processing ${data.feeRequests.length} fee requests`);
             const fulfilledRequests = data.feeRequests
-              .filter((req: FeeRequest) => {
+              .filter((req: FeeRequest, idx: number) => {
                 const isFulfilled = req.fulfilled === true;
                 const hasRandomness = req.randomnessValue && 
                   req.randomnessValue !== '0x0000000000000000000000000000000000000000000000000000000000000000' &&
                   req.randomnessValue !== '0x0';
-                return isFulfilled && hasRandomness;
+                const shouldInclude = isFulfilled && hasRandomness;
+                
+                if (!shouldInclude) {
+                  console.log(`  ⏭️ Skipping request ${idx}:`, {
+                    fulfilled: req.fulfilled,
+                    hasRandomness: !!hasRandomness,
+                    randomnessValue: req.randomnessValue?.slice(0, 20),
+                  });
+                }
+                
+                return shouldInclude;
               })
               .map((req: FeeRequest) => {
                 let timestamp = req.timestamp;
@@ -140,6 +207,8 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
               });
             console.log(`✅ Adding ${fulfilledRequests.length} fulfilled fee requests`);
             combinedVRF.push(...fulfilledRequests);
+          } else {
+            console.warn('⚠️ feeRequests is not an array:', typeof data.feeRequests, data.feeRequests);
           }
           
           // Sort by timestamp (most recent first)
