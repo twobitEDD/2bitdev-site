@@ -126,7 +126,7 @@ export function RouletteGameDemo() {
 
           console.log("Spin result received:", spinResultData);
 
-          // Update current spin with result
+          // Update current spin with result first
           const completedSpin: SpinResult = {
             ...newSpin,
             result: spinResultData.result,
@@ -136,7 +136,7 @@ export function RouletteGameDemo() {
           setCurrentSpin(completedSpin);
 
           // Start spinning animation after result is set
-          // The SpinningRouletteWheel component will animate when isSpinning is true and result is set
+          // The SpinningRouletteWheel component needs both isSpinning=true and result set
           setTimeout(() => {
             setIsWheelSpinning(true);
           }, 100);

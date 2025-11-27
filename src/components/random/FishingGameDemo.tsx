@@ -322,17 +322,27 @@ export function FishingGameDemo() {
       };
 
       setCaughtFish(fish);
+      setFishingStep("caught");
+      
       // Reload NFTs from contract to get the actual token ID
       if (!isPlaytestMode && isConnected && signer) {
-        // Wait a bit for the transaction to be mined
+        // Try multiple times with increasing delays to ensure NFT is loaded
         setTimeout(() => {
+          console.log("🔄 Reloading NFTs after catch (attempt 1)...");
           loadUserNFTs();
-        }, 2000);
+        }, 3000);
+        setTimeout(() => {
+          console.log("🔄 Reloading NFTs after catch (attempt 2)...");
+          loadUserNFTs();
+        }, 8000);
+        setTimeout(() => {
+          console.log("🔄 Reloading NFTs after catch (attempt 3)...");
+          loadUserNFTs();
+        }, 15000);
       } else {
         // In playtest mode, just add to local history
         setFishHistory([fish, ...fishHistory]);
       }
-      setFishingStep("caught");
 
       toast({
         title: `Caught a ${fish.fishName}!`,
@@ -450,11 +460,24 @@ export function FishingGameDemo() {
             duration: 5000,
           });
 
-          // Reload NFTs
-          if (isConnected && signer) {
+          // Reload NFTs - wait longer for transaction to be mined and indexed
+          if (!isPlaytestMode && isConnected && signer) {
+            // Try multiple times with increasing delays to ensure NFT is loaded
             setTimeout(() => {
+              console.log("🔄 Reloading NFTs after Pattern 1 catch (attempt 1)...");
               loadUserNFTs();
-            }, 2000);
+            }, 3000);
+            setTimeout(() => {
+              console.log("🔄 Reloading NFTs after Pattern 1 catch (attempt 2)...");
+              loadUserNFTs();
+            }, 8000);
+            setTimeout(() => {
+              console.log("🔄 Reloading NFTs after Pattern 1 catch (attempt 3)...");
+              loadUserNFTs();
+            }, 15000);
+          } else if (isPlaytestMode) {
+            // In playtest mode, add to local history immediately
+            setFishHistory([fish, ...fishHistory]);
           }
 
           // Reset for next fishing trip

@@ -138,10 +138,9 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
           
           // Sort by timestamp (most recent first) and update UI immediately
           combinedVRF.sort((a, b) => b.timestamp - a.timestamp);
-          if (combinedVRF.length > 0) {
-            setVrfData([...combinedVRF]);
-            setLoading(false);
-          }
+          // Always set loading to false and update data, even if empty
+          setVrfData([...combinedVRF]);
+          setLoading(false);
           
           // Fetch game-specific VRF data from contracts in parallel (non-blocking)
           const withTimeout = <T,>(promise: Promise<T>, timeoutMs: number = 8000): Promise<T> => {
@@ -333,6 +332,11 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
             allVRF.sort((a, b) => b.timestamp - a.timestamp);
             const limitedVRF = allVRF.slice(0, 50);
             setVrfData(limitedVRF);
+            // Ensure loading is false after all data is fetched
+            setLoading(false);
+          }).catch((error) => {
+            console.error("Error in Promise.allSettled:", error);
+            setLoading(false);
           });
         } else {
           setLoading(false);

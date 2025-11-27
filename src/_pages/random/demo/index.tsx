@@ -396,10 +396,9 @@ const DemoPageContent = () => {
           
           // Sort by timestamp (most recent first) and update UI immediately with API data
           combinedVRF.sort((a, b) => b.timestamp - a.timestamp);
-          if (combinedVRF.length > 0) {
-            setVrfData([...combinedVRF]);
-            setLoading(false); // Show data immediately when API data is available
-          }
+          // Always set loading to false and update data, even if empty
+          setVrfData([...combinedVRF]);
+          setLoading(false); // Show data immediately when API data is available
           
           // Fetch game-specific VRF data from contracts in parallel (non-blocking)
           // Use Promise.allSettled with timeout to prevent hanging
@@ -446,6 +445,11 @@ const DemoPageContent = () => {
             const limitedVRF = allVRF.slice(0, 50); // Increased limit for scrolling list
             console.log('Final VRF data count:', limitedVRF.length);
             setVrfData(limitedVRF);
+            // Ensure loading is false after all data is fetched
+            setLoading(false);
+          }).catch((error) => {
+            console.error("Error in Promise.allSettled:", error);
+            setLoading(false);
           });
         } else {
           console.error('Failed to fetch VRF data:', response.status, response.statusText);

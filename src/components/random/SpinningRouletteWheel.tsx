@@ -46,8 +46,12 @@ export function SpinningRouletteWheel({
     if (result !== undefined && result !== 255) {
       hasSpunRef.current = false;
     }
+    // Reset hasSpunRef when spinning stops to allow re-spinning
+    if (!isSpinning) {
+      hasSpunRef.current = false;
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [result]);
+  }, [result, isSpinning]);
 
   useEffect(() => {
     if (isSpinning && result !== undefined && result !== 255 && !hasSpunRef.current) {
