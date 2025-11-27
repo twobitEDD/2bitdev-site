@@ -10,7 +10,7 @@ export default function DungeonCrawlerPage() {
     <WalletProvider>
       <PlaytestModeProvider>
         <GamePageLayout currentGame="dungeon-crawler" contractKey="dungeonCrawler">
-          <EnhancedDungeonCrawlerDemo />
+              <EnhancedDungeonCrawlerDemo />
         </GamePageLayout>
       </PlaytestModeProvider>
     </WalletProvider>

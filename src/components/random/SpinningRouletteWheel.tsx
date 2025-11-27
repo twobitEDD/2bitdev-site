@@ -19,6 +19,15 @@ export function SpinningRouletteWheel({
   const [isAnimating, setIsAnimating] = useState(false);
   const animationFrameRef = useRef<number | null>(null);
   const hasSpunRef = useRef(false);
+  const pendingAnimationRef = useRef(false);
+  const currentResultRef = useRef<number | undefined>(result);
+  const currentIsSpinningRef = useRef<boolean>(isSpinning);
+  
+  // Update refs when props change
+  useEffect(() => {
+    currentResultRef.current = result;
+    currentIsSpinningRef.current = isSpinning;
+  }, [result, isSpinning]);
 
   // European roulette numbers in order
   const wheelNumbers = [
@@ -54,7 +63,56 @@ export function SpinningRouletteWheel({
   }, [result, isSpinning]);
 
   useEffect(() => {
+    // Cleanup function
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, []);
+  
+  useEffect(() => {
+    // If spinning but result is pending (255), show continuous spinning animation
+    if (isSpinning && result === 255 && !isAnimating && !pendingAnimationRef.current) {
+      console.log("🎰 Starting pending spin animation");
+      setIsAnimating(true);
+      pendingAnimationRef.current = true;
+      let startRotation = rotation;
+      const startTime = Date.now();
+      const spinSpeed = 0.3; // Rotation speed for pending state
+      
+      const animatePending = () => {
+        // Check if we should stop (result arrived or stopped spinning) - use refs for current values
+        if (currentResultRef.current !== 255 || !currentIsSpinningRef.current) {
+          pendingAnimationRef.current = false;
+          setIsAnimating(false);
+          return;
+        }
+        
+        const elapsed = Date.now() - startTime;
+        const currentRotation = startRotation + (elapsed * spinSpeed);
+        setRotation(currentRotation % 360);
+        
+        animationFrameRef.current = requestAnimationFrame(animatePending);
+      };
+      
+      animationFrameRef.current = requestAnimationFrame(animatePending);
+      
+      // Cleanup
+      return () => {
+        pendingAnimationRef.current = false;
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+        }
+      };
+    } else if (result !== 255) {
+      // Reset pending animation flag when result arrives
+      pendingAnimationRef.current = false;
+    }
+    
+    // When result arrives, animate to final position
     if (isSpinning && result !== undefined && result !== 255 && !hasSpunRef.current) {
+      console.log("🎰 Starting result animation to:", result);
       hasSpunRef.current = true;
       setIsAnimating(true);
       

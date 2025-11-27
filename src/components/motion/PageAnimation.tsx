@@ -8,13 +8,13 @@ export const PageAnimation = ({ children }: { children: ReactNode }) => {
   // Only animate the y position for a subtle entrance effect
   // This prevents the page from appearing broken if animation doesn't trigger
   return (
-    <MotionBox
+      <MotionBox
       initial={{ opacity: 1, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 15 }}
       transition={{ delay: 0.1, duration: 0.3 }}
-    >
-      {children}
-    </MotionBox>
-  );
+      >
+        {children}
+      </MotionBox>
+);
 };

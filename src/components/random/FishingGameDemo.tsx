@@ -140,22 +140,35 @@ export function FishingGameDemo() {
       const tokenIds: bigint[] = [];
       for (let i = 0; i < balanceNum; i++) {
         try {
-          const tokenId = await nftContract.tokenOfOwnerByIndex(userAddress, i);
+          // Add timeout for each token fetch to prevent hanging
+          const tokenId = await Promise.race([
+            nftContract.tokenOfOwnerByIndex(userAddress, i),
+            new Promise<bigint>((_, reject) => 
+              setTimeout(() => reject(new Error(`Timeout fetching token ${i}`)), 5000)
+            )
+          ]);
           tokenIds.push(tokenId);
           console.log(`  Token ${i}: #${tokenId.toString()}`);
-        } catch (err) {
-          console.warn(`❌ Error getting token ${i}:`, err);
+        } catch (err: any) {
+          console.warn(`❌ Error getting token ${i}:`, err?.message || err);
+          // Continue to next token instead of stopping
         }
       }
 
       console.log(`✅ Found ${tokenIds.length} token IDs:`, tokenIds.map(t => t.toString()));
 
-      // Get metadata for each token
+      // Get metadata for each token (with timeout)
       const loadedFish: FishCatch[] = [];
       for (const tokenId of tokenIds) {
         try {
           console.log(`📝 Loading metadata for token #${tokenId.toString()}...`);
-          const metadata = await nftContract.fishMetadata(tokenId);
+          const metadata = await Promise.race([
+            nftContract.fishMetadata(tokenId),
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error(`Timeout loading metadata for token ${tokenId.toString()}`)), 5000)
+            )
+          ]) as any;
+          
           const fishType = Number(metadata.fishType);
           const fishName = metadata.fishName;
           const size = Number(metadata.size);
@@ -173,10 +186,13 @@ export function FishingGameDemo() {
             randomness,
             tokenId: Number(tokenId),
           });
-        } catch (err) {
-          console.warn(`❌ Error loading metadata for token ${tokenId.toString()}:`, err);
+        } catch (err: any) {
+          console.warn(`❌ Error loading metadata for token ${tokenId.toString()}:`, err?.message || err);
+          // Continue loading other tokens instead of stopping
         }
       }
+      
+      console.log(`📊 Successfully loaded ${loadedFish.length} out of ${tokenIds.length} NFTs`);
 
       // Sort by token ID (newest first, assuming higher token IDs are newer)
       loadedFish.sort((a, b) => (b.tokenId || 0) - (a.tokenId || 0));

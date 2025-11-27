@@ -152,38 +152,38 @@ export function EnhancedDungeonCrawlerDemo() {
       return;
     }
 
-    // Skip if in playtest mode (no contract to query)
-    if (isPlaytestMode) {
+        // Skip if in playtest mode (no contract to query)
+        if (isPlaytestMode) {
       console.log("Skipping character load - playtest mode");
-      return;
-    }
+          return;
+        }
 
     // Skip if no address
     if (!address) {
       console.log("Skipping character load - no address");
-      return;
-    }
+          return;
+        }
 
     try {
       setLoadingCharacters(true);
       console.log("🔄 Loading characters from contract...", { network, address });
 
-      const dungeonCrawlerAddress = contractsConfig[network]?.dungeonCrawler;
-      if (!dungeonCrawlerAddress) {
-        console.log(`DungeonCrawler not deployed on ${network}`);
+        const dungeonCrawlerAddress = contractsConfig[network]?.dungeonCrawler;
+        if (!dungeonCrawlerAddress) {
+          console.log(`DungeonCrawler not deployed on ${network}`);
         setLoadingCharacters(false);
-        return;
-      }
+          return;
+        }
 
-      // Create read-only provider using Alchemy RPC for reliable data access
-      const rpcUrl = getRpcUrl(network);
-      const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
-      console.log(`Using RPC for ${network}:`, rpcUrl.includes('alchemy') ? 'Alchemy' : 'Public');
+        // Create read-only provider using Alchemy RPC for reliable data access
+        const rpcUrl = getRpcUrl(network);
+        const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
+        console.log(`Using RPC for ${network}:`, rpcUrl.includes('alchemy') ? 'Alchemy' : 'Public');
 
       // Use full ABI from JSON file for accurate function signatures
       const contract = new ethers.Contract(dungeonCrawlerAddress, DungeonCrawlerABI.abi, rpcProvider);
-      
-      // Get user's character IDs with timeout
+        
+        // Get user's character IDs with timeout
       // Use getPlayerCharacters() function instead of playerCharacters mapping
       let characterIds: bigint[] = [];
       try {
@@ -204,27 +204,27 @@ export function EnhancedDungeonCrawlerDemo() {
         setLoadingCharacters(false);
         return;
       }
-      
-      if (!characterIds || characterIds.length === 0) {
-        console.log("No past characters found");
+        
+        if (!characterIds || characterIds.length === 0) {
+          console.log("No past characters found");
         setLoadingCharacters(false);
-        return;
-      }
+          return;
+        }
 
       console.log(`Found ${characterIds.length} character IDs for address ${address}`);
 
-      // Fetch each character's data
-      const loadedCharacters: Character[] = [];
-      const classNames = ["Warrior", "Mage", "Rogue", "Cleric"];
+        // Fetch each character's data
+        const loadedCharacters: Character[] = [];
+        const classNames = ["Warrior", "Mage", "Rogue", "Cleric"];
 
-      for (const characterId of characterIds) {
-        try {
-          const charData = await Promise.race([
-            contract.getCharacter(characterId),
-            new Promise((_, reject) => 
-              setTimeout(() => reject(new Error(`Timeout fetching character ${characterId.toString()}`)), 3000)
-            )
-          ]) as any;
+        for (const characterId of characterIds) {
+          try {
+            const charData = await Promise.race([
+              contract.getCharacter(characterId),
+              new Promise((_, reject) => 
+                setTimeout(() => reject(new Error(`Timeout fetching character ${characterId.toString()}`)), 3000)
+              )
+            ]) as any;
 
           // Safely access player address - try both named and indexed access
           let playerAddress: string | null = null;
@@ -236,15 +236,15 @@ export function EnhancedDungeonCrawlerDemo() {
             continue;
           }
 
-          // Check if character exists (player address should not be zero)
+            // Check if character exists (player address should not be zero)
           if (!playerAddress || playerAddress === ethers.ZeroAddress || playerAddress === "0x0000000000000000000000000000000000000000") {
             console.warn(`Character ${characterId.toString()} does not exist (zero address)`);
-            continue;
-          }
+              continue;
+            }
 
           // Safely access all character properties with fallbacks
-          const contractCharacterId = Number(characterId);
-          const characterIdLocal = `char_${contractCharacterId}_${Date.now()}`;
+            const contractCharacterId = Number(characterId);
+            const characterIdLocal = `char_${contractCharacterId}_${Date.now()}`;
           
           // Safely get class - try named first, then indexed
           let classValue = 0;
@@ -255,9 +255,9 @@ export function EnhancedDungeonCrawlerDemo() {
             continue;
           }
           const className = classNames[classValue] || "Unknown";
-          
-          // Map status: 0=active, 1=legendary, 2=early_death
-          const statusMap: Character["status"][] = ["active", "legendary", "early_death"];
+            
+            // Map status: 0=active, 1=legendary, 2=early_death
+            const statusMap: Character["status"][] = ["active", "legendary", "early_death"];
           let statusValue = 0;
           try {
             statusValue = Number(charData?.status ?? charData?.[14] ?? 0);
@@ -267,10 +267,10 @@ export function EnhancedDungeonCrawlerDemo() {
           const status = statusMap[statusValue] || "active";
 
           // Safely extract all character properties
-          const character: Character = {
-            id: characterIdLocal,
-            contractCharacterId,
-            class: className,
+            const character: Character = {
+              id: characterIdLocal,
+              contractCharacterId,
+              class: className,
             strength: Number(charData?.strength ?? charData?.[2] ?? 10),
             dexterity: Number(charData?.dexterity ?? charData?.[3] ?? 10),
             intelligence: Number(charData?.intelligence ?? charData?.[4] ?? 10),
@@ -283,11 +283,11 @@ export function EnhancedDungeonCrawlerDemo() {
             wealth: Number(charData?.wealth ?? charData?.[11] ?? 0),
             alive: charData?.alive ?? charData?.[12] ?? true,
             actionCount: Number(charData?.actionCount ?? charData?.[13] ?? 0),
-            status,
+              status,
             createdAt: Number(charData?.createdAt ?? charData?.[15] ?? Date.now() / 1000) * 1000, // Convert from seconds to milliseconds
-          };
+            };
 
-          loadedCharacters.push(character);
+            loadedCharacters.push(character);
         } catch (error: any) {
           // More detailed error logging
           if (error?.code === 'CALL_EXCEPTION' || error?.message?.includes('revert')) {
@@ -297,33 +297,33 @@ export function EnhancedDungeonCrawlerDemo() {
           } else {
             console.warn(`Failed to load character ${characterId.toString()}:`, error?.message || error);
           }
-          // Continue loading other characters even if one fails
+            // Continue loading other characters even if one fails
+          }
         }
-      }
 
-      if (loadedCharacters.length > 0) {
-        console.log(`Loaded ${loadedCharacters.length} characters from contract`);
-        // Sort by creation time (newest first)
-        loadedCharacters.sort((a, b) => b.createdAt - a.createdAt);
-        setCharacters(loadedCharacters);
+        if (loadedCharacters.length > 0) {
+          console.log(`Loaded ${loadedCharacters.length} characters from contract`);
+          // Sort by creation time (newest first)
+          loadedCharacters.sort((a, b) => b.createdAt - a.createdAt);
+          setCharacters(loadedCharacters);
         // Select the first (newest) character if none selected
         if (!selectedCharacterId && loadedCharacters.length > 0) {
-          setSelectedCharacterId(loadedCharacters[0].id);
+            setSelectedCharacterId(loadedCharacters[0].id);
+          }
+        } else {
+          console.log("No characters found for this address");
         }
-      } else {
-        console.log("No characters found for this address");
-      }
-    } catch (error) {
-      console.error("Error loading past characters:", error);
-      if (error instanceof Error) {
-        console.error("Error details:", {
-          message: error.message,
-          stack: error.stack,
-          network,
-          address,
-          dungeonCrawlerAddress: contractsConfig[network]?.dungeonCrawler
-        });
-      }
+      } catch (error) {
+        console.error("Error loading past characters:", error);
+        if (error instanceof Error) {
+          console.error("Error details:", {
+            message: error.message,
+            stack: error.stack,
+            network,
+            address,
+            dungeonCrawlerAddress: contractsConfig[network]?.dungeonCrawler
+          });
+        }
     } finally {
       setLoadingCharacters(false);
     }

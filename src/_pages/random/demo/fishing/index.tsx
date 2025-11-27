@@ -10,7 +10,7 @@ export default function FishingGamePage() {
     <WalletProvider>
       <PlaytestModeProvider>
         <GamePageLayout currentGame="fishing" contractKey="fishingGame">
-          <FishingGameDemo />
+              <FishingGameDemo />
         </GamePageLayout>
       </PlaytestModeProvider>
     </WalletProvider>

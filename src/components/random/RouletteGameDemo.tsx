@@ -76,6 +76,10 @@ export function RouletteGameDemo() {
         timestamp: Date.now(),
       };
       setCurrentSpin(newSpin);
+      
+      // Start spinning animation immediately to show pending state
+      // This makes the UI feel responsive while waiting for VRF
+      setIsWheelSpinning(true);
 
       toast({
         title: "Spin Requested",
@@ -126,7 +130,8 @@ export function RouletteGameDemo() {
 
           console.log("Spin result received:", spinResultData);
 
-          // Update current spin with result first
+          // Update current spin with result
+          // Wheel is already spinning from when spin was requested
           const completedSpin: SpinResult = {
             ...newSpin,
             result: spinResultData.result,
@@ -134,12 +139,12 @@ export function RouletteGameDemo() {
             vrfSeed: spinResultData.vrfSeed,
           };
           setCurrentSpin(completedSpin);
-
-          // Start spinning animation after result is set
-          // The SpinningRouletteWheel component needs both isSpinning=true and result set
-          setTimeout(() => {
+          
+          // Wheel should already be spinning, but ensure it is
+          // The SpinningRouletteWheel will detect the result change and animate to it
+          if (!isWheelSpinning) {
             setIsWheelSpinning(true);
-          }, 100);
+          }
 
           // Add to recent spins
           setRecentSpins((prev) => {
@@ -243,11 +248,11 @@ export function RouletteGameDemo() {
         let recentSpinIds: bigint[] = [];
         try {
           recentSpinIds = await Promise.race([
-            contract.getRecentSpins(20),
+          contract.getRecentSpins(20),
             new Promise<bigint[]>((_, reject) => 
               setTimeout(() => reject(new Error(`Timeout fetching spins from ${network}`)), 8000)
-            )
-          ]) as bigint[];
+          )
+        ]) as bigint[];
         } catch (error: any) {
           // Handle network errors gracefully
           if (error?.code === 'NETWORK_ERROR' || error?.message?.includes('NetworkError') || error?.message?.includes('fetch')) {

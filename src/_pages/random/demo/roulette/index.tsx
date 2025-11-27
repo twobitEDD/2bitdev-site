@@ -10,7 +10,7 @@ export default function RouletteGamePage() {
     <WalletProvider>
       <PlaytestModeProvider>
         <GamePageLayout currentGame="roulette" contractKey="rouletteGame">
-          <RouletteGameDemo />
+              <RouletteGameDemo />
         </GamePageLayout>
       </PlaytestModeProvider>
     </WalletProvider>

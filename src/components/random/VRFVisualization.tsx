@@ -132,6 +132,19 @@ export function VRFVisualization({ entries, maxEntries = 50 }: VRFVisualizationP
   }, [entries]);
 
   const displayEntries = entries.slice(0, maxEntries);
+  
+  // Debug logging
+  useEffect(() => {
+    console.log("🎲 VRFVisualization received entries:", {
+      totalEntries: entries.length,
+      displayEntries: displayEntries.length,
+      maxEntries,
+      sampleEntry: displayEntries[0] ? {
+        vrfValue: displayEntries[0].vrfValue?.slice(0, 20),
+        gameSource: displayEntries[0].gameSource,
+      } : null,
+    });
+  }, [entries, displayEntries.length, maxEntries]);
 
   if (displayEntries.length === 0) {
     return (

@@ -149,10 +149,21 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
           
           // Always update data (even if empty) to ensure UI reflects current state
           const limitedVRF = combinedVRF.slice(0, 50);
+          console.log(`📊 Setting VRF data: ${limitedVRF.length} entries`);
           setVrfData(limitedVRF);
           
           // Always set loading to false after backend API call completes
           setLoading(false);
+          
+          // Debug: Log what we're passing to VRFVisualization
+          console.log("📤 Passing to VRFVisualization:", {
+            entriesCount: limitedVRF.length,
+            sampleEntry: limitedVRF[0] ? {
+              vrfValue: limitedVRF[0].vrfValue?.slice(0, 20),
+              gameSource: limitedVRF[0].gameSource,
+              timestamp: limitedVRF[0].timestamp,
+            } : null,
+          });
         } else {
           console.error('❌ API response not OK:', response.status, response.statusText);
           setLoading(false);
