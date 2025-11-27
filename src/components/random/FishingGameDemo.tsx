@@ -274,14 +274,44 @@ export function FishingGameDemo() {
       const nftLinked = fishingGameInNFT.toLowerCase() === fishingGameAddress.toLowerCase();
 
       if (!fishingGameLinked || !nftLinked) {
-        setNftLinkageError(
-          `NFT contract linkage issue: FishingGame.nftContract=${nftContractInFishingGame}, NFT.fishingGame=${fishingGameInNFT}. NFTs will not mint until contracts are properly linked.`
-        );
+        let errorMessage = "NFT contract linkage issue:\n";
+        
+        if (!fishingGameLinked) {
+          if (nftContractInFishingGame === "0x0000000000000000000000000000000000000000") {
+            errorMessage += `❌ FishingGame.nftContract() is not set (address(0))\n`;
+            errorMessage += `   Expected: ${nftAddress}\n`;
+            errorMessage += `   Fix: Call FishingGame.setNFTContract(${nftAddress})\n\n`;
+          } else {
+            errorMessage += `❌ FishingGame.nftContract() mismatch\n`;
+            errorMessage += `   Expected: ${nftAddress}\n`;
+            errorMessage += `   Actual: ${nftContractInFishingGame}\n`;
+            errorMessage += `   Fix: Call FishingGame.setNFTContract(${nftAddress})\n\n`;
+          }
+        }
+        
+        if (!nftLinked) {
+          if (fishingGameInNFT === "0x0000000000000000000000000000000000000000") {
+            errorMessage += `❌ NFT.fishingGame() is not set (address(0))\n`;
+            errorMessage += `   Expected: ${fishingGameAddress}\n`;
+            errorMessage += `   Fix: Call NFT.setFishingGame(${fishingGameAddress})\n`;
+          } else {
+            errorMessage += `❌ NFT.fishingGame() mismatch\n`;
+            errorMessage += `   Expected: ${fishingGameAddress}\n`;
+            errorMessage += `   Actual: ${fishingGameInNFT}\n`;
+            errorMessage += `   Fix: Call NFT.setFishingGame(${fishingGameAddress})\n`;
+          }
+        }
+        
+        errorMessage += `\nNFTs will not mint until contracts are properly linked.`;
+        
+        setNftLinkageError(errorMessage);
         console.error("❌ NFT Contract Linkage Issue:", {
           expectedFishingGame: fishingGameAddress,
           expectedNFT: nftAddress,
           actualFishingGameNFT: nftContractInFishingGame,
           actualNFTFishingGame: fishingGameInNFT,
+          fishingGameLinked,
+          nftLinked,
         });
       } else {
         setNftLinkageError(null);
