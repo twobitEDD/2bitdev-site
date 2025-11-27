@@ -156,12 +156,12 @@ export function VRFVisualization({ entries, maxEntries = 50 }: VRFVisualizationP
       
       <Box
         ref={scrollContainerRef}
-        maxH="600px"
-        overflowY="auto"
-        overflowX="hidden"
+        maxW="100%"
+        overflowX="auto"
+        overflowY="hidden"
         sx={{
           "&::-webkit-scrollbar": {
-            width: "8px",
+            height: "8px",
           },
           "&::-webkit-scrollbar-track": {
             background: bgColor,
@@ -176,7 +176,7 @@ export function VRFVisualization({ entries, maxEntries = 50 }: VRFVisualizationP
           },
         }}
       >
-        <VStack spacing={3} align="stretch">
+        <HStack spacing={3} align="stretch" pb={2}>
           {displayEntries.map((entry, idx) => {
             const color = hexToColor(entry.vrfValue, idx);
             const randomNumber = vrfToNumber(entry.vrfValue);
@@ -194,21 +194,23 @@ export function VRFVisualization({ entries, maxEntries = 50 }: VRFVisualizationP
                 borderRadius="lg"
                 borderWidth="1px"
                 borderColor={borderColor}
+                minW="280px"
+                maxW="280px"
                 opacity={isAnimated ? 1 : 0}
                 transform={isAnimated ? "translateX(0)" : "translateX(-20px)"}
                 transition="all 0.3s ease-out"
                 _hover={{
                   borderColor: gameConfig?.color || "brand.400",
-                  transform: "translateX(4px) scale(1.02)",
+                  transform: "translateY(-4px) scale(1.02)",
                   boxShadow: "md",
                 }}
               >
-                <Flex justify="space-between" align="start" gap={3}>
-                  {/* Left: Color bar and game info */}
-                  <Flex align="center" gap={3} flex={1} minW={0}>
+                <VStack align="start" spacing={2} w="100%">
+                  {/* Top: Color bar and game info */}
+                  <Flex align="center" gap={2} w="100%">
                     <Box
                       w="4px"
-                      h="60px"
+                      h="40px"
                       borderRadius="full"
                       bg={color}
                       flexShrink={0}
@@ -237,53 +239,52 @@ export function VRFVisualization({ entries, maxEntries = 50 }: VRFVisualizationP
                             {entry.network}
                           </Badge>
                         )}
-                        {entry.blockNumber > 0 && (
-                          <Badge colorScheme="blue" fontSize="xs">
-                            Block #{entry.blockNumber.toLocaleString()}
-                          </Badge>
-                        )}
                       </HStack>
                       
-                      <HStack spacing={3} fontSize="xs" color="gray.500" flexWrap="wrap">
+                      <HStack spacing={2} fontSize="xs" color="gray.500" flexWrap="wrap">
                         <Text>#{randomNumber}</Text>
                         <Text>🎲 {diceRoll}</Text>
                         <Text>{formatRelativeTime(entry.timestamp)}</Text>
-                        {entry.metadata?.spinId && (
-                          <Text>Spin #{entry.metadata.spinId}</Text>
-                        )}
-                        {entry.metadata?.characterId && (
-                          <Text>Char #{entry.metadata.characterId}</Text>
-                        )}
-                        {entry.requestId && (
-                          <Tooltip label={entry.requestId}>
-                            <Text isTruncated maxW="100px">
-                              Req: {entry.requestId.slice(0, 8)}...
-                            </Text>
-                          </Tooltip>
-                        )}
                       </HStack>
                     </VStack>
                   </Flex>
 
-                  {/* Right: VRF Value */}
-                  <Tooltip label={entry.vrfValue}>
-                    <Code
-                      fontSize="xs"
-                      p={2}
-                      bg={bgColor}
-                      borderRadius="md"
-                      maxW="120px"
-                      isTruncated
-                      flexShrink={0}
-                    >
-                      {entry.vrfValue.slice(0, 16)}...
-                    </Code>
-                  </Tooltip>
-                </Flex>
+                  {/* Bottom: Metadata and VRF Value */}
+                  <VStack align="start" spacing={1} w="100%" fontSize="xs">
+                    {entry.metadata?.spinId && (
+                      <Text color="gray.400">Spin #{entry.metadata.spinId}</Text>
+                    )}
+                    {entry.metadata?.characterId && (
+                      <Text color="gray.400">Char #{entry.metadata.characterId}</Text>
+                    )}
+                    {entry.blockNumber > 0 && (
+                      <Text color="gray.400">Block #{entry.blockNumber.toLocaleString()}</Text>
+                    )}
+                    {entry.requestId && (
+                      <Tooltip label={entry.requestId}>
+                        <Text color="gray.400" isTruncated maxW="100%">
+                          Req: {entry.requestId.slice(0, 12)}...
+                        </Text>
+                      </Tooltip>
+                    )}
+                    <Tooltip label={entry.vrfValue}>
+                      <Code
+                        fontSize="xs"
+                        p={2}
+                        bg={bgColor}
+                        borderRadius="md"
+                        w="100%"
+                        isTruncated
+                      >
+                        {entry.vrfValue.slice(0, 20)}...
+                      </Code>
+                    </Tooltip>
+                  </VStack>
+                </VStack>
               </Box>
             );
           })}
-        </VStack>
+        </HStack>
       </Box>
     </Box>
   );

@@ -21,13 +21,8 @@ import { PlaytestModeToggle } from "@components/random/PlaytestModeToggle";
 import { PlaytestModeProvider } from "@contexts/PlaytestModeContext";
 import { WalletProvider, useWallet } from "@contexts/WalletContext";
 import { siteConfig } from "@config/site";
-import { contractsConfig } from "@config/contracts";
-import { getRpcUrl } from "@config/rpc";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { ethers } from "ethers";
-import RouletteGameABI from "@abis/RouletteGame.json";
-import DungeonCrawlerABI from "@abis/DungeonCrawler.json";
 
 interface VRFEntry {
   blockNumber: number;
@@ -59,13 +54,6 @@ const DemoPageContent = () => {
   const [vrfData, setVrfData] = useState<VRFEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Helper to get a provider for read-only queries using Alchemy RPC
-  // Always uses Alchemy RPCs for reliable, fast access regardless of user's MetaMask configuration
-  const getReadOnlyProvider = (network: "base" | "baseSepolia" = "baseSepolia"): ethers.JsonRpcProvider => {
-    const rpcUrl = getRpcUrl(network);
-    return new ethers.JsonRpcProvider(rpcUrl);
-  };
-
   useEffect(() => {
     // Skip during build/SSR - only run on client
     if (typeof window === 'undefined') {
@@ -73,261 +61,9 @@ const DemoPageContent = () => {
       return;
     }
 
-    // Helper function to fetch RouletteGame spins with timeout
-    const fetchRouletteGameSpins = async (network: "base" | "baseSepolia" = "baseSepolia"): Promise<VRFEntry[]> => {
-      try {
-        const rouletteAddress = contractsConfig[network]?.rouletteGame;
-        if (!rouletteAddress) {
-          console.log(`RouletteGame not deployed on ${network}`);
-          return [];
-        }
-
-        // Use Alchemy RPC for reliable data access
-        const rpcProvider = getReadOnlyProvider(network);
-        // Use full ABI from JSON file
-        const contract = new ethers.Contract(rouletteAddress, RouletteGameABI.abi, rpcProvider);
-        
-        // Get recent spins (last 10) with timeout
-        let recentSpinIds: bigint[] = [];
-        try {
-          recentSpinIds = await Promise.race([
-            contract.getRecentSpins(10),
-            new Promise<bigint[]>((_, reject) => 
-              setTimeout(() => reject(new Error(`Timeout fetching spins from ${network}`)), 8000)
-            )
-          ]) as bigint[];
-        } catch (error: any) {
-          // Handle network errors gracefully
-          if (error?.code === 'NETWORK_ERROR' || error?.message?.includes('NetworkError') || error?.message?.includes('fetch')) {
-            console.warn(`Network error fetching spins from ${network}, skipping...`);
-            return [];
-          }
-          throw error;
-        }
-        
-        if (!recentSpinIds || recentSpinIds.length === 0) {
-          return [];
-        }
-
-        const spins: VRFEntry[] = [];
-        
-        // Fetch each spin's details with timeout protection
-        for (const spinId of recentSpinIds) {
-          try {
-            const spin = await Promise.race([
-              contract.getSpin(spinId),
-              new Promise((_, reject) => 
-                setTimeout(() => reject(new Error(`Timeout fetching spin ${spinId.toString()}`)), 3000)
-              )
-            ]) as any;
-            
-            // Safely access spin properties
-            const result = spin?.result ?? spin?.[1] ?? 255;
-            const vrfSeed = spin?.vrfSeed ?? spin?.[4] ?? null;
-            const timestamp = spin?.timestamp ?? spin?.[5] ?? null;
-            
-            // Check if spin is completed (result != 255 and vrfSeed is not zero)
-            if (result !== 255 && 
-                vrfSeed && 
-                vrfSeed !== ethers.ZeroHash && 
-                vrfSeed !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
-              // Convert timestamp from seconds to milliseconds
-              let ts = timestamp ? Number(timestamp) : Date.now();
-              if (ts < 1000000000000) {
-                ts = ts * 1000;
-              }
-              
-              spins.push({
-                blockNumber: 0, // Game requests don't have block numbers
-                timestamp: ts || Date.now(),
-                vrfValue: vrfSeed,
-                harmonyBlockHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-                gameSource: "RouletteGame",
-                network: network,
-                metadata: {
-                  spinId: spinId.toString(),
-                  result: result,
-                  color: spin?.color ?? spin?.[2] ?? "unknown",
-                },
-              });
-            }
-          } catch (error: any) {
-            // Skip spins that don't exist or fail to load
-            if (error?.code === 'CALL_EXCEPTION' || error?.message?.includes('revert') || error?.message?.includes('Timeout') || error?.message?.includes('RangeError')) {
-              // Spin doesn't exist or timed out, skip silently
-            } else {
-              console.warn(`Error fetching spin ${spinId.toString()}:`, error?.message || error);
-            }
-            // Continue with next spin
-          }
-        }
-        
-        console.log(`Fetched ${spins.length} RouletteGame spins from ${network}`);
-        return spins;
-      } catch (error) {
-        console.error(`Error fetching RouletteGame spins from ${network}:`, error);
-        return [];
-      }
-    };
-
-    // Helper function to fetch DungeonCrawler VRF data
-    const fetchDungeonCrawlerVRF = async (network: "base" | "baseSepolia" = "baseSepolia"): Promise<VRFEntry[]> => {
-      try {
-        const dungeonAddress = contractsConfig[network]?.dungeonCrawler;
-        if (!dungeonAddress) {
-          console.log(`DungeonCrawler not deployed on ${network}`);
-          return [];
-        }
-
-        // Use Alchemy RPC for reliable data access
-        const rpcProvider = getReadOnlyProvider(network);
-        // Use full ABI from JSON file
-        const contract = new ethers.Contract(dungeonAddress, DungeonCrawlerABI.abi, rpcProvider);
-        const vrfEntries: VRFEntry[] = [];
-        
-        // Fetch recent characters (last 10)
-        try {
-          let characterCounter: bigint;
-          try {
-            characterCounter = await Promise.race([
-              contract.characterCounter(),
-              new Promise<bigint>((_, reject) => 
-                setTimeout(() => reject(new Error('Timeout')), 5000)
-              )
-            ]) as bigint;
-          } catch (error: any) {
-            if (error?.code === 'NETWORK_ERROR' || error?.message?.includes('NetworkError') || error?.message?.includes('fetch')) {
-              console.warn(`Network error fetching characterCounter from ${network}, skipping...`);
-              return [];
-            }
-            throw error;
-          }
-          
-          const startId = characterCounter > BigInt(10) ? characterCounter - BigInt(10) : BigInt(1);
-          
-          for (let charId = startId; charId <= characterCounter; charId++) {
-            try {
-              const character = await Promise.race([
-                contract.characters(charId),
-                new Promise((_, reject) => 
-                  setTimeout(() => reject(new Error('Timeout')), 2000)
-                )
-              ]) as any;
-              
-                    // Safely access creationSeed - try named first, then indexed
-                    // Mapping structure: 0=player, 1=class, 2=strength, 3=dexterity, 4=intelligence, 
-                    // 5=wisdom, 6=constitution, 7=charisma, 8=level, 9=experience, 10=health, 
-                    // 11=maxHealth, 12=wealth, 13=creationSeed, 14=alive, 15=actionCount, 16=status, 17=createdAt
-                    let creationSeed: string | null = null;
-                    try {
-                      creationSeed = character?.creationSeed || character?.[13] || null;
-                    } catch (e) {
-                      // Skip if we can't access creationSeed
-                      continue;
-                    }
-                    
-                    // Safely access createdAt - try named first, then indexed (index 17)
-                    let createdAt: number | bigint | null = null;
-                    try {
-                      createdAt = character?.createdAt || character?.[17] || null;
-                    } catch (e) {
-                      createdAt = null;
-                    }
-              
-              if (creationSeed && 
-                  creationSeed !== ethers.ZeroHash && 
-                  creationSeed !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
-                let timestamp = createdAt ? Number(createdAt) : Date.now();
-                if (timestamp < 1000000000000) {
-                  timestamp = timestamp * 1000;
-                }
-                
-                vrfEntries.push({
-                  blockNumber: 0,
-                  timestamp: timestamp || Date.now(),
-                  vrfValue: creationSeed,
-                  harmonyBlockHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-                  gameSource: "DungeonCrawler",
-                  network: network,
-                  metadata: {
-                    characterId: charId.toString(),
-                    type: "character_creation",
-                  },
-                });
-              }
-            } catch (error: any) {
-              // Skip characters that don't exist or fail to load
-              if (error?.code === 'CALL_EXCEPTION' || error?.message?.includes('revert') || error?.message?.includes('RangeError') || error?.message?.includes('Timeout')) {
-                // Character doesn't exist, skip silently
-              } else {
-                console.warn(`Error fetching character ${charId.toString()}:`, error?.message || error);
-              }
-            }
-          }
-        } catch (error) {
-          console.warn(`Error fetching characters:`, error);
-        }
-        
-        // Fetch recent interactions (last 10)
-        try {
-          const interactionCounter = await contract.interactionCounter();
-          const startId = interactionCounter > BigInt(10) ? interactionCounter - BigInt(10) : BigInt(1);
-          
-          for (let interactionId = startId; interactionId <= interactionCounter; interactionId++) {
-            try {
-              const interaction = await Promise.race([
-                contract.getInteraction(interactionId),
-                new Promise((_, reject) => 
-                  setTimeout(() => reject(new Error('Timeout')), 2000)
-                )
-              ]) as any;
-              
-              // Safely access interaction properties
-              const vrfSeed = interaction?.vrfSeed || interaction?.[7] || null;
-              let completed = false;
-              try {
-                completed = interaction?.completed ?? interaction?.[2] ?? false;
-              } catch (e) {
-                completed = false;
-              }
-              
-              if (completed && vrfSeed && 
-                  vrfSeed !== ethers.ZeroHash && 
-                  vrfSeed !== "0x0000000000000000000000000000000000000000000000000000000000000000") {
-                vrfEntries.push({
-                  blockNumber: 0,
-                  timestamp: Date.now(),
-                  vrfValue: vrfSeed,
-                  harmonyBlockHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-                  gameSource: "DungeonCrawler",
-                  network: network,
-                  metadata: {
-                    interactionId: interactionId.toString(),
-                    type: "interaction",
-                  },
-                });
-              }
-            } catch (error: any) {
-              // Skip interactions that don't exist or fail to load
-              if (error?.code === 'CALL_EXCEPTION' || error?.message?.includes('revert') || error?.message?.includes('RangeError') || error?.message?.includes('Timeout')) {
-                // Interaction doesn't exist, skip silently
-              } else {
-                console.warn(`Error fetching interaction ${interactionId.toString()}:`, error?.message || error);
-              }
-            }
-          }
-        } catch (error) {
-          console.warn(`Error fetching interactions:`, error);
-        }
-        
-        console.log(`Fetched ${vrfEntries.length} DungeonCrawler VRF entries from ${network}`);
-        return vrfEntries;
-      } catch (error) {
-        console.error(`Error fetching DungeonCrawler VRF from ${network}:`, error);
-        return [];
-      }
-    };
-
+    // NOTE: Removed blockchain polling - all VRF data comes from backend API
+    // The backend API should include game-specific VRF data (RouletteGame, DungeonCrawler, FishingGame)
+    
     const fetchVRFData = async () => {
       try {
         const response = await fetch(siteConfig.servRandomStatusUrl, {
@@ -340,7 +76,6 @@ const DemoPageContent = () => {
             recentRandomnessLength: data.recentRandomness?.length || 0,
             hasFeeRequests: !!data.feeRequests,
             feeRequestsLength: data.feeRequests?.length || 0,
-            feeRequestsSample: data.feeRequests?.slice(0, 3),
           });
           
           const combinedVRF: VRFEntry[] = [];
@@ -381,10 +116,10 @@ const DemoPageContent = () => {
                 }
                 
                 return {
-                  blockNumber: 0, // Game requests don't have block numbers
+                  blockNumber: 0,
                   timestamp: timestamp || Date.now(),
                   vrfValue: req.randomnessValue!,
-                  harmonyBlockHash: "0x0000000000000000000000000000000000000000000000000000000000000000", // Not available for game requests
+                  harmonyBlockHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
                   gameSource: "FeeRequest",
                   network: req.network || "unknown",
                   requestId: req.requestId,
@@ -394,63 +129,18 @@ const DemoPageContent = () => {
             combinedVRF.push(...fulfilledRequests);
           }
           
-          // Sort by timestamp (most recent first) and update UI immediately with API data
+          // Sort by timestamp (most recent first)
           combinedVRF.sort((a, b) => b.timestamp - a.timestamp);
-          // Always set loading to false and update data, even if empty
-          setVrfData([...combinedVRF]);
-          setLoading(false); // Show data immediately when API data is available
           
-          // Fetch game-specific VRF data from contracts in parallel (non-blocking)
-          // Use Promise.allSettled with timeout to prevent hanging
-          const withTimeout = <T,>(promise: Promise<T>, timeoutMs: number = 8000): Promise<T> => {
-            return Promise.race([
-              promise,
-              new Promise<T>((_, reject) => 
-                setTimeout(() => reject(new Error('Request timeout')), timeoutMs)
-              )
-            ]);
-          };
-          
-          // Fetch contract data asynchronously and update when ready
-          Promise.allSettled([
-            withTimeout(fetchRouletteGameSpins("baseSepolia"), 8000),
-            withTimeout(fetchRouletteGameSpins("base"), 8000),
-            withTimeout(fetchDungeonCrawlerVRF("baseSepolia"), 8000),
-            withTimeout(fetchDungeonCrawlerVRF("base"), 8000),
-          ]).then((results) => {
-            const baseSepoliaSpins = results[0].status === 'fulfilled' ? results[0].value : [];
-            const baseSpins = results[1].status === 'fulfilled' ? results[1].value : [];
-            const baseSepoliaDungeon = results[2].status === 'fulfilled' ? results[2].value : [];
-            const baseDungeon = results[3].status === 'fulfilled' ? results[3].value : [];
-            
-            // Log any failures
-            if (results[0].status === 'rejected') {
-              console.error('Failed to fetch RouletteGame spins from baseSepolia:', results[0].reason);
-            }
-            if (results[1].status === 'rejected') {
-              console.error('Failed to fetch RouletteGame spins from base:', results[1].reason);
-            }
-            if (results[2].status === 'rejected') {
-              console.error('Failed to fetch DungeonCrawler VRF from baseSepolia:', results[2].reason);
-            }
-            if (results[3].status === 'rejected') {
-              console.error('Failed to fetch DungeonCrawler VRF from base:', results[3].reason);
-            }
-            
-            console.log(`Game VRF data: RouletteGame baseSepolia=${baseSepoliaSpins.length}, base=${baseSpins.length}, DungeonCrawler baseSepolia=${baseSepoliaDungeon.length}, base=${baseDungeon.length}`);
-            
-            // Combine all data and update
-            const allVRF = [...combinedVRF, ...baseSepoliaSpins, ...baseSpins, ...baseSepoliaDungeon, ...baseDungeon];
-            allVRF.sort((a, b) => b.timestamp - a.timestamp);
-            const limitedVRF = allVRF.slice(0, 50); // Increased limit for scrolling list
-            console.log('Final VRF data count:', limitedVRF.length);
+          // Only update data if we have entries from backend API
+          // Don't clear existing data if backend returns empty
+          if (combinedVRF.length > 0) {
+            const limitedVRF = combinedVRF.slice(0, 50);
             setVrfData(limitedVRF);
-            // Ensure loading is false after all data is fetched
-            setLoading(false);
-          }).catch((error) => {
-            console.error("Error in Promise.allSettled:", error);
-            setLoading(false);
-          });
+          }
+          
+          // Always set loading to false after backend API call completes
+          setLoading(false);
         } else {
           console.error('Failed to fetch VRF data:', response.status, response.statusText);
           setLoading(false);
@@ -493,8 +183,8 @@ const DemoPageContent = () => {
             </Box>
           )}
 
-            {/* Playtest Mode Toggle */}
-            <PlaytestModeToggle />
+          {/* Playtest Mode Toggle */}
+          <PlaytestModeToggle />
 
           {/* Game Selection Cards */}
           <Box>
