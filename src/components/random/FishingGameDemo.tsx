@@ -776,7 +776,7 @@ export function FishingGameDemo() {
               </Text>
             </Box>
             <Text fontSize="xs" mt={3} color="gray.500">
-              <strong>Note:</strong> This is a demo environment. You don't need to fix anything - this information helps you understand how contract linkage works in SERV.random integrations.
+              <strong>Note:</strong> This is a demo environment. You don&apos;t need to fix anything - this information helps you understand how contract linkage works in SERV.random integrations.
             </Text>
             <Text fontSize="xs" mt={2} color="gray.500">
               <strong>How it works:</strong> For NFTs to mint, the NFT contract must know which FishingGame contract can call it, and the FishingGame must know which NFT contract to mint to. This bidirectional linkage ensures security.
