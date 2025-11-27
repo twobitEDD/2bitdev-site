@@ -322,6 +322,9 @@ export function RouletteGameDemo() {
           console.log(`Loaded ${loadedSpins.length} past spins from ${network}`);
           setRecentSpins(loadedSpins);
           
+          // Set currentSpin to the most recent spin (first in sorted array)
+          setCurrentSpin(loadedSpins[0]);
+          
           // Update statistics
           const stats = {
             totalSpins: loadedSpins.length,
@@ -339,6 +342,33 @@ export function RouletteGameDemo() {
 
     loadPastSpins();
   }, [isPlaytestMode, network]); // Removed provider dependency - we use public RPC
+
+  // Ensure currentSpin always points to the most recent spin from recentSpins
+  // (unless there's a pending spin in progress)
+  useEffect(() => {
+    if (recentSpins.length > 0) {
+      const mostRecentSpin = recentSpins[0];
+      // Use functional update to avoid stale closure issues
+      setCurrentSpin((prev) => {
+        // Only update if:
+        // 1. prev is null, OR
+        // 2. The most recent spin is newer than prev, OR
+        // 3. prev is pending (result === 255) but we have a completed spin
+        // Don't update if prev is already the most recent spin (same spinId)
+        if (
+          !prev ||
+          (mostRecentSpin.timestamp > prev.timestamp) ||
+          (prev.result === 255 && mostRecentSpin.result !== 255)
+        ) {
+          // Only update if it's actually a different spin
+          if (!prev || prev.spinId !== mostRecentSpin.spinId) {
+            return mostRecentSpin;
+          }
+        }
+        return prev; // Keep current value
+      });
+    }
+  }, [recentSpins]); // Only depend on recentSpins to avoid loops
 
   const cardBg = useColorModeValue("white", "gray.700");
   const borderColor = useColorModeValue("gray.200", "gray.600");

@@ -114,14 +114,23 @@ export function FishingGameDemo() {
       const userAddress = await signer.getAddress();
       console.log("👤 User address:", userAddress);
       
-      // NFT Contract ABI
+      // NFT Contract ABI - using minimal ABI for now (should be replaced with JSON ABI when available)
       const nftAbi = [
         "function balanceOf(address owner) view returns (uint256)",
         "function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)",
         "function fishMetadata(uint256 tokenId) view returns (uint8 fishType, uint256 size, uint256 value, uint256 timestamp, string memory fishName, bytes32 randomness)",
+        "event FishNFTMinted(address indexed to, uint256 indexed tokenId, uint8 fishType, uint256 size, uint256 value, string fishName, bytes32 randomness)",
       ];
 
       const nftContract = new ethers.Contract(nftAddress, nftAbi, provider);
+      
+      // Check if contract exists
+      const contractCode = await provider.getCode(nftAddress);
+      if (!contractCode || contractCode === "0x" || contractCode === "0x0") {
+        console.warn(`⚠️ NFT contract not found at ${nftAddress}`);
+        setFishHistory([]);
+        return;
+      }
       
       // Get user's balance
       console.log("📊 Checking NFT balance...");
@@ -151,11 +160,38 @@ export function FishingGameDemo() {
           console.log(`  Token ${i}: #${tokenId.toString()}`);
         } catch (err: any) {
           console.warn(`❌ Error getting token ${i}:`, err?.message || err);
+          // If enumeration fails, try event-based approach
+          if (i === 0) {
+            console.log("⚠️ tokenOfOwnerByIndex not available, trying events...");
+            try {
+              const currentBlock = await provider.getBlockNumber();
+              const fromBlock = Math.max(0, currentBlock - 100000);
+              const filter = nftContract.filters.FishNFTMinted(userAddress, null);
+              const events = await nftContract.queryFilter(filter, fromBlock, currentBlock);
+              
+              const tokenIdSet = new Set<string>();
+              for (const event of events) {
+                if ("args" in event && event.args && event.args.tokenId) {
+                  tokenIdSet.add(event.args.tokenId.toString());
+                }
+              }
+              tokenIds.push(...Array.from(tokenIdSet).map(id => BigInt(id)));
+              console.log(`   ✅ Found ${tokenIdSet.size} token(s) via events`);
+            } catch (eventErr) {
+              console.warn(`   ⚠️ Could not query events:`, eventErr);
+            }
+          }
           // Continue to next token instead of stopping
         }
       }
 
       console.log(`✅ Found ${tokenIds.length} token IDs:`, tokenIds.map(t => t.toString()));
+
+      if (tokenIds.length === 0) {
+        console.log("ℹ️ No NFTs found for user");
+        setFishHistory([]);
+        return;
+      }
 
       // Get metadata for each token (with timeout)
       const loadedFish: FishCatch[] = [];
