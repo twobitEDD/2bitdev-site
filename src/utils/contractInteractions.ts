@@ -1233,11 +1233,18 @@ export async function realCatchFish(
     });
   } else if (nftMintingFailedEvent) {
     const parsed = fishingGame.interface.parseLog(nftMintingFailedEvent);
-    console.error("❌ Found NFTMintingFailed event:", {
+    const errorDetails = {
       player: parsed?.args.player ?? parsed?.args[0],
       fishType: parsed?.args.fishType ?? parsed?.args[1],
       reason: parsed?.args.reason ?? parsed?.args[2],
-    });
+    };
+    console.error("❌ Found NFTMintingFailed event:", errorDetails);
+    console.error("⚠️ NFT was NOT minted! This usually means:");
+    console.error("   1. FishingGame.nftContract() is not set (address(0))");
+    console.error("   2. NFT contract's fishingGame() doesn't match FishingGame address");
+    console.error("   3. NFT contract has an error during minting");
+    console.error("   Check contract linkage with: FishingGame.nftContract() and NFT.fishingGame()");
+    // Don't throw - fish was still caught successfully, just NFT minting failed
   } else {
     // This is normal if fish was already caught via Pattern 1 callback (events are in different transaction)
     // Only log as info, not warning, since we'll check catch history below

@@ -86,6 +86,7 @@ export function FishingGameDemo() {
   const [loadingNFTs, setLoadingNFTs] = useState(false);
   const [vrfSeed, setVrfSeed] = useState<string | null>(null);
   const [pattern, setPattern] = useState<"pattern1" | "pattern2">("pattern1");
+  const [nftLinkageError, setNftLinkageError] = useState<string | null>(null);
 
   // Load user's NFTs from contract
   const loadUserNFTs = useCallback(async () => {
@@ -242,15 +243,67 @@ export function FishingGameDemo() {
     }
   }, [isPlaytestMode, isConnected, signer, provider]);
 
+  // Check NFT contract linkage when component mounts or wallet connects
+  const checkNFTLinkage = useCallback(async () => {
+    if (isPlaytestMode || !isConnected || !signer || !provider) {
+      setNftLinkageError(null);
+      return;
+    }
+
+    try {
+      const network = "baseSepolia";
+      const fishingGameAddress = contractsConfig[network]?.fishingGame;
+      const nftAddress = contractsConfig[network]?.fishingGameNFT;
+
+      if (!fishingGameAddress || !nftAddress) {
+        return;
+      }
+
+      // Check FishingGame's NFT contract
+      const fishingGameAbi = ["function nftContract() view returns (address)"];
+      const fishingGameContract = new ethers.Contract(fishingGameAddress, fishingGameAbi, provider);
+      const nftContractInFishingGame = await fishingGameContract.nftContract();
+
+      // Check NFT contract's FishingGame address
+      const nftAbi = ["function fishingGame() view returns (address)"];
+      const nftContract = new ethers.Contract(nftAddress, nftAbi, provider);
+      const fishingGameInNFT = await nftContract.fishingGame();
+
+      // Verify linkage
+      const fishingGameLinked = nftContractInFishingGame.toLowerCase() === nftAddress.toLowerCase();
+      const nftLinked = fishingGameInNFT.toLowerCase() === fishingGameAddress.toLowerCase();
+
+      if (!fishingGameLinked || !nftLinked) {
+        setNftLinkageError(
+          `NFT contract linkage issue: FishingGame.nftContract=${nftContractInFishingGame}, NFT.fishingGame=${fishingGameInNFT}. NFTs will not mint until contracts are properly linked.`
+        );
+        console.error("❌ NFT Contract Linkage Issue:", {
+          expectedFishingGame: fishingGameAddress,
+          expectedNFT: nftAddress,
+          actualFishingGameNFT: nftContractInFishingGame,
+          actualNFTFishingGame: fishingGameInNFT,
+        });
+      } else {
+        setNftLinkageError(null);
+        console.log("✅ NFT contract linkage verified");
+      }
+    } catch (error) {
+      console.error("Error checking NFT linkage:", error);
+      // Don't set error state - might be a temporary network issue
+    }
+  }, [isPlaytestMode, isConnected, signer, provider]);
+
   // Load NFTs when component mounts or wallet connects
   useEffect(() => {
     if (isConnected && !isPlaytestMode && signer) {
+      checkNFTLinkage();
       loadUserNFTs();
     } else if (isPlaytestMode) {
       // In playtest mode, clear history on disconnect
       setFishHistory([]);
+      setNftLinkageError(null);
     }
-  }, [isConnected, isPlaytestMode, signer, loadUserNFTs]);
+  }, [isConnected, isPlaytestMode, signer, loadUserNFTs, checkNFTLinkage]);
 
   const handleGoFishing = async () => {
     // Check if wallet connected when not in playtest mode
@@ -524,12 +577,59 @@ export function FishingGameDemo() {
           setCaughtFish(fish);
           setFishingStep("caught");
           
-          toast({
-            title: `Caught a ${fish.fishName}!`,
-            description: `${getFishEmoji(fish.fishType)} ${fish.rarity} - Size: ${fish.size}cm, Value: ${fish.value} gold`,
-            status: "success",
-            duration: 5000,
-          });
+          // Check if NFT was actually minted by checking user's NFT balance before and after
+          let nftMinted = false;
+          if (!isPlaytestMode && isConnected && signer && provider) {
+            try {
+              const network = "baseSepolia";
+              const nftAddress = contractsConfig[network]?.fishingGameNFT;
+              if (nftAddress) {
+                const userAddress = await signer.getAddress();
+                const nftAbi = ["function balanceOf(address owner) view returns (uint256)"];
+                const nftContract = new ethers.Contract(nftAddress, nftAbi, provider);
+                const balanceBefore = await nftContract.balanceOf(userAddress);
+                
+                // Wait a bit for the NFT to be minted
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                const balanceAfter = await nftContract.balanceOf(userAddress);
+                nftMinted = balanceAfter > balanceBefore;
+                
+                if (!nftMinted) {
+                  console.warn("⚠️ NFT was not minted after catch. Checking contract linkage...");
+                  checkNFTLinkage();
+                  toast({
+                    title: `Caught a ${fish.fishName}!`,
+                    description: `${getFishEmoji(fish.fishType)} ${fish.rarity} - Size: ${fish.size}cm, Value: ${fish.value} gold. ⚠️ NFT may not have been minted - check console for details.`,
+                    status: "warning",
+                    duration: 8000,
+                  });
+                } else {
+                  toast({
+                    title: `Caught a ${fish.fishName}!`,
+                    description: `${getFishEmoji(fish.fishType)} ${fish.rarity} - Size: ${fish.size}cm, Value: ${fish.value} gold`,
+                    status: "success",
+                    duration: 5000,
+                  });
+                }
+              }
+            } catch (error) {
+              console.error("Error checking NFT mint status:", error);
+              toast({
+                title: `Caught a ${fish.fishName}!`,
+                description: `${getFishEmoji(fish.fishType)} ${fish.rarity} - Size: ${fish.size}cm, Value: ${fish.value} gold`,
+                status: "success",
+                duration: 5000,
+              });
+            }
+          } else {
+            toast({
+              title: `Caught a ${fish.fishName}!`,
+              description: `${getFishEmoji(fish.fishType)} ${fish.rarity} - Size: ${fish.size}cm, Value: ${fish.value} gold`,
+              status: "success",
+              duration: 5000,
+            });
+          }
 
           // Reload NFTs - wait longer for transaction to be mined and indexed
           if (!isPlaytestMode && isConnected && signer) {
@@ -626,6 +726,22 @@ export function FishingGameDemo() {
             >
               Switch to Base Sepolia
             </Button>
+          </Box>
+        </Alert>
+      )}
+
+      {/* NFT Linkage Error */}
+      {!isPlaytestMode && isConnected && nftLinkageError && (
+        <Alert status="error" borderRadius="lg" mb={4}>
+          <AlertIcon />
+          <Box>
+            <Text fontWeight="bold">⚠️ NFT Contract Not Properly Linked</Text>
+            <Text fontSize="sm" mt={2}>
+              {nftLinkageError}
+            </Text>
+            <Text fontSize="xs" mt={2} color="gray.600">
+              Fish catches will work, but NFTs will not be minted. Please contact the contract owner to fix the linkage.
+            </Text>
           </Box>
         </Alert>
       )}
