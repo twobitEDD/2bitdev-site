@@ -29,6 +29,7 @@ import { usePlaytestMode } from "@contexts/PlaytestModeContext";
 import { useWallet } from "@contexts/WalletContext";
 import { goFishing, catchFish, pollForFulfillmentStatus } from "@utils/contractHelpers";
 import { contractsConfig } from "@config/contracts";
+import { getRpcUrl } from "@config/rpc";
 import { ethers } from "ethers";
 
 interface FishCatch {
@@ -259,16 +260,17 @@ export function FishingGameDemo() {
         return;
       }
 
-      // Use a fresh provider to avoid caching issues
-      const freshProvider = provider;
+      // Use direct RPC call to bypass provider cache
+      // Create a fresh provider connection to force latest block read
+      const rpcUrl = getRpcUrl("baseSepolia");
+      const freshProvider = new ethers.JsonRpcProvider(rpcUrl);
       
       // Check FishingGame's NFT contract
       const fishingGameAbi = ["function nftContract() view returns (address)"];
       const fishingGameContract = new ethers.Contract(fishingGameAddress, fishingGameAbi, freshProvider);
       const nftContractInFishingGame = await fishingGameContract.nftContract();
 
-      // Check NFT contract's FishingGame address - add a small delay to ensure state is updated
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Check NFT contract's FishingGame address - use fresh provider
       const nftAbi = ["function fishingGame() view returns (address)"];
       const nftContract = new ethers.Contract(nftAddress, nftAbi, freshProvider);
       const fishingGameInNFT = await nftContract.fishingGame();
