@@ -287,11 +287,16 @@ const DemoPageContent = () => {
                     🎣 Fishing Game
                   </Heading>
                   <Text color="gray.400" mb={4} fontSize="sm">
-                    Catch fish using VRF randomness. Each catch is determined by on-chain randomness from SERV.random.
+                    Catch fish using VRF randomness. Each catch is determined by on-chain randomness from SERV.random. Try both integration patterns!
                   </Text>
-                  <Badge colorScheme="blue" fontSize="xs">
-                    Pattern 1: Automatic Callback
-                  </Badge>
+                  <Flex gap={2} flexWrap="wrap">
+                    <Badge colorScheme="blue" fontSize="xs">
+                      Pattern 1: Automatic Callback
+                    </Badge>
+                    <Badge colorScheme="green" fontSize="xs">
+                      Pattern 2: Manual Claim
+                    </Badge>
+                  </Flex>
                 </Box>
               </Link>
 
