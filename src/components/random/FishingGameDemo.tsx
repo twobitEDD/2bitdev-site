@@ -259,19 +259,32 @@ export function FishingGameDemo() {
         return;
       }
 
+      // Use a fresh provider to avoid caching issues
+      const freshProvider = provider;
+      
       // Check FishingGame's NFT contract
       const fishingGameAbi = ["function nftContract() view returns (address)"];
-      const fishingGameContract = new ethers.Contract(fishingGameAddress, fishingGameAbi, provider);
+      const fishingGameContract = new ethers.Contract(fishingGameAddress, fishingGameAbi, freshProvider);
       const nftContractInFishingGame = await fishingGameContract.nftContract();
 
-      // Check NFT contract's FishingGame address
+      // Check NFT contract's FishingGame address - add a small delay to ensure state is updated
+      await new Promise(resolve => setTimeout(resolve, 500));
       const nftAbi = ["function fishingGame() view returns (address)"];
-      const nftContract = new ethers.Contract(nftAddress, nftAbi, provider);
+      const nftContract = new ethers.Contract(nftAddress, nftAbi, freshProvider);
       const fishingGameInNFT = await nftContract.fishingGame();
 
       // Verify linkage
       const fishingGameLinked = nftContractInFishingGame.toLowerCase() === nftAddress.toLowerCase();
       const nftLinked = fishingGameInNFT.toLowerCase() === fishingGameAddress.toLowerCase();
+
+      console.log("🔍 NFT Linkage Check:", {
+        fishingGameAddress,
+        nftAddress,
+        nftContractInFishingGame,
+        fishingGameInNFT,
+        fishingGameLinked,
+        nftLinked,
+      });
 
       if (!fishingGameLinked || !nftLinked) {
         let errorMessage = "NFT contract linkage issue:\n";
@@ -326,6 +339,7 @@ export function FishingGameDemo() {
   // Load NFTs when component mounts or wallet connects
   useEffect(() => {
     if (isConnected && !isPlaytestMode && signer) {
+      // Check linkage first, then load NFTs
       checkNFTLinkage();
       loadUserNFTs();
     } else if (isPlaytestMode) {
@@ -334,6 +348,16 @@ export function FishingGameDemo() {
       setNftLinkageError(null);
     }
   }, [isConnected, isPlaytestMode, signer, loadUserNFTs, checkNFTLinkage]);
+
+  // Re-check linkage periodically (every 30 seconds) to catch updates
+  useEffect(() => {
+    if (isConnected && !isPlaytestMode && signer && provider) {
+      const interval = setInterval(() => {
+        checkNFTLinkage();
+      }, 30000); // Check every 30 seconds
+      return () => clearInterval(interval);
+    }
+  }, [isConnected, isPlaytestMode, signer, provider, checkNFTLinkage]);
 
   const handleGoFishing = async () => {
     // Check if wallet connected when not in playtest mode
@@ -781,16 +805,29 @@ export function FishingGameDemo() {
             <Text fontSize="xs" mt={2} color="gray.500">
               <strong>How it works:</strong> For NFTs to mint, the NFT contract must know which FishingGame contract can call it, and the FishingGame must know which NFT contract to mint to. This bidirectional linkage ensures security.
             </Text>
-            <Text fontSize="xs" mt={2} color="blue.400">
-              <a 
-                href={`https://sepolia.basescan.org/address/${contractsConfig.baseSepolia?.fishingGameNFT}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ textDecoration: 'underline' }}
+            <Flex mt={3} gap={2} flexWrap="wrap">
+              <Button
+                size="xs"
+                colorScheme="blue"
+                variant="outline"
+                onClick={() => {
+                  console.log("🔄 Refreshing NFT linkage check...");
+                  checkNFTLinkage();
+                }}
               >
-                Explore NFT Contract on BaseScan →
-              </a>
-            </Text>
+                🔄 Refresh Check
+              </Button>
+              <Text fontSize="xs" color="blue.400" alignSelf="center">
+                <a 
+                  href={`https://sepolia.basescan.org/address/${contractsConfig.baseSepolia?.fishingGameNFT}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: 'underline' }}
+                >
+                  Explore NFT Contract on BaseScan →
+                </a>
+              </Text>
+            </Flex>
           </Box>
         </Alert>
       )}
