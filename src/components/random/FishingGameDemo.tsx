@@ -760,17 +760,36 @@ export function FishingGameDemo() {
         </Alert>
       )}
 
-      {/* NFT Linkage Error */}
+      {/* NFT Linkage Info - Educational for Demo Users */}
       {!isPlaytestMode && isConnected && nftLinkageError && (
-        <Alert status="error" borderRadius="lg" mb={4}>
+        <Alert status="info" borderRadius="lg" mb={4}>
           <AlertIcon />
           <Box>
-            <Text fontWeight="bold">⚠️ NFT Contract Not Properly Linked</Text>
+            <Text fontWeight="bold">📚 Learning: NFT Contract Linkage</Text>
             <Text fontSize="sm" mt={2}>
-              {nftLinkageError}
+              This demo shows how SERV.random contracts work together. The NFT contract linkage status helps you understand contract relationships.
             </Text>
-            <Text fontSize="xs" mt={2} color="gray.600">
-              Fish catches will work, but NFTs will not be minted. Please contact the contract owner to fix the linkage.
+            <Box mt={3} p={3} bg={bgColor} borderRadius="md" fontSize="xs">
+              <Text fontWeight="semibold" mb={2}>Current Status:</Text>
+              <Text whiteSpace="pre-wrap" fontFamily="mono" color="gray.300">
+                {nftLinkageError}
+              </Text>
+            </Box>
+            <Text fontSize="xs" mt={3} color="gray.500">
+              <strong>Note:</strong> This is a demo environment. You don't need to fix anything - this information helps you understand how contract linkage works in SERV.random integrations.
+            </Text>
+            <Text fontSize="xs" mt={2} color="gray.500">
+              <strong>How it works:</strong> For NFTs to mint, the NFT contract must know which FishingGame contract can call it, and the FishingGame must know which NFT contract to mint to. This bidirectional linkage ensures security.
+            </Text>
+            <Text fontSize="xs" mt={2} color="blue.400">
+              <a 
+                href={`https://sepolia.basescan.org/address/${contractsConfig.baseSepolia?.fishingGameNFT}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: 'underline' }}
+              >
+                Explore NFT Contract on BaseScan →
+              </a>
             </Text>
           </Box>
         </Alert>
