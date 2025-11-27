@@ -91,6 +91,7 @@ export function FishingGameDemo() {
   const loadUserNFTs = useCallback(async () => {
     // Skip if in playtest mode or wallet not connected
     if (isPlaytestMode || !isConnected || !signer || !provider) {
+      console.log("⏭️ Skipping NFT load - playtest mode or wallet not connected");
       return;
     }
 
@@ -99,12 +100,19 @@ export function FishingGameDemo() {
       const network = "baseSepolia"; // Using Base Sepolia for now
       const nftAddress = contractsConfig[network]?.fishingGameNFT;
       
+      console.log("🎣 Loading NFTs from:", {
+        network,
+        nftAddress,
+        fishingGame: contractsConfig[network]?.fishingGame,
+      });
+      
       if (!nftAddress) {
-        console.warn("FishingGameNFT address not configured for", network);
+        console.warn("❌ FishingGameNFT address not configured for", network);
         return;
       }
 
       const userAddress = await signer.getAddress();
+      console.log("👤 User address:", userAddress);
       
       // NFT Contract ABI
       const nftAbi = [
@@ -116,35 +124,45 @@ export function FishingGameDemo() {
       const nftContract = new ethers.Contract(nftAddress, nftAbi, provider);
       
       // Get user's balance
+      console.log("📊 Checking NFT balance...");
       const balance = await nftContract.balanceOf(userAddress);
       const balanceNum = Number(balance);
+      console.log(`📊 NFT Balance: ${balanceNum} tokens`);
       
       if (balanceNum === 0) {
+        console.log("ℹ️ No NFTs found for user");
         setFishHistory([]);
         return;
       }
 
       // Get all token IDs owned by user
+      console.log(`🔍 Fetching ${balanceNum} token IDs...`);
       const tokenIds: bigint[] = [];
       for (let i = 0; i < balanceNum; i++) {
         try {
           const tokenId = await nftContract.tokenOfOwnerByIndex(userAddress, i);
           tokenIds.push(tokenId);
+          console.log(`  Token ${i}: #${tokenId.toString()}`);
         } catch (err) {
-          console.warn(`Error getting token ${i}:`, err);
+          console.warn(`❌ Error getting token ${i}:`, err);
         }
       }
+
+      console.log(`✅ Found ${tokenIds.length} token IDs:`, tokenIds.map(t => t.toString()));
 
       // Get metadata for each token
       const loadedFish: FishCatch[] = [];
       for (const tokenId of tokenIds) {
         try {
+          console.log(`📝 Loading metadata for token #${tokenId.toString()}...`);
           const metadata = await nftContract.fishMetadata(tokenId);
           const fishType = Number(metadata.fishType);
           const fishName = metadata.fishName;
           const size = Number(metadata.size);
           const value = Number(metadata.value);
           const randomness = metadata.randomness;
+          
+          console.log(`  ✅ Token #${tokenId.toString()}: ${fishName} (Type: ${fishType}, Size: ${size}cm, Value: ${value})`);
           
           loadedFish.push({
             fishType,
@@ -156,16 +174,17 @@ export function FishingGameDemo() {
             tokenId: Number(tokenId),
           });
         } catch (err) {
-          console.warn(`Error loading metadata for token ${tokenId}:`, err);
+          console.warn(`❌ Error loading metadata for token ${tokenId.toString()}:`, err);
         }
       }
 
       // Sort by token ID (newest first, assuming higher token IDs are newer)
       loadedFish.sort((a, b) => (b.tokenId || 0) - (a.tokenId || 0));
       
+      console.log(`🎉 Loaded ${loadedFish.length} fish NFTs successfully`);
       setFishHistory(loadedFish);
     } catch (error) {
-      console.error("Error loading user NFTs:", error);
+      console.error("❌ Error loading user NFTs:", error);
     } finally {
       setLoadingNFTs(false);
     }
@@ -704,13 +723,27 @@ export function FishingGameDemo() {
       </Box>
 
       {/* Fish History */}
-      {(loadingNFTs || fishHistory.length > 0) && (
+      {!isPlaytestMode && (
         <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor} mb={4}>
           <Flex justify="space-between" align="center" mb={4}>
             <Heading size="sm" color="white">
               Your Fish Collection ({fishHistory.length})
             </Heading>
-            {loadingNFTs && <Spinner size="sm" color="brand.400" />}
+            <Flex align="center" gap={2}>
+              {loadingNFTs && <Spinner size="sm" color="brand.400" />}
+              <Button
+                size="sm"
+                colorScheme="blue"
+                variant="outline"
+                onClick={() => {
+                  console.log("🔄 Manual NFT reload triggered");
+                  loadUserNFTs();
+                }}
+                isLoading={loadingNFTs}
+              >
+                🔄 Reload NFTs
+              </Button>
+            </Flex>
           </Flex>
           {loadingNFTs && fishHistory.length === 0 && (
             <Text color="gray.400" textAlign="center" py={4}>

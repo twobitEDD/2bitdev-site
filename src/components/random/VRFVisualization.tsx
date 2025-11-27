@@ -196,8 +196,8 @@ export function VRFVisualization({ entries, maxEntries = 50 }: VRFVisualizationP
                 borderColor={borderColor}
                 minW="280px"
                 maxW="280px"
-                opacity={isAnimated ? 1 : 0}
-                transform={isAnimated ? "translateX(0)" : "translateX(-20px)"}
+                opacity={1}
+                transform={isAnimated ? "translateX(0)" : "translateX(0)"}
                 transition="all 0.3s ease-out"
                 _hover={{
                   borderColor: gameConfig?.color || "brand.400",

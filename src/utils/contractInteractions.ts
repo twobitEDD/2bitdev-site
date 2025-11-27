@@ -1205,6 +1205,63 @@ export async function realCatchFish(
     console.log("⚠️ RandomnessReceived event not found - fish may have already been caught");
   }
   
+  // Check for NFT minting events (from FishingGame contract)
+  const nftMintedEvent = contractLogs.find((log: any) => {
+    try {
+      const parsed = fishingGame.interface.parseLog(log);
+      return parsed?.name === "FishNFTMinted";
+    } catch {
+      return false;
+    }
+  });
+  
+  const nftMintingFailedEvent = contractLogs.find((log: any) => {
+    try {
+      const parsed = fishingGame.interface.parseLog(log);
+      return parsed?.name === "NFTMintingFailed";
+    } catch {
+      return false;
+    }
+  });
+  
+  if (nftMintedEvent) {
+    const parsed = fishingGame.interface.parseLog(nftMintedEvent);
+    console.log("✅ Found FishNFTMinted event:", {
+      player: parsed?.args.player ?? parsed?.args[0],
+      tokenId: parsed?.args.tokenId?.toString() ?? parsed?.args[1]?.toString(),
+      fishType: parsed?.args.fishType ?? parsed?.args[2],
+    });
+  } else if (nftMintingFailedEvent) {
+    const parsed = fishingGame.interface.parseLog(nftMintingFailedEvent);
+    console.error("❌ Found NFTMintingFailed event:", {
+      player: parsed?.args.player ?? parsed?.args[0],
+      fishType: parsed?.args.fishType ?? parsed?.args[1],
+      reason: parsed?.args.reason ?? parsed?.args[2],
+    });
+  } else {
+    console.warn("⚠️ No FishNFTMinted or NFTMintingFailed event found - NFT may not have been minted");
+  }
+  
+  // Also check all logs for NFT contract events (NFT contract address might be different)
+  const nftAddress = contractsConfig[network]?.fishingGameNFT;
+  if (nftAddress) {
+    const nftContractLogs = receipt.logs.filter((log: any) => 
+      log.address.toLowerCase() === nftAddress.toLowerCase()
+    );
+    console.log(`📦 Logs from NFT contract (${nftAddress}): ${nftContractLogs.length} out of ${receipt.logs.length}`);
+    
+    if (nftContractLogs.length > 0) {
+      console.log("✅ Found logs from NFT contract - NFT may have been minted");
+      nftContractLogs.forEach((log: any, idx: number) => {
+        console.log(`  NFT Log ${idx}:`, {
+          address: log.address,
+          topics: log.topics,
+          data: log.data?.slice(0, 66), // First 32 bytes
+        });
+      });
+    }
+  }
+  
   // Find FishCaught event
   const event = contractLogs.find((log: any) => {
     try {
