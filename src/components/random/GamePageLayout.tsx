@@ -73,24 +73,39 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
 
     const fetchVRFData = async () => {
       try {
+        console.log('🔄 Fetching VRF data from:', siteConfig.servRandomStatusUrl);
         const response = await fetch(siteConfig.servRandomStatusUrl, {
           cache: "no-store",
         });
+        
         if (response.ok) {
           const data = await response.json();
+          console.log('📊 API Response:', {
+            hasRecentRandomness: !!data.recentRandomness,
+            recentRandomnessLength: data.recentRandomness?.length || 0,
+            hasFeeRequests: !!data.feeRequests,
+            feeRequestsLength: data.feeRequests?.length || 0,
+            feeRequestsSample: data.feeRequests?.slice(0, 3),
+            fullDataKeys: Object.keys(data),
+          });
+          
           const combinedVRF: VRFEntry[] = [];
           
           // Add Harmony block VRF entries
           if (data.recentRandomness && Array.isArray(data.recentRandomness)) {
+            console.log(`✅ Adding ${data.recentRandomness.length} Harmony block entries`);
             data.recentRandomness.forEach((entry: any) => {
-              combinedVRF.push({
-                blockNumber: entry.blockNumber || 0,
-                timestamp: entry.timestamp || Date.now(),
-                vrfValue: entry.vrfValue || entry.randomness || '0x0',
-                harmonyBlockHash: entry.harmonyBlockHash || entry.blockHash || '0x0',
-                gameSource: "Harmony Block",
-                network: "harmony",
-              });
+              const vrfValue = entry.vrfValue || entry.randomness;
+              if (vrfValue && vrfValue !== '0x0' && vrfValue !== '0x0000000000000000000000000000000000000000000000000000000000000000') {
+                combinedVRF.push({
+                  blockNumber: entry.blockNumber || 0,
+                  timestamp: entry.timestamp || Date.now(),
+                  vrfValue: vrfValue,
+                  harmonyBlockHash: entry.harmonyBlockHash || entry.blockHash || '0x0',
+                  gameSource: "Harmony Block",
+                  network: "harmony",
+                });
+              }
             });
           }
           
@@ -123,29 +138,27 @@ export function GamePageLayout({ currentGame, children, contractKey }: GamePageL
                   requestId: req.requestId,
                 };
               });
+            console.log(`✅ Adding ${fulfilledRequests.length} fulfilled fee requests`);
             combinedVRF.push(...fulfilledRequests);
           }
           
           // Sort by timestamp (most recent first)
           combinedVRF.sort((a, b) => b.timestamp - a.timestamp);
           
-          // Only update data if we have entries from backend API
-          // Don't clear existing data if backend returns empty
-          if (combinedVRF.length > 0) {
-            const limitedVRF = combinedVRF.slice(0, 50);
-            setVrfData(limitedVRF);
-          }
+          console.log(`📈 Total VRF entries: ${combinedVRF.length}`);
+          
+          // Always update data (even if empty) to ensure UI reflects current state
+          const limitedVRF = combinedVRF.slice(0, 50);
+          setVrfData(limitedVRF);
           
           // Always set loading to false after backend API call completes
           setLoading(false);
-          
-          // NOTE: Removed blockchain polling - all data comes from backend API
-          // The backend API should include game-specific VRF data (RouletteGame, DungeonCrawler, FishingGame)
         } else {
+          console.error('❌ API response not OK:', response.status, response.statusText);
           setLoading(false);
         }
       } catch (error) {
-        console.error("Error fetching VRF data:", error);
+        console.error("❌ Error fetching VRF data:", error);
         setLoading(false);
       }
     };
