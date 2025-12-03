@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { SpinningRouletteWheel } from "./SpinningRouletteWheel";
 import { requestSpin, getSpinResultHelper, pollForFulfillmentStatus } from "@utils/contractHelpers";
-import { useToast, Box, Button, Stack, Text, useColorModeValue, Code, Badge, SimpleGrid, Heading, Flex } from "@chakra-ui/react";
+import { useToast, Box, Button, Stack, Text, useColorModeValue, Code, Badge, SimpleGrid, Heading, Flex, Alert, AlertIcon } from "@chakra-ui/react";
 import { usePlaytestMode } from "@contexts/PlaytestModeContext";
 import { useWallet } from "@contexts/WalletContext";
 import { contractsConfig } from "@config/contracts";
@@ -20,8 +20,8 @@ interface SpinResult {
 }
 
 export function RouletteGameDemo() {
-  const { isPlaytestMode } = usePlaytestMode();
-  const { signer, provider, address, chainId } = useWallet();
+  const { isPlaytestMode, togglePlaytestMode } = usePlaytestMode();
+  const { signer, provider, address, chainId, isConnected, connectWallet, disconnectWallet } = useWallet();
   const [currentSpin, setCurrentSpin] = useState<SpinResult | null>(null);
   const [recentSpins, setRecentSpins] = useState<SpinResult[]>([]);
   const [requestId, setRequestId] = useState<string | null>(null);
@@ -386,6 +386,76 @@ export function RouletteGameDemo() {
           </Badge>
         )}
       </Flex>
+
+      {/* Wallet Connection Alert */}
+      {!isPlaytestMode && !isConnected && (
+        <Alert status="info" borderRadius="lg" mb={4}>
+          <AlertIcon />
+          <Box flex={1}>
+            <Text fontWeight="bold">Connect Wallet to Use Real Contracts</Text>
+            <Text fontSize="sm" mt={1} color="gray.600">
+              Connect your wallet to interact with SERV.random contracts, or enable Playtest Mode to test without a wallet.
+            </Text>
+            <Button
+              size="sm"
+              colorScheme="blue"
+              mt={3}
+              onClick={connectWallet}
+            >
+              Connect Wallet
+            </Button>
+          </Box>
+        </Alert>
+      )}
+
+      {/* Wallet Connected - Show Disconnect Option */}
+      {!isPlaytestMode && isConnected && (
+        <Alert status="success" borderRadius="lg" mb={4}>
+          <AlertIcon />
+          <Box flex={1}>
+            <Flex justify="space-between" align="center" flexWrap="wrap" gap={2}>
+              <Box>
+                <Text fontWeight="bold">Wallet Connected</Text>
+                <Text fontSize="sm" mt={1} color="gray.600">
+                  {address?.slice(0, 6)}...{address?.slice(-4)}
+                </Text>
+              </Box>
+              <Button
+                size="sm"
+                colorScheme="red"
+                variant="outline"
+                onClick={disconnectWallet}
+              >
+                Disconnect
+              </Button>
+            </Flex>
+          </Box>
+        </Alert>
+      )}
+
+      {/* Playtest Mode - Show Use Blockchain Option */}
+      {isPlaytestMode && (
+        <Alert status="warning" borderRadius="lg" mb={4}>
+          <AlertIcon />
+          <Box flex={1}>
+            <Flex justify="space-between" align="center" flexWrap="wrap" gap={2}>
+              <Box>
+                <Text fontWeight="bold">Playtest Mode Active</Text>
+                <Text fontSize="sm" mt={1} color="gray.600">
+                  Using mock contracts. Toggle off Playtest Mode to use real blockchain contracts.
+                </Text>
+              </Box>
+              <Button
+                size="sm"
+                colorScheme="blue"
+                onClick={togglePlaytestMode}
+              >
+                Use Blockchain
+              </Button>
+            </Flex>
+          </Box>
+        </Alert>
+      )}
 
       <Box bg={cardBg} p={6} borderRadius="lg" borderWidth="1px" borderColor={borderColor} mb={4}>
         <SpinningRouletteWheel

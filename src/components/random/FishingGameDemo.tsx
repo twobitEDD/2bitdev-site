@@ -73,8 +73,8 @@ const getRarityColor = (rarity: string): string => {
 
 export function FishingGameDemo() {
   const toast = useToast();
-  const { isPlaytestMode } = usePlaytestMode();
-  const { isConnected, signer, provider, connectWallet, switchToBaseSepolia, isBaseSepolia } = useWallet();
+  const { isPlaytestMode, togglePlaytestMode } = usePlaytestMode();
+  const { isConnected, signer, provider, switchToBaseSepolia, isBaseSepolia, connectWallet, disconnectWallet, address } = useWallet();
   const cardBg = useColorModeValue("white", "gray.700");
   const borderColor = useColorModeValue("gray.200", "gray.600");
   const bgColor = useColorModeValue("gray.50", "gray.800");
@@ -749,21 +749,70 @@ export function FishingGameDemo() {
 
       {/* Wallet Connection Alert */}
       {!isPlaytestMode && !isConnected && (
-        <Alert status="warning" borderRadius="lg" mb={4}>
+        <Alert status="info" borderRadius="lg" mb={4}>
           <AlertIcon />
-          <Box>
+          <Box flex={1}>
             <Text fontWeight="bold">Connect Wallet to Use Real Contracts</Text>
+            <Text fontSize="sm" mt={1} color="gray.600">
+              Connect your wallet to interact with SERV.random contracts, or enable Playtest Mode to test without a wallet.
+            </Text>
             <Button
               size="sm"
               colorScheme="blue"
-              mt={2}
+              mt={3}
               onClick={connectWallet}
             >
               Connect Wallet
             </Button>
-            <Text fontSize="sm" mt={2} color="gray.600">
-              Or enable Playtest Mode to test without a wallet
-            </Text>
+          </Box>
+        </Alert>
+      )}
+
+      {/* Wallet Connected - Show Disconnect Option */}
+      {!isPlaytestMode && isConnected && (
+        <Alert status="success" borderRadius="lg" mb={4}>
+          <AlertIcon />
+          <Box flex={1}>
+            <Flex justify="space-between" align="center" flexWrap="wrap" gap={2}>
+              <Box>
+                <Text fontWeight="bold">Wallet Connected</Text>
+                <Text fontSize="sm" mt={1} color="gray.600">
+                  {address?.slice(0, 6)}...{address?.slice(-4)}
+                </Text>
+              </Box>
+              <Button
+                size="sm"
+                colorScheme="red"
+                variant="outline"
+                onClick={disconnectWallet}
+              >
+                Disconnect
+              </Button>
+            </Flex>
+          </Box>
+        </Alert>
+      )}
+
+      {/* Playtest Mode - Show Use Blockchain Option */}
+      {isPlaytestMode && (
+        <Alert status="warning" borderRadius="lg" mb={4}>
+          <AlertIcon />
+          <Box flex={1}>
+            <Flex justify="space-between" align="center" flexWrap="wrap" gap={2}>
+              <Box>
+                <Text fontWeight="bold">Playtest Mode Active</Text>
+                <Text fontSize="sm" mt={1} color="gray.600">
+                  Using mock contracts. Toggle off Playtest Mode to use real blockchain contracts.
+                </Text>
+              </Box>
+              <Button
+                size="sm"
+                colorScheme="blue"
+                onClick={togglePlaytestMode}
+              >
+                Use Blockchain
+              </Button>
+            </Flex>
           </Box>
         </Alert>
       )}

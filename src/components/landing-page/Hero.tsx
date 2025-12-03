@@ -29,22 +29,16 @@ export default function Hero() {
           fontWeight={600}
           fontSize={{ base: "3xl", sm: "3xl", md: "4xl", lg: "5xl" }}
         >
-          <Text as={"span"}>A Secure</Text>
+          <Text as={"span"}>Blockchain Development</Text>
           <Box></Box>
-          <Text as={"span"}>Decentralized</Text>
-          <Box></Box>
-          <Text as={"span"}>Online Data Layer</Text>
+          <Text as={"span"}>Services</Text>
         </Heading>
 
         <Text fontSize={"lg"} color={"gray.400"} mb={4}>
-          SERV Protocol provides an easy to use Perpetual Data System, allowing
-          Developers to focus on building sottware not running servers.
+          SERV has run a blockchain and is now primarily a blockchain development service. We advise, deploy blockchains, and offer blockchain services to help developers build on-chain applications.
         </Text>
         <Text fontSize={"lg"} color={"gray.400"} mb={4}>
-          Defining a Reliable Standard for Sharing Interactive Experiences;
-          Data-Management for: Payment Processing, Inventory Management,
-          Communications, Leaderboards, Match-Making and User Management built
-          to run on our perpetual server system.
+          Starting with a basic service: a RAND function for Coinbase&apos;s Base blockchain, providing verifiable randomness for smart contracts. Coming soon to ERGO blockchain.
         </Text>
         <Stack
           spacing={{ base: 4, sm: 6 }}

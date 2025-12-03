@@ -15,11 +15,10 @@ export function InfoAndStats() {
             py={{ base: 4, md: 20, xl: 40 }}
           >
             <Box mb={{ base: 8, md: 20 }}>
-              <SuperTitle> Sounds Great... </SuperTitle>
-              <Title>What kind of Services? </Title>
+              <SuperTitle> Our Services </SuperTitle>
+              <Title>Blockchain Development & Randomness </Title>
               <Description>
-                There are many Decentralized Services operated by external
-                ecosystem developers, the SERV ORG and SERV Validator DAO.
+                SERV provides blockchain development services and tools. We advise on blockchain architecture, deploy custom blockchains, and offer essential services like verifiable randomness for smart contracts.
               </Description>
             </Box>
 
@@ -58,45 +57,13 @@ const StatsText = ({ children }: { children: ReactNode }) => (
 
 const stats = [
   {
-    title: "Network Explorer",
-    link: "https://tserv-explorer.tryethernal.com",
-    content: (
-      <>
-        <StatsText>Explorer.Serv.Services</StatsText> is setup for detailed
-        monitoring and real-time analytics of what happens on the network.
-      </>
-    ),
-  },
-  {
-    title: "Proposal Portal",
-    link: "#InfoAndStats",
-    content: (
-      <>
-        <StatsText>Funding.Serv.Services</StatsText> is where SERV&apos;s
-        community can elect to allocate SERV tokens using a decentralized cross
-        chain proposal mechanism.
-      </>
-    ),
-  },
-  {
-    title: "Deployment Hub",
-    link: "#InfoAndStats",
-    content: (
-      <>
-        <StatsText>Deploy.Serv.Services</StatsText> is where developers can
-        create their network interfaces for their projects. Allowing them to
-        easily create online connections to their software.
-      </>
-    ),
-  },
-  {
-    title: "ServRandom",
+    title: "SERV Random (SRAND)",
     link: "/random",
     content: (
       <>
-        <StatsText>ServRandom</StatsText> provides production-ready
-        cryptographic randomness across multiple blockchains using Harmony VRF.
-        Get verifiable random values for your dApps and smart contracts.
+        <StatsText>random.SERV.services</StatsText> provides production-ready
+        cryptographic randomness for smart contracts. Currently serving Base blockchain and coming soon to ERGO blockchain. 
+        Get verifiable random values (VRF) for your dApps using our SRAND token service.
       </>
     ),
   },

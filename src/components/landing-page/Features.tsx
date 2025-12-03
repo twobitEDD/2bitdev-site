@@ -100,9 +100,9 @@ export default function Features() {
     <>
       <Stack as={Container} maxW={"3xl"} textAlign={"center"}>
         <SuperTitle>How does it work?</SuperTitle>
-        <Title>Perpetual Server Services</Title>
+        <Title>Blockchain Development Services</Title>
         <Description>
-          Our Network is Built to Provide Affordable Server Services and Last Forever by being Community Owned Since Our Genesis.
+          SERV provides blockchain development services including architecture consulting, custom blockchain deployment, and essential on-chain services like verifiable randomness.
           <Text>
           </Text>
         </Description>
