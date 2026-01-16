@@ -72,12 +72,13 @@ export default function Hero() {
           <Text fontSize={"lg"} color={"gray.300"} mb={2} maxW="lg">
             We build modern systems that blend technology integration, AI
             deployment, and hands-on production for construction, design, and
-            digital experiences.
+            interactive experiences.
           </Text>
           <Text fontSize={"lg"} color={"gray.400"} mb={4} maxW="lg">
             From strategy to execution, our team brings together engineering,
             creative production, and infrastructure support so you can ship
-            ambitious ideas with confidence.
+            video game entertainment, immersive experiences, and blockchain-
+            connected products with confidence.
           </Text>
           <Stack
             spacing={{ base: 4, sm: 6 }}
@@ -157,8 +158,8 @@ export default function Hero() {
             <Stack direction="row" spacing={3} mt={6} flexWrap="wrap">
               {[
                 { label: "AI Integration", color: "accent.green" },
-                { label: "Spatial Design", color: "accent.red" },
-                { label: "Interactive Media", color: "accent.blue" },
+                { label: "Game Experiences", color: "accent.blue" },
+                { label: "Blockchain Ready", color: "accent.red" },
               ].map((item) => (
                 <Box
                   key={item.label}

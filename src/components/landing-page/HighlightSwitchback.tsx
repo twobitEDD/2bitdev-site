@@ -215,8 +215,8 @@ export default function HighlightSwitchback() {
                   backgroundSize="32px 32px"
                 />
                 <Text fontSize="sm" color="gray.400">
-                  Lighting, fabrication, and interactive media engineered for
-                  real environments.
+                  Lighting, fabrication, interactive media, and blockchain
+                  touchpoints engineered for real environments.
                 </Text>
               </Stack>
             </Box>

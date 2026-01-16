@@ -20,7 +20,7 @@ export function InfoAndStats() {
               <Description>
                 2bit entertainment develops original digital properties while
                 supporting partner teams with production-ready technology,
-                design, and integration support.
+                interactive media, and blockchain-connected integrations.
               </Description>
             </Box>
 

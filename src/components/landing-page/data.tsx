@@ -17,15 +17,15 @@ export const data = {
       icon: <Icons.sun />,
     },
     {
-      title: "Production & Design",
+      title: "Interactive Experiences",
       description:
-        "Spatial design, construction technology, and media production tuned for real-world execution.",
+        "Video games, immersive media, and experiential builds tuned for real-world execution.",
       icon: <Icons.media />,
     },
     {
-      title: "Operations & Support",
+      title: "Blockchain Connection",
       description:
-        "Documentation, training, and ongoing support so your systems stay resilient after launch.",
+        "Wallets, tokenized access, and on-chain integrations that connect experiences to blockchain.",
       icon: <Icons.check />,
     },
   ],
@@ -49,7 +49,7 @@ export const data = {
     {
       title: "Creative technology that ships",
       description:
-        "Interactive installations, digital experiences, and production pipelines designed for launch-ready delivery.",
+        "Interactive installations, game builds, and production pipelines designed for launch-ready delivery.",
       icon: <Icons.media />,
     },
     {
@@ -65,9 +65,9 @@ export const data = {
       icon: <Icons.messageCircle />,
     },
     {
-      title: "Future-ready support",
+      title: "Blockchain-ready experiences",
       description:
-        "We stay engaged after launch to ensure systems keep evolving.",
+        "We connect products to blockchain when it adds trust, ownership, or new revenue models.",
       icon: <Icons.check />,
     },
   ],
