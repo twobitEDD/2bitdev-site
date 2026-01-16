@@ -3,42 +3,33 @@ export type SiteConfig = typeof siteConfig;
 const navItems = [
   {
     label: "Services",
-    href: "https://serv.services",
+    href: "/#services",
   },
   {
-    label: "SERV.random",
-    href: "/random",
+    label: "Capabilities",
+    href: "/#capabilities",
   },
   {
-    label: "Features",
-    href: "/#/page1",
+    label: "Projects",
+    href: "/#projects",
   },
   {
-    label: "Docs",
-    href: "/docs",
-  },
-  {
-    label: "Blog",
-    href: "/blog",
-  },
-  {
-    label: "About",
-    href: "/about",
+    label: "Contact",
+    href: "/#contact",
   },
 ];
 
 export const siteConfig = {
-  name: "SERV Protocol",
+  name: "2bit entertainment",
   description:
-    "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium .",
+    "Technology integration, consulting, and production for ambitious teams.",
   navItems: navItems, // header links
   navMenuItems: navItems, // drawer links
   links: {
-    github: "https://github.com/ServProtocol",
-    twitter: "https://twitter.com/ServProtocol",
-    docs: "https://servprotocol.com/docs",
-    discord: "https://discord.gg/uFH988AfJA",
-    forum: "https://forum.servprotocol.com",
+    github: "https://github.com/2bit-entertainment",
+    email: "mailto:hello@2bitentertainment.com",
+    studio: "/#contact",
+    twitter: "https://twitter.com/2bitentertainment",
   },
   maxHeaderWidth: "xl",
   maxContentWidth: "max-w-[1280]",

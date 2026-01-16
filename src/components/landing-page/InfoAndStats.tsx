@@ -5,7 +5,7 @@ import { Description, SuperTitle, Title } from "./Section";
 
 export function InfoAndStats() {
   return (
-    <Box bg={"gray.800"} position={"relative"}>
+    <Box bg={"black"} position={"relative"} id="projects">
       <Container maxW={"7xl"} zIndex={10} position={"relative"}>
         <Stack direction={{ base: "column", lg: "row" }}>
           <Stack
@@ -15,14 +15,16 @@ export function InfoAndStats() {
             py={{ base: 4, md: 20, xl: 40 }}
           >
             <Box mb={{ base: 8, md: 20 }}>
-              <SuperTitle> Our Services </SuperTitle>
-              <Title>Blockchain Development & Randomness </Title>
+              <SuperTitle> Digital projects </SuperTitle>
+              <Title>Experiences we are actively building</Title>
               <Description>
-                SERV provides blockchain development services and tools. We advise on blockchain architecture, deploy custom blockchains, and offer essential services like verifiable randomness for smart contracts.
+                2bit entertainment develops original digital properties while
+                supporting partner teams with production-ready technology,
+                design, and integration support.
               </Description>
             </Box>
 
-            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
+            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10}>
               {stats.map((stat) => (
                 <Link nonce="false" href={stat.link} passHref key={stat.link}>
                   <Box key={stat.title}>
@@ -57,13 +59,33 @@ const StatsText = ({ children }: { children: ReactNode }) => (
 
 const stats = [
   {
-    title: "SERV Random (SRAND)",
-    link: "/random",
+    title: "Fish Fight",
+    link: "/#projects",
     content: (
       <>
-        <StatsText>random.SERV.services</StatsText> provides production-ready
-        cryptographic randomness for smart contracts. Currently serving Base blockchain and coming soon to ERGO blockchain. 
-        Get verifiable random values (VRF) for your dApps using our SRAND token service.
+        An action-forward digital world where player decisions reshape the
+        battlefield. Live tuning, competitive mechanics, and cinematic
+        storytelling.
+      </>
+    ),
+  },
+  {
+    title: "PokePocket Cards",
+    link: "/#projects",
+    content: (
+      <>
+        A tactile digital collectible experience with dynamic rarity, social
+        drops, and production-grade merchandising support.
+      </>
+    ),
+  },
+  {
+    title: "SERV",
+    link: "/#projects",
+    content: (
+      <>
+        Systems and integrations built for reliability. We keep these tools in
+        motion to support rapid deployment for partners.
       </>
     ),
   },

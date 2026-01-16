@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Image, SimpleGrid } from "@chakra-ui/react";
+import { Box, Button, Flex, SimpleGrid, Stack, Text } from "@chakra-ui/react";
 import { FadeIn } from "@components/motion/Animation";
 import Link from "next/link";
 import { Description, Title } from "./Section";
@@ -11,7 +11,13 @@ export default function HighlightSwitchback() {
       alignItems="center"
       // mt={{ base: 10, md: 28 }}
     >
-      <Box bg="white" _dark={{ bg: "gray.800" }} px={8} py={20} mx="auto">
+      <Box
+        bg="black"
+        px={{ base: 6, md: 8 }}
+        py={{ base: 16, md: 20 }}
+        mx="auto"
+        id="capabilities"
+      >
         {/* Left Section */}
         <FadeIn direction="from-bottom-to-top">
           <SimpleGrid
@@ -22,21 +28,17 @@ export default function HighlightSwitchback() {
             spacingX={{ base: 10, md: 24 }}
           >
             <Box>
-              <Title>Network-Operator Token Genesis</Title>
+              <Title>Integration that feels effortless</Title>
               <Description>
-                SERV Protocol owes it&apos;s existance to it&apos;s network
-                operators, which is why SERV has implimented a unique and
-                effective way of starting the network. SERV has generated a list
-                of the proven Server Operators on the network which SERV derives
-                it&apos;s codebase, so initially the token supply will be
-                allocated directly the network operators (inspired by Proof of
-                Work blockchains like Bitcoin and Ergo).
+                We step into complex environments and connect the systems
+                underneath. From construction tech to operational tooling, we
+                wire the hardware, software, and data flow to work as one.
               </Description>
               <Link
                 nonce="false"
-                href={"https://docs.serv.services"}
+                href={"#contact"}
                 passHref
-                key={"https://docs.serv.services"}
+                key={"#contact"}
               >
                 <Button
                   w={{ base: "full", sm: "auto" }}
@@ -44,23 +46,43 @@ export default function HighlightSwitchback() {
                   size="lg"
                   variant="solid"
                 >
-                  Learn More
+                  Schedule a consult
                 </Button>
               </Link>
             </Box>
             <Box
               w="full"
               h="full"
-              bg="gray.200"
-              _dark={{ bg: "gray.700" }}
+              bg="blackAlpha.700"
+              border="1px solid"
+              borderColor="whiteAlpha.200"
               textAlign={"center"}
+              borderRadius="2xl"
+              px={8}
+              py={10}
             >
-              <Image
-                alt={"Token Genesis Image"}
-                fit={"cover"}
-                align={"center"}
-                src={"/0_3_5.png"}
-              />
+              <Stack spacing={4} align="flex-start">
+                <Text fontSize="sm" textTransform="uppercase" color="gray.400">
+                  Integration map
+                </Text>
+                <Text fontSize="2xl" color="white" fontWeight="semibold">
+                  Signal + infrastructure
+                </Text>
+                <Box
+                  w="full"
+                  h="140px"
+                  borderRadius="lg"
+                  bgGradient="linear(to-br, rgba(255,255,255,0.05), rgba(255,255,255,0))"
+                  border="1px solid"
+                  borderColor="whiteAlpha.200"
+                  backgroundImage="linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)"
+                  backgroundSize="32px 32px"
+                />
+                <Text fontSize="sm" color="gray.400">
+                  Sensor networks, edge compute, and real-time dashboards that
+                  stay online.
+                </Text>
+              </Stack>
             </Box>
           </SimpleGrid>
         </FadeIn>
@@ -75,22 +97,17 @@ export default function HighlightSwitchback() {
             spacingX={{ base: 10, md: 24 }}
           >
             <Box order={{ base: "initial", md: 2 }}>
-              <Title>Allowing Developers to focus on Development</Title>
+              <Title>AI systems that stay reliable</Title>
               <Description>
-                The technical skilled related to Software Development are
-                different than the technical skills related to Network Server
-                Operations. SERV Protocol is dedicated to simiplifying the
-                processes of making online experiences without demanding that
-                developers oversee network operations. From creating easy to use
-                templates and examples for Development, to encouraging open
-                source inititives, SERV is built to allow software developers to
-                stay focused on making software.
+                We bring applied AI into production environments without
+                compromising security or uptime. From orchestration to
+                observability, we turn tools into dependable systems.
               </Description>
               <Link
                 nonce="false"
-                href={"https://docs.serv.services"}
+                href={"#contact"}
                 passHref
-                key={"https://docs.serv.services"}
+                key={"#contact"}
               >
                 <Button
                   w={{ base: "full", sm: "auto" }}
@@ -98,25 +115,42 @@ export default function HighlightSwitchback() {
                   size="lg"
                   variant="solid"
                 >
-                  Learn More
+                  Plan an AI rollout
                 </Button>
               </Link>
             </Box>
             <Box
               w="full"
               h="full"
-              bg="gray.200"
-              _dark={{ bg: "gray.700" }}
+              bg="blackAlpha.700"
+              border="1px solid"
+              borderColor="whiteAlpha.200"
               textAlign={"center"}
+              borderRadius="2xl"
+              px={8}
+              py={10}
             >
-              <Image
-                alt={"Game Developer Image"}
-                fit={"cover"}
-                align={"center"}
-                w={"100%"}
-                h={"100%"}
-                src={"/0_3_6.png"}
-              />
+              <Stack spacing={4} align="flex-start">
+                <Text fontSize="sm" textTransform="uppercase" color="gray.400">
+                  AI operations
+                </Text>
+                <Text fontSize="2xl" color="white" fontWeight="semibold">
+                  Automation + control
+                </Text>
+                <Box
+                  w="full"
+                  h="140px"
+                  borderRadius="lg"
+                  bgGradient="linear(to-br, rgba(96,165,250,0.2), rgba(0,0,0,0))"
+                  border="1px solid"
+                  borderColor="whiteAlpha.200"
+                  backgroundImage="linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)"
+                  backgroundSize="32px 32px"
+                />
+                <Text fontSize="sm" color="gray.400">
+                  Model deployment, feedback loops, and measurable outcomes.
+                </Text>
+              </Stack>
             </Box>
           </SimpleGrid>
         </FadeIn>
@@ -130,23 +164,17 @@ export default function HighlightSwitchback() {
             spacingX={{ base: 10, md: 24 }}
           >
             <Box>
-              <Title>Community Owned from the Start </Title>
+              <Title>Production and design that delivers</Title>
               <Description>
-                With the goal of perpetual network operations, SERV Protocol
-                starts off by giving complete control over it&apos;s operations
-                to it&apos;s operators. By giving ownership of the network to
-                it&apos;s operators, those whom run the network are set to
-                benefit from the long term success of the network; This mean
-                that the network has the ability to be supported longer than if
-                it were ran by a single business entity. It&apos;s shared
-                ownership allows for shared network costs, and ultimately a
-                chance at shared success.
+                We produce the physical and digital layers that connect people
+                to technology. Expect modern aesthetics, clear documentation,
+                and hands-on delivery from design through install.
               </Description>
               <Link
                 nonce="false"
-                href={"https://docs.serv.services"}
+                href={"#contact"}
                 passHref
-                key={"https://docs.serv.services"}
+                key={"#contact"}
               >
                 <Button
                   w={{ base: "full", sm: "auto" }}
@@ -154,23 +182,43 @@ export default function HighlightSwitchback() {
                   size="lg"
                   variant="solid"
                 >
-                  Learn More
+                  Start production
                 </Button>
               </Link>
             </Box>
             <Box
               w="full"
               h="full"
-              bg="gray.200"
-              _dark={{ bg: "gray.700" }}
+              bg="blackAlpha.700"
+              border="1px solid"
+              borderColor="whiteAlpha.200"
               textAlign={"center"}
+              borderRadius="2xl"
+              px={8}
+              py={10}
             >
-              <Image
-                alt={"Community Owned Image"}
-                fit={"cover"}
-                align={"center"}
-                src={"/0_0_3.png"}
-              />
+              <Stack spacing={4} align="flex-start">
+                <Text fontSize="sm" textTransform="uppercase" color="gray.400">
+                  Production stack
+                </Text>
+                <Text fontSize="2xl" color="white" fontWeight="semibold">
+                  Spatial + digital output
+                </Text>
+                <Box
+                  w="full"
+                  h="140px"
+                  borderRadius="lg"
+                  bgGradient="linear(to-br, rgba(255,80,80,0.2), rgba(0,0,0,0))"
+                  border="1px solid"
+                  borderColor="whiteAlpha.200"
+                  backgroundImage="linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)"
+                  backgroundSize="32px 32px"
+                />
+                <Text fontSize="sm" color="gray.400">
+                  Lighting, fabrication, and interactive media engineered for
+                  real environments.
+                </Text>
+              </Stack>
             </Box>
           </SimpleGrid>
         </FadeIn>

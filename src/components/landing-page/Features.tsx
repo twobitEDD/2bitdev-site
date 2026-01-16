@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Box,
-  Container,
-  Flex,
-  Heading,
-  Stack,
-  Text,
-  useColorModeValue,
-} from "@chakra-ui/react";
+import { Box, Container, Flex, Heading, Stack, Text } from "@chakra-ui/react";
 import { ReactElement } from "react";
 import { Description, SuperTitle, Title } from "./Section";
 import Link from "next/link";
@@ -33,8 +25,8 @@ export const FeatureCard = ({
   href,
   isExternal,
 }: CardProps) => {
-  const cardBg = useColorModeValue("gray.100", "gray.700");
-  
+  const cardBg = "blackAlpha.700";
+
   const CardContent = (
     <Box
       maxW={{ base: "full", md: "275px" }}
@@ -44,6 +36,8 @@ export const FeatureCard = ({
       overflow="hidden"
       p={6}
       mb={100}
+      bg={cardBg}
+      borderColor="whiteAlpha.200"
       _hover={href ? { borderColor: "brand.400", cursor: "pointer" } : {}}
     >
       <Stack align={"start"} spacing={2}>
@@ -62,14 +56,16 @@ export const FeatureCard = ({
             justify={"center"}
             color={iconColor || "brand.300"}
             rounded={"full"}
-            bg={cardBg}
+            bg="blackAlpha.600"
           >
             {icon}
           </Flex>
-          <Heading size="md">{heading}</Heading>
+          <Heading size="md" color="white">
+            {heading}
+          </Heading>
         </Flex>
         <Box mt={2}>
-          <Text mt={1} fontSize={"sm"} color={"gray.400"}>
+          <Text mt={1} fontSize={"sm"} color={"gray.300"}>
             {description}
           </Text>
         </Box>
@@ -98,15 +94,15 @@ export const FeatureCard = ({
 export default function Features() {
   return (
     <>
-      <Stack as={Container} maxW={"3xl"} textAlign={"center"}>
-        <SuperTitle>How does it work?</SuperTitle>
-        <Title>Blockchain Development Services</Title>
+      <Stack as={Container} maxW={"3xl"} textAlign={"center"} id="services">
+        <SuperTitle>Services</SuperTitle>
+        <Title>Full-spectrum technology support</Title>
         <Description>
-          SERV provides blockchain development services including architecture consulting, custom blockchain deployment, and essential on-chain services like verifiable randomness.
-          <Text>
-          </Text>
+          2bit entertainment delivers consulting, production, and technical
+          integration for teams that need expert execution across software,
+          space, and storytelling.
+          <Text></Text>
         </Description>
-
       </Stack>
 
       <FadeIn direction="from-bottom-to-top">

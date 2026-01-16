@@ -19,6 +19,8 @@ const Home = () => {
         gap={16}
         mb={8}
         w="full"
+        bg="black"
+        color="white"
       >
         <Hero />
         <Features />

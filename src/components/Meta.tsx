@@ -1,4 +1,4 @@
-const APP_NAME = "serv-protocol";
+const APP_NAME = "2bit entertainment";
 
 const Meta = () => {
   return (
@@ -9,7 +9,7 @@ const Meta = () => {
       <meta name="apple-mobile-web-app-title" content={APP_NAME} />
       <meta name="format-detection" content="telephone=no" />
       <meta name="mobile-web-app-capable" content="yes" />
-      <meta name="theme-color" content="#FFFFFF" />
+      <meta name="theme-color" content="#050505" />
 
       <link rel="shortcut icon" href="/favicon.ico" />
 

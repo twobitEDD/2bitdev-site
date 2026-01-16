@@ -5,32 +5,25 @@ import {
   CloseButton,
   Container,
   Flex,
-  Icon,
   IconButton,
+  HStack,
   VStack,
   chakra,
-  useColorMode,
   useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
 import { Icons } from "@components/icons";
 import { siteConfig } from "@config/site";
 import { useViewportScroll } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
-import { FaHeart, FaMoon, FaSun } from "react-icons/fa";
 
 export default function App() {
   const pathname = usePathname();
   const mobileNav = useDisclosure();
 
-  const { toggleColorMode: toggleMode } = useColorMode();
-  const text = useColorModeValue("dark", "light");
-  const SwitchIcon = useColorModeValue(FaMoon, FaSun);
-
-  const bg = useColorModeValue("white", "gray.800");
+  const bg = useColorModeValue("white", "black");
   const ref = React.useRef<HTMLDivElement | null>(null);
   const [y, setY] = React.useState(0);
   const height = ref.current ? ref.current.getBoundingClientRect() : 0;
@@ -42,9 +35,9 @@ export default function App() {
 
   const SponsorButton = (
     <Link
-      href={"https://twitter.com/servprotocol"}
+      href={"/#contact"}
       passHref
-      key={"https://twitter.com/servprotocol"}
+      key={"/#contact"}
     >
       <Button
         variant="solid"
@@ -53,9 +46,9 @@ export default function App() {
         colorScheme={"brand"}
         bg={"brand.400"}
         _hover={{ bg: "brand.500" }}
-        leftIcon={<Icon as={FaHeart} w="4" h="4" color="white" mr="1" />}
+        rightIcon={<Icons.arrowRight />}
       >
-        Follow SERV Protocol
+        Start a project
       </Button>
     </Link>
   );
@@ -106,7 +99,7 @@ export default function App() {
       // top="0"
       w="full"
       h="60px"
-      bg="rgba(26, 32, 44, 0.8)"
+      bg="rgba(5, 5, 5, 0.85)"
       backdropFilter="blur(10px)"
       boxShadow={
         y > (height as number)
@@ -137,12 +130,21 @@ export default function App() {
                     height: 40,
                   }}
                 >
-                  <Image
-                    src="/logos/SERV_Logo_V1Dark.png"
-                    alt={siteConfig.name}
-                    width={40}
-                    height={40}
-                  />
+                  <Flex
+                    align="center"
+                    justify="center"
+                    border="1px solid"
+                    borderColor="whiteAlpha.300"
+                    borderRadius="md"
+                    w="40px"
+                    h="40px"
+                    fontSize="sm"
+                    fontWeight="bold"
+                    color="white"
+                    bg="blackAlpha.700"
+                  >
+                    2b
+                  </Flex>
                 </Link>
                 <chakra.h1
                   fontSize="xl"
@@ -157,7 +159,7 @@ export default function App() {
               </Flex>
 
               {/* Nav links section */}
-              {/* <Flex>
+              <Flex>
                 <HStack
                   display={{
                     base: "none",
@@ -166,13 +168,18 @@ export default function App() {
                 >
                   {siteConfig.navItems.map((item) => (
                     <Link href={item.href} passHref key={item.href}>
-                      <Button as={"a"} variant="ghost">
+                      <Button
+                        as={"a"}
+                        variant="ghost"
+                        color="gray.300"
+                        _hover={{ color: "white" }}
+                      >
                         {item.label}
                       </Button>
                     </Link>
                   ))}
                 </HStack>
-              </Flex> */}
+              </Flex>
 
               {/* Right section */}
               <Flex

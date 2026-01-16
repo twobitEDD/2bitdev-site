@@ -9,7 +9,7 @@ export function SuperTitle({ children }: PropsWithChildren) {
       textTransform={"uppercase"}
       mb={3}
       fontSize={"xl"}
-      color={"brand.300"}
+      color={"accent.blue"}
     >
       {children}
     </Text>

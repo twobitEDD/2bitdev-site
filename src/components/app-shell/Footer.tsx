@@ -28,9 +28,7 @@ const Footer2 = () => {
 export default Footer;
 
 import { VisuallyHidden, chakra } from "@chakra-ui/react";
-import Image from "next/image";
-import { FaDiscord, FaTwitter, FaYoutube } from "react-icons/fa";
-import { MdForum } from "react-icons/md";
+import { FaEnvelope, FaGithub, FaTwitter } from "react-icons/fa";
 
 const Logo = (props: any) => {
   return (
@@ -101,12 +99,21 @@ function Footer() {
       >
         <Stack spacing={6}>
           <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
-            <Image
-              src="/logos/SERV_Logo_V1Dark.png"
-              alt={siteConfig.name + " logo"}
-              width={32}
-              height={32}
-            />
+            <Flex
+              align="center"
+              justify="center"
+              border="1px solid"
+              borderColor="whiteAlpha.300"
+              borderRadius="md"
+              w="32px"
+              h="32px"
+              fontSize="xs"
+              fontWeight="bold"
+              color="white"
+              bg="blackAlpha.700"
+            >
+              2b
+            </Flex>
             <Heading fontSize={"xl"} display={"inline-block"} ml={2}>
               {siteConfig.name}
             </Heading>
@@ -118,22 +125,22 @@ function Footer() {
           </Text>
           <Stack direction={"row"} spacing={6}>
             <SocialButton
+              label={"Email"}
+              href={siteConfig.links.email}
+            >
+              <FaEnvelope />
+            </SocialButton>
+            <SocialButton
               label={"Twitter"}
-              href={"https://twitter.com/servprotocol"}
+              href={siteConfig.links.twitter}
             >
               <FaTwitter />
             </SocialButton>
             <SocialButton
-              label={"YouTube"}
-              href={"https://www.youtube.com/@harmonyvalidatordao7379"}
+              label={"Github"}
+              href={siteConfig.links.github}
             >
-              <FaYoutube />
-            </SocialButton>
-            <SocialButton
-              label={"discord"}
-              href={"https://discord.gg/uFH988AfJA"}
-            >
-              <FaDiscord />
+              <FaGithub />
             </SocialButton>
           </Stack>
         </Stack>

@@ -7,11 +7,12 @@ type RootLayoutProps = {
   children: React.ReactNode;
 };
 
-const APP_NAME = "SERV Protocol";
+const APP_NAME = "2bit entertainment";
 
 export const metadata: Metadata = {
   title: { default: APP_NAME, template: "%s | nextarter-chakra" },
-  description: "A Secure Decentralized Online Data Layer",
+  description:
+    "Technology integration, consulting, and production for ambitious teams.",
 
   viewport: {
     width: "device-width",
@@ -26,18 +27,18 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
-  themeColor: "#FFFFFF",
+  themeColor: "#050505",
   openGraph: {
-    url: "https://Serv.Services",
-    title: "SERV Protocol",
-    description: "A Secure Decentralized Online Data Layer",
+    url: "https://2bitentertainment.com",
+    title: "2bit entertainment",
+    description:
+      "Technology integration, consulting, and production for ambitious teams.",
     images: {
-      url: "https://servprotocol.nyc3.cdn.digitaloceanspaces.com/BlockchainImage.jpeg",
-      alt: "https://serv.services",
+      url: "/og-image.svg",
+      alt: "2bit entertainment",
     },
   },
   twitter: {
-    creator: "@sozonome",
     card: "summary_large_image",
   },
 };

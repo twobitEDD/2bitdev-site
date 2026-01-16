@@ -3,135 +3,181 @@
 import {
   Box,
   Button,
+  Divider,
   Flex,
   Heading,
-  Image,
   Stack,
   Text,
-  createIcon,
 } from "@chakra-ui/react";
 import { Icons } from "@components/icons";
 import Link from "next/link";
+import AnimatedLandscape from "./AnimatedLandscape";
 
 export default function Hero() {
+  const projectSignals = [
+    {
+      title: "Fish Fight",
+      description: "Competitive action prototype with reactive systems.",
+    },
+    {
+      title: "PokePocket Cards",
+      description: "Collectible digital card experience in production.",
+    },
+    {
+      title: "SERV",
+      description: "Infrastructure and tooling for secure integrations.",
+    },
+  ];
+
   return (
-    <Stack
-      align={"center"}
-      spacing={{ base: 8, md: 10 }}
-      py={{ base: 20, md: 28 }}
-      mt={{ base: 10, md: 28 }}
-      direction={{ base: "column", md: "row" }}
-    >
-      {/* Left Column */}
-      <Stack flex={1} spacing={{ base: 5, md: 5 }}>
-        <Heading
-          lineHeight={1.1}
-          fontWeight={600}
-          fontSize={{ base: "3xl", sm: "3xl", md: "4xl", lg: "5xl" }}
-        >
-          <Text as={"span"}>Blockchain Development</Text>
-          <Box></Box>
-          <Text as={"span"}>Services</Text>
-        </Heading>
-
-        <Text fontSize={"lg"} color={"gray.400"} mb={4}>
-          SERV has run a blockchain and is now primarily a blockchain development service. We advise, deploy blockchains, and offer blockchain services to help developers build on-chain applications.
-        </Text>
-        <Text fontSize={"lg"} color={"gray.400"} mb={4}>
-          Starting with a basic service: a RAND function for Coinbase&apos;s Base blockchain, providing verifiable randomness for smart contracts. Coming soon to ERGO blockchain.
-        </Text>
-        <Stack
-          spacing={{ base: 4, sm: 6 }}
-          direction={{ base: "column", sm: "row" }}
-        >
-          <Link
-            nonce="false"
-            href={
-              "https://bafkreicwweipen4ngbxlgcxltkx7d7dzlfd4z7rgs4mgvmuntrfap75tmm.ipfs.nftstorage.link/"
-            }
-            passHref
-            key={
-              "https://bafkreicwweipen4ngbxlgcxltkx7d7dzlfd4z7rgs4mgvmuntrfap75tmm.ipfs.nftstorage.link/"
-            }
-          >
-            <Button
-              rounded={"full"}
-              size={"lg"}
-              fontWeight={"bold"}
-              color={"white"}
-              px={6}
-              colorScheme={"brand"}
-              bg={"brand.400"}
-              _hover={{ bg: "brand.500" }}
-            >
-              View White Paper
-            </Button>
-          </Link>
-          <Link
-            nonce="false"
-            href={"https://docs.serv.services"}
-            passHref
-            key={"https://docs.serv.services"}
-          >
-            <Button
-              rounded={"full"}
-              size={"lg"}
-              fontWeight={"normal"}
-              // colorScheme="brand"
-              variant={"ghost"}
-              px={6}
-              rightIcon={<Icons.arrowRight />}
-            >
-              Learn More
-            </Button>
-          </Link>
-        </Stack>
-      </Stack>
-
-      {/* Right Column */}
-      <Flex
-        flex={1}
-        justify={"center"}
+    <Box position="relative" w="full" overflow="hidden" py={{ base: 16, md: 24 }}>
+      <AnimatedLandscape />
+      <Box
+        position="absolute"
+        inset={0}
+        bgGradient="linear(to-b, rgba(5,5,5,0.4), rgba(5,5,5,0.9))"
+        pointerEvents="none"
+      />
+      <Stack
         align={"center"}
-        position={"relative"}
-        w={"full"}
+        spacing={{ base: 8, md: 10 }}
+        direction={{ base: "column", lg: "row" }}
+        position="relative"
+        zIndex={1}
+        px={{ base: 6, md: 10 }}
       >
-        <Box
+        {/* Left Column */}
+        <Stack flex={1} spacing={{ base: 6, md: 6 }}>
+          <Text
+            fontSize="sm"
+            textTransform="uppercase"
+            letterSpacing="0.24em"
+            color="gray.400"
+          >
+            Technology, consulting, production
+          </Text>
+          <Heading
+            lineHeight={1.1}
+            fontWeight={600}
+            fontSize={{ base: "4xl", sm: "4xl", md: "5xl", lg: "6xl" }}
+          >
+            <Text as={"span"} color="white">
+              2bit
+            </Text>{" "}
+            <Text as={"span"} color="gray.300">
+              entertainment
+            </Text>
+          </Heading>
+
+          <Text fontSize={"lg"} color={"gray.300"} mb={2} maxW="lg">
+            We build modern systems that blend technology integration, AI
+            deployment, and hands-on production for construction, design, and
+            digital experiences.
+          </Text>
+          <Text fontSize={"lg"} color={"gray.400"} mb={4} maxW="lg">
+            From strategy to execution, our team brings together engineering,
+            creative production, and infrastructure support so you can ship
+            ambitious ideas with confidence.
+          </Text>
+          <Stack
+            spacing={{ base: 4, sm: 6 }}
+            direction={{ base: "column", sm: "row" }}
+          >
+            <Link nonce="false" href={"#contact"} passHref key={"#contact"}>
+              <Button
+                rounded={"full"}
+                size={"lg"}
+                fontWeight={"bold"}
+                color={"white"}
+                px={6}
+                colorScheme={"brand"}
+                bg={"brand.400"}
+                _hover={{ bg: "brand.500" }}
+              >
+                Start a project
+              </Button>
+            </Link>
+            <Link nonce="false" href={"#projects"} passHref key={"#projects"}>
+              <Button
+                rounded={"full"}
+                size={"lg"}
+                fontWeight={"normal"}
+                variant={"outline"}
+                borderColor="whiteAlpha.400"
+                color="white"
+                px={6}
+                rightIcon={<Icons.arrowRight />}
+                _hover={{ bg: "whiteAlpha.100" }}
+              >
+                Explore projects
+              </Button>
+            </Link>
+          </Stack>
+        </Stack>
+
+        {/* Right Column */}
+        <Flex
+          flex={1}
+          justify={"center"}
+          align={"center"}
           position={"relative"}
-          height={"300px"}
-          rounded={"2xl"}
-          boxShadow={"2xl"}
-          width={"full"}
-          overflow={"hidden"}
+          w={"full"}
         >
-          {/* <IconButton
-            aria-label={"Play Button"}
-            variant={"ghost"}
-            _hover={{ bg: "transparent" }}
-            icon={<PlayIcon w={12} h={12} />}
-            size={"lg"}
-            color={"white"}
-            position={"absolute"}
-            left={"50%"}
-            top={"50%"}
-            transform={"translateX(-50%) translateY(-50%)"}
-          /> */}
-          <Image
-            alt={"Hero Image"}
-            fit={"cover"}
-            align={"center"}
-            w={"100%"}
-            h={"100%"}
-            src={"/BlockchainImage.jpeg"}
-          />
-        </Box>
-      </Flex>
-    </Stack>
+          <Box
+            position={"relative"}
+            rounded={"2xl"}
+            width={"full"}
+            maxW="480px"
+            bg="blackAlpha.700"
+            border="1px solid"
+            borderColor="whiteAlpha.200"
+            px={{ base: 6, md: 8 }}
+            py={{ base: 6, md: 8 }}
+            backdropFilter="blur(12px)"
+          >
+            <Text fontSize="sm" textTransform="uppercase" color="gray.400">
+              Digital projects in motion
+            </Text>
+            <Heading size="md" color="white" mt={2} mb={4}>
+              Build the future with live systems
+            </Heading>
+            <Stack spacing={4}>
+              {projectSignals.map((project) => (
+                <Box key={project.title}>
+                  <Text fontWeight="semibold" color="white">
+                    {project.title}
+                  </Text>
+                  <Text fontSize="sm" color="gray.400">
+                    {project.description}
+                  </Text>
+                  <Divider borderColor="whiteAlpha.200" mt={3} />
+                </Box>
+              ))}
+            </Stack>
+            <Stack direction="row" spacing={3} mt={6} flexWrap="wrap">
+              {[
+                { label: "AI Integration", color: "accent.green" },
+                { label: "Spatial Design", color: "accent.red" },
+                { label: "Interactive Media", color: "accent.blue" },
+              ].map((item) => (
+                <Box
+                  key={item.label}
+                  px={3}
+                  py={1}
+                  borderRadius="full"
+                  border="1px solid"
+                  borderColor="whiteAlpha.200"
+                  color="white"
+                  fontSize="xs"
+                  bg="blackAlpha.500"
+                >
+                  <Text color={item.color}>{item.label}</Text>
+                </Box>
+              ))}
+            </Stack>
+          </Box>
+        </Flex>
+      </Stack>
+    </Box>
   );
 }
-
-const PlayIcon = createIcon({
-  displayName: "PlayIcon",
-  viewBox: "0 0 58 58",
-  d: "M28.9999 0.562988C13.3196 0.562988 0.562378 13.3202 0.562378 29.0005C0.562378 44.6808 13.3196 57.438 28.9999 57.438C44.6801 57.438 57.4374 44.6808 57.4374 29.0005C57.4374 13.3202 44.6801 0.562988 28.9999 0.562988ZM39.2223 30.272L23.5749 39.7247C23.3506 39.8591 23.0946 39.9314 22.8332 39.9342C22.5717 39.9369 22.3142 39.8701 22.0871 39.7406C21.86 39.611 21.6715 39.4234 21.5408 39.1969C21.4102 38.9705 21.3421 38.7133 21.3436 38.4519V19.5491C21.3421 19.2877 21.4102 19.0305 21.5408 18.8041C21.6715 18.5776 21.86 18.3899 22.0871 18.2604C22.3142 18.1308 22.5717 18.064 22.8332 18.0668C23.0946 18.0696 23.3506 18.1419 23.5749 18.2763L39.2223 27.729C39.4404 27.8619 39.6207 28.0486 39.7458 28.2713C39.8709 28.494 39.9366 28.7451 39.9366 29.0005C39.9366 29.2559 39.8709 29.507 39.7458 29.7297C39.6207 29.9523 39.4404 30.1391 39.2223 30.272Z",
-});

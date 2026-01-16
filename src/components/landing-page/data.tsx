@@ -5,82 +5,70 @@ import { Icons } from "@components/icons";
 export const data = {
   topFeatures: [
     {
-      title: "SERVICES",
+      title: "Technology Integration",
       description:
-        "Our network aims to provide developers with decentralized access to services, allowing them to use our network to enhance their experience as a developer, without needing to master blockchain development.",
-      icon: <Icons.add />,
+        "We design, install, and integrate the technical systems that power complex environments, from infrastructure to live operations.",
+      icon: <Icons.slidersHorizontal />,
     },
     {
-      title: "ECONOMICS",
+      title: "AI + Automation",
       description:
-        "How we operate is based on sound economic principles, and decisions made about the protocol's economics must consider all 4 pillars (SERVICES, ECONOMICS, RELIABILITY & VALUES)",
-      icon: <Icons.billing />,
-    },
-    {
-      title: "RELIABILITY",
-      description:
-        "Reliability means establishing a shared ownership of the network  across a globe  choices to allow our network to be sustainable long-term and must work to have a multi-year emergency operations budget in part by being Community Owned.",
+        "Deploy practical AI workflows, custom tooling, and intelligent automations that keep your team moving fast.",
       icon: <Icons.sun />,
     },
     {
-      title: "VALUES",
+      title: "Production & Design",
       description:
-        "Our ability to build this network without sacrificing the values which brought us all to blockchain is vital. Decentralized, Trustless, Open-Source.",
-      icon: <Icons.user />,
+        "Spatial design, construction technology, and media production tuned for real-world execution.",
+      icon: <Icons.media />,
+    },
+    {
+      title: "Operations & Support",
+      description:
+        "Documentation, training, and ongoing support so your systems stay resilient after launch.",
+      icon: <Icons.check />,
     },
   ],
   fullFeatures: [
     {
-      title: "Community-Owned, Decentralized, Fair-Launched",
+      title: "Strategy that aligns with execution",
       description: (
         <>
-          At the root of our mission is to create a blockchain that SERVs
-          it&apos;s community; Operators, Developers & Users.
+          We translate bold ideas into roadmaps that teams can build against in
+          weeks, not quarters.
         </>
       ),
       icon: <Icons.arrowRight />,
     },
     {
-      title: "Sed do eiusmod tempor",
+      title: "Systems built to scale",
       description:
-        "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.",
-      icon: <Icons.add />,
+        "Our infrastructure work keeps operations reliable, from cloud architecture to on-site deployments.",
+      icon: <Icons.slidersVertical />,
     },
     {
-      title: "Duis aute irure dolor",
+      title: "Creative technology that ships",
       description:
-        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-      icon: <Icons.copy />,
+        "Interactive installations, digital experiences, and production pipelines designed for launch-ready delivery.",
+      icon: <Icons.media />,
     },
     {
-      title: "Excepteur sint occaecat",
+      title: "Integrated AI operations",
       description:
-        "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-      icon: <Icons.ellipsis />,
+        "We select, deploy, and monitor the right AI tooling so it stays reliable in the real world.",
+      icon: <Icons.sun />,
     },
     {
-      title: "Lorem ipsum dolor sit amet",
+      title: "Collaborative delivery",
       description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-      icon: <Icons.copy />,
+        "We operate alongside your team with clear checkpoints, documentation, and training.",
+      icon: <Icons.messageCircle />,
     },
     {
-      title: "Sed do eiusmod tempor",
+      title: "Future-ready support",
       description:
-        "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.",
-      icon: <Icons.copy />,
-    },
-    {
-      title: "Duis aute irure dolor",
-      description:
-        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-      icon: <Icons.filter />,
-    },
-    {
-      title: "Excepteur sint occaecat",
-      description:
-        "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-      icon: <Icons.eyeNone />,
+        "We stay engaged after launch to ensure systems keep evolving.",
+      icon: <Icons.check />,
     },
   ],
 };
