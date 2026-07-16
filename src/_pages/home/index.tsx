@@ -3,8 +3,8 @@
 import { Box, Divider, Flex } from "@chakra-ui/react";
 import { BackgroundModeProvider } from "@components/landing-page/BackgroundModeProvider";
 import BackgroundModeToggle from "@components/landing-page/BackgroundModeToggle";
-import CheckerboardScrollBackground from "@components/landing-page/CheckerboardScrollBackground";
-import CheckerboardSection from "@components/landing-page/CheckerboardSection";
+import LandingSection from "@components/landing-page/LandingSection";
+import MagneticEscherBackground from "@components/landing-page/MagneticEscherBackground";
 import { Community } from "@components/landing-page/Community";
 import Features from "@components/landing-page/Features";
 import Hero from "@components/landing-page/Hero";
@@ -16,37 +16,37 @@ const Home = () => {
   return (
     <BackgroundModeProvider>
       <PageAnimation>
-        <CheckerboardScrollBackground />
+        <MagneticEscherBackground />
         <BackgroundModeToggle />
         <Flex
-        direction="column"
-        alignItems="center"
-        justifyContent="center"
-        minHeight="70vh"
-        gap={16}
-        mb={8}
-        w="full"
-        color="white"
-        position="relative"
-        zIndex={1}
-      >
-        <CheckerboardSection variant="black" frameAccent="emerald">
-          <Hero />
-        </CheckerboardSection>
-        <CheckerboardSection variant="white" frameAccent="emerald">
-          <Features />
-        </CheckerboardSection>
-        <CheckerboardSection variant="black" frameAccent="cyan">
-          <HighlightSwitchback />
-        </CheckerboardSection>
-        <CheckerboardSection variant="white" frameAccent="amber">
-          <InfoAndStats />
-        </CheckerboardSection>
-        <CheckerboardSection variant="black" frameAccent="magenta">
-          <Community />
-        </CheckerboardSection>
-        <Box p={10} />
-        <Divider borderColor="whiteAlpha.300" />
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          minHeight="70vh"
+          gap={16}
+          mb={8}
+          w="full"
+          color="white"
+          position="relative"
+          zIndex={1}
+        >
+          <LandingSection tone="dark" frameAccent="emerald">
+            <Hero />
+          </LandingSection>
+          <LandingSection tone="light" frameAccent="emerald">
+            <Features />
+          </LandingSection>
+          <LandingSection tone="dark" frameAccent="cyan">
+            <HighlightSwitchback />
+          </LandingSection>
+          <LandingSection tone="light" frameAccent="amber">
+            <InfoAndStats />
+          </LandingSection>
+          <LandingSection tone="dark" frameAccent="magenta">
+            <Community />
+          </LandingSection>
+          <Box p={10} />
+          <Divider borderColor="whiteAlpha.300" />
         </Flex>
       </PageAnimation>
     </BackgroundModeProvider>

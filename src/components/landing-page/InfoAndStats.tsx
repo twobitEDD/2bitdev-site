@@ -21,7 +21,7 @@ export function InfoAndStats() {
         <Stack direction={{ base: "column", lg: "row" }}>
           <Stack
             flex={1}
-            color={"var(--checker-description, gray.400)"}
+            color={"var(--section-description, gray.400)"}
             justify={{ lg: "center" }}
             py={{ base: 2, md: 8 }}
           >
@@ -84,12 +84,12 @@ export function InfoAndStats() {
                       <Text
                         fontFamily={"heading"}
                         fontSize={"2xl"}
-                        color={"var(--checker-heading, white)"}
+                        color={"var(--section-heading, white)"}
                         mb={2}
                       >
                         {project.title}
                       </Text>
-                      <Text fontSize={"md"} color={"var(--checker-description, gray.400)"}>
+                      <Text fontSize={"md"} color={"var(--section-description, gray.400)"}>
                         {project.summary}
                       </Text>
                     </Box>

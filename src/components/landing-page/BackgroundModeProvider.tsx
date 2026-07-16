@@ -42,9 +42,9 @@ function applyBgMode(mode: BgMode) {
   document.documentElement.setAttribute("data-bg-mode", mode);
 }
 
-function applyEffectSettings(settings: BgEffectSettings) {
+function applyEffectSettings(mode: BgMode, settings: BgEffectSettings) {
   const root = document.documentElement;
-  const vars = effectSettingsToCssVars(settings);
+  const vars = effectSettingsToCssVars(mode, settings);
   Object.entries(vars).forEach(([key, value]) => {
     root.style.setProperty(key, value);
   });
@@ -62,9 +62,9 @@ function persistEffects(mode: BgMode, settings: BgEffectSettings) {
 }
 
 export function BackgroundModeProvider({ children }: { children: ReactNode }) {
-  const [mode, setModeState] = useState<BgMode>("voxel");
+  const [mode, setModeState] = useState<BgMode>("tessellation");
   const [effects, setEffectsState] = useState<BgEffectSettings>(
-    DEFAULT_EFFECT_SETTINGS.voxel
+    DEFAULT_EFFECT_SETTINGS.tessellation
   );
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export function BackgroundModeProvider({ children }: { children: ReactNode }) {
     setModeState(storedMode);
     setEffectsState(storedEffects);
     applyBgMode(storedMode);
-    applyEffectSettings(storedEffects);
+    applyEffectSettings(storedMode, storedEffects);
   }, []);
 
   const setMode = useCallback((next: BgMode) => {
@@ -81,7 +81,7 @@ export function BackgroundModeProvider({ children }: { children: ReactNode }) {
     setModeState(next);
     setEffectsState(nextEffects);
     applyBgMode(next);
-    applyEffectSettings(nextEffects);
+    applyEffectSettings(next, nextEffects);
     try {
       window.localStorage.setItem(BG_MODE_STORAGE_KEY, next);
     } catch {
@@ -94,7 +94,7 @@ export function BackgroundModeProvider({ children }: { children: ReactNode }) {
     <K extends keyof BgEffectSettings>(key: K, value: BgEffectSettings[K]) => {
       setEffectsState((prev) => {
         const next = mergeEffectSettings(mode, { ...prev, [key]: value });
-        applyEffectSettings(next);
+        applyEffectSettings(mode, next);
         persistEffects(mode, next);
         return next;
       });
@@ -105,7 +105,7 @@ export function BackgroundModeProvider({ children }: { children: ReactNode }) {
   const resetEffects = useCallback(() => {
     const defaults = mergeEffectSettings(mode);
     setEffectsState(defaults);
-    applyEffectSettings(defaults);
+    applyEffectSettings(mode, defaults);
     persistEffects(mode, defaults);
   }, [mode]);
 

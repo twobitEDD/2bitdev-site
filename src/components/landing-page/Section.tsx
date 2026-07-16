@@ -9,7 +9,7 @@ export function SuperTitle({ children }: PropsWithChildren) {
       textTransform={"uppercase"}
       mb={3}
       fontSize={"xl"}
-      color={"var(--checker-super-title, accent.blue)"}
+      color={"var(--section-super-title, accent.blue)"}
     >
       {children}
     </Text>
@@ -19,7 +19,7 @@ export function SuperTitle({ children }: PropsWithChildren) {
 export function Title({ children }: PropsWithChildren) {
   return (
     <Heading
-      color={"var(--checker-heading, white)"}
+      color={"var(--section-heading, white)"}
       mb={5}
       fontSize={{
         base: "3xl",
@@ -32,7 +32,7 @@ export function Title({ children }: PropsWithChildren) {
 }
 export function Description({ children }: PropsWithChildren) {
   return (
-    <Text fontSize={"lg"} color={"var(--checker-description, gray.400)"}>
+    <Text fontSize={"lg"} color={"var(--section-description, gray.400)"}>
       {children}
     </Text>
   );
