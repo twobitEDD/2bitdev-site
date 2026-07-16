@@ -56,9 +56,9 @@ export default function Hero() {
           >
             <Text as={"span"} color="white">
               2bit
-            </Text>
-            <Text as={"span"} color="brand.300">
-              DEV
+            </Text>{" "}
+            <Text as={"span"} color="gray.300">
+              entertainment
             </Text>
           </Heading>
 

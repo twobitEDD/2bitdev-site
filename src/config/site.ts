@@ -20,16 +20,16 @@ const navItems = [
 ];
 
 export const siteConfig = {
-  name: "2bitDEV",
+  name: "2bit Entertainment",
   legalName: "2bit Entertainment",
   description:
     "Indie games, interactive experiences, and software production — from Planet's Core and Fish Fight to agency-backed work for Google, Dell, and Washington University.",
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://2bitDEV.com",
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://2bitENT.com",
   navItems: navItems,
   navMenuItems: navItems,
   links: {
     github: "https://github.com/twobitENT",
-    email: "mailto:EddNorris@2bitdev.com",
+    email: "mailto:hello@2bitentertainment.com",
     studio: "/#contact",
     fishFight: "https://fishfight.app",
     ergnomes: "https://ergnomes.io",

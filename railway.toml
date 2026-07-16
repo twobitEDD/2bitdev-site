@@ -1,0 +1,13 @@
+# 2bit Entertainment studio site — deploy to 2bitENT.com on Railway.
+# Source: twobitEDD/2bitdev-site (fork of serv-website entertainment branch).
+
+[build]
+builder = "nixpacks"
+buildCommand = "yarn install && yarn build"
+
+[deploy]
+startCommand = "yarn start"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
+healthcheckPath = "/"
+healthcheckTimeout = 300
