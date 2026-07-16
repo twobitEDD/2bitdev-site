@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import "@styles/checkerboard.css";
 import Providers from "@app/providers";
 import Layout from "@components/app-shell";
 import { siteConfig } from "@config/site";

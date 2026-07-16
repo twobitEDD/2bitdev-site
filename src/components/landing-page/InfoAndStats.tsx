@@ -6,12 +6,12 @@ import { Description, SuperTitle, Title } from "./Section";
 
 export function InfoAndStats() {
   return (
-    <Box bg={"black"} position={"relative"} id="projects">
+    <Box position={"relative"} id="projects">
       <Container maxW={"7xl"} zIndex={10} position={"relative"}>
         <Stack direction={{ base: "column", lg: "row" }}>
           <Stack
             flex={1}
-            color={"gray.400"}
+            color={"var(--checker-description, gray.400)"}
             justify={{ lg: "center" }}
             py={{ base: 4, md: 20, xl: 40 }}
           >
@@ -40,12 +40,12 @@ export function InfoAndStats() {
                     <Text
                       fontFamily={"heading"}
                       fontSize={"3xl"}
-                      color={"white"}
+                      color={"var(--checker-heading, white)"}
                       mb={3}
                     >
                       {project.title}
                     </Text>
-                    <Text fontSize={"xl"} color={"gray.400"}>
+                    <Text fontSize={"xl"} color={"var(--checker-description, gray.400)"}>
                       {project.summary}
                     </Text>
                   </Box>

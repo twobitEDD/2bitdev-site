@@ -1,0 +1,127 @@
+/* Scroll-driven checkerboard background for 2bitENT landing page */
+
+.checker-scroll-root {
+  --checker-cell: 72px;
+  --checker-offset-x: 0px;
+  --checker-offset-y: 0px;
+  --checker-rotate: 0deg;
+  --checker-tilt: 0deg;
+  --checker-roll: 0deg;
+  --checker-scale: 1;
+  --edge-reveal: 0;
+  --section-fill: #000000;
+}
+
+.checker-scroll-layer {
+  position: fixed;
+  inset: -20%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(45deg, #000000 25%, transparent 25%),
+    linear-gradient(-45deg, #000000 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #000000 75%),
+    linear-gradient(-45deg, transparent 75%, #000000 75%);
+  background-size: var(--checker-cell) var(--checker-cell);
+  background-position:
+    var(--checker-offset-x) var(--checker-offset-y),
+    var(--checker-offset-x) var(--checker-offset-y),
+    calc(var(--checker-cell) / 2 + var(--checker-offset-x))
+      calc(var(--checker-cell) / 2 + var(--checker-offset-y)),
+    calc(var(--checker-cell) / 2 + var(--checker-offset-x))
+      calc(var(--checker-cell) / 2 + var(--checker-offset-y));
+  transform-origin: 50% 40%;
+  transform: perspective(1100px) rotateX(var(--checker-tilt))
+    rotateZ(var(--checker-roll)) scale(var(--checker-scale));
+  will-change: transform, background-size, background-position;
+}
+
+.checker-scroll-layer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 120% 80% at 50% 45%,
+    transparent 35%,
+    rgba(0, 0, 0, 0.12) 100%
+  );
+  mix-blend-mode: multiply;
+  opacity: 0.35;
+}
+
+.checker-curve-line {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  opacity: 0.55;
+}
+
+.checker-curve-line path {
+  fill: none;
+  stroke: url(#checker-curve-stroke);
+  stroke-width: clamp(28px, 5vw, 64px);
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.checker-section {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+}
+
+.checker-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--section-fill);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent calc(var(--edge-reveal) * 14%),
+    #000 calc(8% + (1 - var(--edge-reveal)) * 18%),
+    #000 calc(92% - (1 - var(--edge-reveal)) * 18%),
+    transparent calc(100% - var(--edge-reveal) * 14%),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent calc(var(--edge-reveal) * 14%),
+    #000 calc(8% + (1 - var(--edge-reveal)) * 18%),
+    #000 calc(92% - (1 - var(--edge-reveal)) * 18%),
+    transparent calc(100% - var(--edge-reveal) * 14%),
+    transparent 100%
+  );
+  transition: background-color 0.2s ease;
+}
+
+.checker-section[data-variant="white"] {
+  --section-fill: #ffffff;
+}
+
+.checker-section[data-variant="black"] {
+  --section-fill: #000000;
+}
+
+.checker-section-content {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .checker-scroll-layer {
+    transform: none;
+    inset: 0;
+  }
+
+  .checker-curve-line {
+    display: none;
+  }
+}

@@ -12,7 +12,6 @@ export default function HighlightSwitchback() {
       // mt={{ base: 10, md: 28 }}
     >
       <Box
-        bg="black"
         px={{ base: 6, md: 8 }}
         py={{ base: 16, md: 20 }}
         mx="auto"
