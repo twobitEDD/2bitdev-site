@@ -1,5 +1,7 @@
 # 2bit Entertainment studio site — deploy to 2bitENT.com on Railway.
 # Source: twobitEDD/2bitdev-site (fork of serv-website entertainment branch).
+# Deploy via GitHub push only — see DEPLOY.md (do NOT use `railway up`).
+# Service: 2bitent-com — https://2bitent-com-production.up.railway.app
 
 [build]
 builder = "nixpacks"

@@ -45,36 +45,21 @@ No secrets are required for the marketing homepage.
 
 ## Railway deployment
 
-This project uses `railway.toml`:
+**Always deploy via GitHub push → Railway.** See **[DEPLOY.md](./DEPLOY.md)** for the full workflow.
+
+| Field | Value |
+|-------|-------|
+| Service | **2bitent-com** (not legacy `2bitent-site`) |
+| GitHub | `twobitEDD/2bitdev-site` → `main` |
+| Railway URL | https://2bitent-com-production.up.railway.app |
+| Custom domain | **2bitent.com** |
+
+Build/start commands are in `railway.toml`:
 
 - **Build:** `yarn install && yarn build`
 - **Start:** `yarn start`
 
-### Service: `2bitent-site` (twobitENT project)
-
-1. In [Railway twobitENT project](https://railway.com/project/3b864b9d-7403-40f2-9a9a-863f393d9e70), open service **2bitent-site**.
-2. **Settings → Source:** connect GitHub repo `twobitEDD/2bitdev-site`, branch `main`.
-3. **Settings → Networking:** custom domain **2bitENT.com** (and `www.2bitENT.com` if desired).
-4. Deploy from the dashboard or push to `main`.
-
-### CLI deploy (alternative)
-
-```bash
-railway link -p 3b864b9d-7403-40f2-9a9a-863f393d9e70 -e production -s 2bitent-site
-railway up
-```
-
-## Custom domain DNS (2bitENT.com)
-
-At your domain registrar (or Cloudflare), add a **CNAME** record:
-
-| Type | Name | Value |
-|------|------|-------|
-| CNAME | `@` or `www` | `2bitent-site-production.up.railway.app` |
-
-Railway will show the exact target after you add the domain in **Settings → Networking → Custom Domain**. Use the value Railway provides (it may differ slightly).
-
-For apex/root (`@`) domains, some registrars require an **ALIAS/ANAME** record instead of CNAME — follow Railway's domain setup wizard.
+Do **not** use `railway up` for production deploys.
 
 ## Origin repo
 
