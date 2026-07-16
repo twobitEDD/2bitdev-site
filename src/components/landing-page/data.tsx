@@ -1,6 +1,7 @@
 "use client";
 
 import { Icons } from "@components/icons";
+import type { ServiceAccent } from "./ServiceVisual";
 
 export const data = {
   topFeatures: [
@@ -9,24 +10,28 @@ export const data = {
       description:
         "We design, install, and integrate the technical systems that power complex environments, from infrastructure to live operations.",
       icon: <Icons.slidersHorizontal />,
+      accent: "cyan" as ServiceAccent,
     },
     {
       title: "AI + Automation",
       description:
         "Deploy practical AI workflows, custom tooling, and intelligent automations that keep your team moving fast.",
       icon: <Icons.sun />,
+      accent: "magenta" as ServiceAccent,
     },
     {
       title: "Interactive Experiences",
       description:
         "Video games, immersive media, and experiential builds tuned for real-world execution.",
       icon: <Icons.media />,
+      accent: "amber" as ServiceAccent,
     },
     {
       title: "Blockchain Connection",
       description:
         "Wallets, tokenized access, and on-chain integrations that connect experiences to blockchain.",
       icon: <Icons.check />,
+      accent: "emerald" as ServiceAccent,
     },
   ],
   fullFeatures: [
