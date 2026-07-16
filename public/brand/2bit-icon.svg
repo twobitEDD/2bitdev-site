@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="2bit">
+  <style>
+    .wordmark {
+      fill: #090b0b;
+      font-family: ui-monospace, "SF Mono", "Cascadia Mono", "IBM Plex Mono", Menlo, monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+    @media (prefers-color-scheme: dark) {
+      .wordmark {
+        fill: #f5f0e4;
+      }
+    }
+  </style>
+  <text x="16" y="20.5" text-anchor="middle" class="wordmark">2bit</text>
+</svg>

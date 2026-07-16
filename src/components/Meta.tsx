@@ -13,7 +13,8 @@ const Meta = () => {
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="theme-color" content="#050505" />
 
-      <link rel="shortcut icon" href="/favicon.ico" />
+      <link rel="icon" href="/brand/2bit-icon.svg" type="image/svg+xml" />
+      <link rel="apple-touch-icon" href="/brand/apple-touch-icon.svg" />
 
       <link rel="manifest" href="/manifest.json" />
     </>

@@ -29,6 +29,11 @@ export const metadata: Metadata = {
     telephone: false,
   },
   themeColor: "#050505",
+  icons: {
+    icon: [{ url: "/brand/2bit-icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/brand/apple-touch-icon.svg", type: "image/svg+xml" }],
+  },
+  manifest: "/manifest.json",
   openGraph: {
     url: siteConfig.siteUrl,
     title: APP_NAME,
