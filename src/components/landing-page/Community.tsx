@@ -1,4 +1,4 @@
-import { Container, Flex, Stack, SystemProps } from "@chakra-ui/react";
+import { Container, Flex, Stack, type SystemProps } from "@chakra-ui/react";
 import { Icons } from "@components/icons";
 import { FadeIn } from "@components/motion/Animation";
 import { siteConfig } from "@config/site";
@@ -9,7 +9,7 @@ import { Description, Title } from "./Section";
 export const Community = () => {
   return (
     <>
-      <Stack as={Container} maxW={"3xl"} textAlign={"center"} id="contact">
+      <Stack as={Container} maxW={"3xl"} textAlign={"center"} id="contact" px={0}>
         <Title>Start the conversation</Title>
         <Description>
           Tell us about the technology, production, or design challenges you
@@ -27,6 +27,8 @@ export const Community = () => {
               description={feat.description}
               href={feat.href}
               isExternal={feat.isExternal}
+              image={feat.image}
+              imageAlt={feat.imageAlt}
               key={feat.title}
             />
           ))}
@@ -44,6 +46,8 @@ export const communityAccounts = [
     iconColor: "#60A5FA",
     href: siteConfig.links.email,
     isExternal: true,
+    image: "/images/cards/contact-email.svg",
+    imageAlt: "Email envelope illustration for project inquiries",
   },
   {
     title: "Studio",
@@ -52,6 +56,8 @@ export const communityAccounts = [
     iconColor: "#34D399",
     href: siteConfig.links.studio,
     isExternal: false,
+    image: "/images/cards/contact-studio.svg",
+    imageAlt: "Studio workspace and collaboration illustration",
   },
   {
     title: "Github",
@@ -60,6 +66,8 @@ export const communityAccounts = [
     iconColor: "#FFFFFF",
     href: siteConfig.links.github,
     isExternal: true,
+    image: "/images/cards/contact-github.svg",
+    imageAlt: "GitHub open-source repository illustration",
   },
 ];
 
@@ -72,7 +80,6 @@ export interface BaseFeature {
   isExternal: boolean;
 }
 
-// Add intersection type
 export type FeatureItem =
   | (BaseFeature & { href?: string; onClick?: undefined })
   | (BaseFeature & { href?: undefined; onClick?: () => void });

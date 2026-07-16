@@ -7,6 +7,7 @@ import Link from "next/link";
 
 import { FadeIn } from "@components/motion/Animation";
 import { siteConfig } from "@config/site";
+import CardImage from "./CardImage";
 import { data } from "./data";
 import {
   SERVICE_ACCENTS,
@@ -22,6 +23,8 @@ interface CardProps {
   iconColor?: string;
   href?: string;
   isExternal?: boolean;
+  image?: string;
+  imageAlt?: string;
 }
 
 export const FeatureCard = ({
@@ -32,6 +35,8 @@ export const FeatureCard = ({
   iconColor,
   href,
   isExternal,
+  image,
+  imageAlt,
 }: CardProps) => {
   const isServiceCard = Boolean(accent);
   const accentMeta = accent ? SERVICE_ACCENTS[accent] : null;
@@ -49,7 +54,15 @@ export const FeatureCard = ({
         } as React.CSSProperties
       }
     >
-      <ServiceVisual accent={accent!} />
+      {image ? (
+        <CardImage
+          src={image}
+          alt={imageAlt || heading}
+          accent={accentMeta.color}
+        />
+      ) : (
+        <ServiceVisual accent={accent!} />
+      )}
       <Stack align="start" spacing={3} className="service-card__body">
         <Flex
           direction="row"
@@ -81,20 +94,30 @@ export const FeatureCard = ({
     </Box>
   ) : (
     <Box
+      className="service-card"
       maxW={{ base: "full", md: "275px" }}
       w="full"
-      borderWidth="1px"
-      borderRadius="lg"
-      overflow="hidden"
-      p={6}
-      mb={100}
-      bg="blackAlpha.700"
-      borderColor="whiteAlpha.200"
-      _hover={href ? { borderColor: "brand.400", cursor: "pointer" } : {}}
+      style={
+        iconColor
+          ? ({
+              "--service-accent": iconColor,
+              "--service-glow": `${iconColor}55`,
+              "--service-gradient": `linear-gradient(135deg, ${iconColor}22 0%, transparent 100%)`,
+            } as React.CSSProperties)
+          : undefined
+      }
     >
-      <Stack align="start" spacing={2}>
+      {image && (
+        <CardImage
+          src={image}
+          alt={imageAlt || heading}
+          accent={iconColor}
+        />
+      )}
+      <Stack align="start" spacing={2} className="service-card__body">
         <Flex direction="row" justifyContent="flex-start" alignItems="center" gap="0.75rem">
           <Flex
+            className="service-card__icon"
             w={10}
             minW={10}
             h={10}
@@ -103,16 +126,15 @@ export const FeatureCard = ({
             justify="center"
             color={iconColor || "brand.300"}
             rounded="full"
-            bg="blackAlpha.600"
           >
             {icon}
           </Flex>
-          <Heading size="md" color="white">
+          <Heading size="md" className="service-card__heading">
             {heading}
           </Heading>
         </Flex>
         <Box mt={2}>
-          <Text mt={1} fontSize="sm" color="gray.300">
+          <Text mt={1} fontSize="sm" className="service-card__description">
             {description}
           </Text>
         </Box>
@@ -147,6 +169,9 @@ export default function Features() {
         textAlign="center"
         id="services"
         className="services-section__header"
+        p={0}
+        bg="transparent"
+        boxShadow="none"
       >
         <SuperTitle>Services</SuperTitle>
         <Title>Full-spectrum technology support</Title>
@@ -158,7 +183,7 @@ export default function Features() {
       </Stack>
 
       <FadeIn direction="from-bottom-to-top">
-        <Container maxW="6xl" mt={12}>
+        <Container maxW="6xl" mt={12} px={0}>
           <SimpleGrid
             columns={{ base: 1, sm: 2, lg: 4 }}
             spacing={{ base: 6, md: 8 }}
@@ -170,6 +195,8 @@ export default function Features() {
                 icon={feat.icon}
                 description={feat.description}
                 accent={feat.accent}
+                image={feat.image}
+                imageAlt={feat.imageAlt}
                 href={(feat as { href?: string }).href}
                 key={feat.title}
               />

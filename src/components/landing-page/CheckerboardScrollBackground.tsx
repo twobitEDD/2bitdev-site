@@ -24,12 +24,44 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
-function getScrollMotionMultiplier(): number {
+function getCssVar(name: string, fallback: number): number {
   const raw = getComputedStyle(document.documentElement)
-    .getPropertyValue("--scroll-motion")
+    .getPropertyValue(name)
     .trim();
   const parsed = parseFloat(raw);
-  return Number.isFinite(parsed) ? clamp(parsed, 0, 1) : 0.6;
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function getScrollMotionMultiplier(): number {
+  return clamp(getCssVar("--scroll-motion", 0.6), 0, 1);
+}
+
+function getBackgroundSpeedMultiplier(): number {
+  return clamp(getCssVar("--background-speed", 1), 0.1, 2.5);
+}
+
+function getCheckerCellBase(): number {
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue("--checker-cell-base")
+    .trim();
+  const parsed = parseFloat(raw);
+  return Number.isFinite(parsed) ? parsed : 72;
+}
+
+function getRotationAmount(): number {
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue("--checker-rotation-amount")
+    .trim();
+  const parsed = parseFloat(raw);
+  return Number.isFinite(parsed) ? parsed : 3;
+}
+
+function getFractureAngleAmount(): number {
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue("--fracture-angle-amount")
+    .trim();
+  const parsed = parseFloat(raw);
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function getBgMode(): BgMode {
@@ -53,6 +85,10 @@ function updateScrollState(mode: BgMode) {
   const scrollHeight = document.documentElement.scrollHeight - viewportHeight;
   const progress = scrollHeight > 0 ? scrollY / scrollHeight : 0;
   const motion = getScrollMotionMultiplier();
+  const speed = getBackgroundSpeedMultiplier();
+  const cellBase = getCheckerCellBase();
+  const rotationAmount = getRotationAmount();
+  const fractureAngleBase = getFractureAngleAmount();
 
   const wave = Math.sin(scrollY * 0.0032);
   const wave2 = Math.cos(scrollY * 0.0022);
@@ -60,31 +96,34 @@ function updateScrollState(mode: BgMode) {
 
   root.style.setProperty(
     "--checker-cell",
-    `${64 + wave * parallax.cellWave * motion + progress * (parallax.cellWave * 0.55 * motion)}px`
+    `${cellBase + wave * parallax.cellWave * motion * speed + progress * (parallax.cellWave * 0.55 * motion * speed)}px`
   );
   root.style.setProperty(
     "--checker-offset-x",
-    `${scrollY * parallax.offsetX * motion + wave2 * (parallax.offsetX * 48 * motion)}px`
+    `${scrollY * parallax.offsetX * motion * speed + wave2 * (parallax.offsetX * 48 * motion * speed)}px`
   );
   root.style.setProperty(
     "--checker-offset-y",
-    `${scrollY * parallax.offsetY * motion + wave * (parallax.offsetY * 60 * motion)}px`
+    `${scrollY * parallax.offsetY * motion * speed + wave * (parallax.offsetY * 60 * motion * speed)}px`
   );
-  root.style.setProperty("--checker-rotate", `${wave * 1.4 * motion}deg`);
+  root.style.setProperty(
+    "--checker-rotate",
+    `${wave * rotationAmount * motion}deg`
+  );
   root.style.setProperty(
     "--checker-tilt",
-    `${parallax.tilt * motion + wave2 * (parallax.tilt * 0.5 * motion) + progress * (parallax.tilt * 0.4 * motion)}deg`
+    `${parallax.tilt * motion + rotationAmount * 0.5 * motion + wave2 * (parallax.tilt * 0.5 * motion) + progress * (parallax.tilt * 0.4 * motion)}deg`
   );
-  root.style.setProperty("--checker-roll", `${wave * 1.6 * motion}deg`);
+  root.style.setProperty(
+    "--checker-roll",
+    `${wave * rotationAmount * 0.8 * motion}deg`
+  );
   root.style.setProperty(
     "--checker-scale",
-    `${1 + wave2 * parallax.scale * motion + progress * (parallax.scale * 0.45 * motion)}`
+    `${1 + wave2 * parallax.scale * motion * speed + progress * (parallax.scale * 0.45 * motion * speed)}`
   );
 
-  const fadeAmount =
-    parseFloat(
-      getComputedStyle(document.documentElement).getPropertyValue("--fade-amount").trim()
-    ) || 0.25;
+  const fadeAmount = getCssVar("--fade-amount", 0.25);
 
   const sections = document.querySelectorAll<HTMLElement>("[data-checker-section]");
   sections.forEach((section, index) => {
@@ -118,23 +157,24 @@ function updateScrollState(mode: BgMode) {
 
     if (mode === "fracture") {
       edgeReveal = clamp(0.62 + (1 - normalizedCenter) * 0.38, 0.58, 1);
-      const fractureAngle = index % 2 === 0 ? -2.5 : 2.5;
+      const fractureSign = index % 2 === 0 ? -1 : 1;
+      const fractureAngle = fractureAngleBase * fractureSign;
       section.style.setProperty("--fracture-angle", `${fractureAngle}deg`);
       section.style.setProperty(
         "--fracture-offset",
-        `${Math.sin(scrollY * 0.0025 + index) * 8 * motion}px`
+        `${Math.sin(scrollY * 0.0025 + index) * 8 * motion * speed}px`
       );
     }
 
     section.style.setProperty("--edge-reveal", edgeReveal.toFixed(3));
 
-    const localCell = 52 + edgeReveal * 90 + (1 - normalizedCenter) * 24;
+    const localCell = cellBase * 0.72 + edgeReveal * 90 + (1 - normalizedCenter) * 24;
     section.style.setProperty("--checker-cell-local", `${localCell}px`);
   });
 
   const curvePath = document.getElementById("checker-curve-path");
   if (curvePath && (mode === "dark" || mode === "light")) {
-    const amplitude = (50 + progress * 70) * motion;
+    const amplitude = (50 + progress * 70) * motion * speed;
     const yBase = viewportHeight * (0.25 + progress * 0.45);
     const width = window.innerWidth;
     curvePath.setAttribute(
@@ -157,9 +197,10 @@ function updateScrollState(mode: BgMode) {
     const y = rect.bottom;
     const width = window.innerWidth;
     const skew = index % 2 === 0 ? -1 : 1;
+    const skewAmount = 18 + Math.abs(fractureAngleBase) * 1.2;
     stripe.setAttribute(
       "d",
-      `M -40 ${y} L ${width + 40} ${y + skew * 28}`
+      `M -40 ${y} L ${width + 40} ${y + skew * skewAmount}`
     );
   });
 }
@@ -194,7 +235,14 @@ export default function CheckerboardScrollBackground() {
         window.cancelAnimationFrame(frame);
       }
     };
-  }, [mode, effects.scrollMotion]);
+  }, [
+    mode,
+    effects.scrollMotion,
+    effects.backgroundSpeed,
+    effects.checkerCellSize,
+    effects.checkerRotation,
+    effects.fractureAngle,
+  ]);
 
   const showCurve = !prefersReducedMotion && (mode === "dark" || mode === "light");
   const showFracture = !prefersReducedMotion && mode === "fracture";

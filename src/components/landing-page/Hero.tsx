@@ -12,6 +12,7 @@ import {
 import { Icons } from "@components/icons";
 import { studioProjects } from "@config/projects";
 import { siteConfig } from "@config/site";
+import Image from "next/image";
 import Link from "next/link";
 import AnimatedLandscape from "./AnimatedLandscape";
 
@@ -128,7 +129,18 @@ export default function Hero() {
             px={{ base: 6, md: 8 }}
             py={{ base: 6, md: 8 }}
             backdropFilter="blur(12px)"
+            overflow="hidden"
           >
+            <Box className="card-image" mb={4} border="none" boxShadow="none">
+              <Image
+                src="/images/cards/hero-signals.svg"
+                alt="Live systems dashboard showing AI, games, and blockchain signals"
+                width={480}
+                height={200}
+                priority
+                style={{ width: "100%", height: "auto" }}
+              />
+            </Box>
             <Text fontSize="sm" textTransform="uppercase" color="gray.400">
               Digital projects in motion
             </Text>

@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  BG_EFFECT_SLIDERS,
+  BG_EFFECT_SLIDER_GROUPS,
   BG_MODE_META,
   BG_MODES,
   type BgMode,
@@ -78,25 +78,32 @@ export default function BackgroundModeToggle() {
             })}
           </div>
 
-          <div className="bg-mode-panel__sliders">
-            {BG_EFFECT_SLIDERS.map((slider) => (
-              <label key={slider.key} className="bg-mode-panel__slider">
-                <span className="bg-mode-panel__slider-label">{slider.label}</span>
-                <input
-                  type="range"
-                  min={slider.min}
-                  max={slider.max}
-                  value={effects[slider.key]}
-                  onChange={(event) =>
-                    setEffect(slider.key, Number(event.target.value))
-                  }
-                  className="bg-mode-panel__range"
-                  aria-valuemin={slider.min}
-                  aria-valuemax={slider.max}
-                  aria-valuenow={effects[slider.key]}
-                />
-                <span className="bg-mode-panel__slider-value">{effects[slider.key]}</span>
-              </label>
+          <div className="bg-mode-panel__slider-groups">
+            {BG_EFFECT_SLIDER_GROUPS.map((group) => (
+              <div key={group.group} className="bg-mode-panel__slider-group">
+                <span className="bg-mode-panel__group-label">{group.label}</span>
+                {group.sliders.map((slider) => (
+                  <label key={slider.key} className="bg-mode-panel__slider">
+                    <span className="bg-mode-panel__slider-label">{slider.label}</span>
+                    <input
+                      type="range"
+                      min={slider.min}
+                      max={slider.max}
+                      value={effects[slider.key]}
+                      onChange={(event) =>
+                        setEffect(slider.key, Number(event.target.value))
+                      }
+                      className="bg-mode-panel__range"
+                      aria-valuemin={slider.min}
+                      aria-valuemax={slider.max}
+                      aria-valuenow={effects[slider.key]}
+                    />
+                    <span className="bg-mode-panel__slider-value">
+                      {effects[slider.key]}
+                    </span>
+                  </label>
+                ))}
+              </div>
             ))}
           </div>
         </div>

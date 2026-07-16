@@ -11,6 +11,8 @@ export const data = {
         "We design, install, and integrate the technical systems that power complex environments, from infrastructure to live operations.",
       icon: <Icons.slidersHorizontal />,
       accent: "cyan" as ServiceAccent,
+      image: "/images/cards/tech-integration.svg",
+      imageAlt: "Connected systems and infrastructure integration diagram",
     },
     {
       title: "AI + Automation",
@@ -18,6 +20,8 @@ export const data = {
         "Deploy practical AI workflows, custom tooling, and intelligent automations that keep your team moving fast.",
       icon: <Icons.sun />,
       accent: "magenta" as ServiceAccent,
+      image: "/images/cards/ai-automation.svg",
+      imageAlt: "AI neural network and automation workflow illustration",
     },
     {
       title: "Interactive Experiences",
@@ -25,6 +29,8 @@ export const data = {
         "Video games, immersive media, and experiential builds tuned for real-world execution.",
       icon: <Icons.media />,
       accent: "amber" as ServiceAccent,
+      image: "/images/cards/interactive-experiences.svg",
+      imageAlt: "Interactive game screen and controller experience",
     },
     {
       title: "Blockchain Connection",
@@ -32,17 +38,15 @@ export const data = {
         "Wallets, tokenized access, and on-chain integrations that connect experiences to blockchain.",
       icon: <Icons.check />,
       accent: "emerald" as ServiceAccent,
+      image: "/images/cards/blockchain.svg",
+      imageAlt: "Blockchain network nodes and connection links",
     },
   ],
   fullFeatures: [
     {
       title: "Strategy that aligns with execution",
-      description: (
-        <>
-          We translate bold ideas into roadmaps that teams can build against in
-          weeks, not quarters.
-        </>
-      ),
+      description:
+        "We translate bold ideas into roadmaps that teams can build against in weeks, not quarters.",
       icon: <Icons.arrowRight />,
     },
     {
@@ -76,4 +80,23 @@ export const data = {
       icon: <Icons.check />,
     },
   ],
+};
+
+export const PROJECT_IMAGES: Record<string, { src: string; alt: string }> = {
+  "Fish Fight": {
+    src: "/images/cards/project-fish-fight.svg",
+    alt: "Ocean conservation game with marine habitat illustration",
+  },
+  PokePocket: {
+    src: "/images/cards/project-pokepocket.svg",
+    alt: "Collectible card game pocket experience artwork",
+  },
+  "Planet's Core": {
+    src: "/images/cards/project-planets-core.svg",
+    alt: "Indie game planet and orbital space scene",
+  },
+  ERGnomes: {
+    src: "/images/cards/project-ergnomes.svg",
+    alt: "NFT ecosystem gnome characters on Ergo platform",
+  },
 };

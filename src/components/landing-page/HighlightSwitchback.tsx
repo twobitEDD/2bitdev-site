@@ -1,7 +1,23 @@
 import { Box, Button, Flex, SimpleGrid, Stack, Text } from "@chakra-ui/react";
+import Image from "next/image";
 import { FadeIn } from "@components/motion/Animation";
 import Link from "next/link";
 import { Description, Title } from "./Section";
+
+const HIGHLIGHT_VISUALS = [
+  {
+    src: "/images/cards/integration-map.svg",
+    alt: "Integration map showing connected signal and infrastructure nodes",
+  },
+  {
+    src: "/images/cards/ai-operations.svg",
+    alt: "AI operations dashboard with automation metrics",
+  },
+  {
+    src: "/images/cards/production-stack.svg",
+    alt: "Production stack with spatial and digital output layers",
+  },
+];
 
 export default function HighlightSwitchback() {
   return (
@@ -9,22 +25,21 @@ export default function HighlightSwitchback() {
       w="full"
       justifyContent="center"
       alignItems="center"
-      // mt={{ base: 10, md: 28 }}
     >
       <Box
-        px={{ base: 6, md: 8 }}
-        py={{ base: 16, md: 20 }}
+        px={{ base: 0, md: 2 }}
+        py={{ base: 4, md: 8 }}
         mx="auto"
         id="capabilities"
+        w="full"
       >
-        {/* Left Section */}
         <FadeIn direction="from-bottom-to-top">
           <SimpleGrid
             alignItems="center"
             columns={{ base: 1, md: 2 }}
-            mb={24}
-            spacingY={{ base: 10, md: 32 }}
-            spacingX={{ base: 10, md: 24 }}
+            mb={16}
+            spacingY={{ base: 10, md: 16 }}
+            spacingX={{ base: 10, md: 16 }}
           >
             <Box>
               <Title>Integration that feels effortless</Title>
@@ -49,34 +64,18 @@ export default function HighlightSwitchback() {
                 </Button>
               </Link>
             </Box>
-            <Box
-              w="full"
-              h="full"
-              bg="blackAlpha.700"
-              border="1px solid"
-              borderColor="whiteAlpha.200"
-              textAlign={"center"}
-              borderRadius="2xl"
-              px={8}
-              py={10}
-            >
-              <Stack spacing={4} align="flex-start">
+            <Box className="highlight-visual">
+              <Image
+                src={HIGHLIGHT_VISUALS[0].src}
+                alt={HIGHLIGHT_VISUALS[0].alt}
+                width={480}
+                height={180}
+                style={{ width: "100%", height: "auto", display: "block" }}
+              />
+              <Stack spacing={2} p={4} align="flex-start">
                 <Text fontSize="sm" textTransform="uppercase" color="gray.400">
                   Integration map
                 </Text>
-                <Text fontSize="2xl" color="white" fontWeight="semibold">
-                  Signal + infrastructure
-                </Text>
-                <Box
-                  w="full"
-                  h="140px"
-                  borderRadius="lg"
-                  bgGradient="linear(to-br, rgba(255,255,255,0.05), rgba(255,255,255,0))"
-                  border="1px solid"
-                  borderColor="whiteAlpha.200"
-                  backgroundImage="linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)"
-                  backgroundSize="32px 32px"
-                />
                 <Text fontSize="sm" color="gray.400">
                   Sensor networks, edge compute, and real-time dashboards that
                   stay online.
@@ -85,15 +84,14 @@ export default function HighlightSwitchback() {
             </Box>
           </SimpleGrid>
         </FadeIn>
-        {/* Right section */}
+
         <FadeIn direction="from-bottom-to-top">
           <SimpleGrid
             alignItems="center"
             columns={{ base: 1, md: 2 }}
-            flexDirection="column-reverse"
-            mb={24}
-            spacingY={{ base: 10, md: 32 }}
-            spacingX={{ base: 10, md: 24 }}
+            mb={16}
+            spacingY={{ base: 10, md: 16 }}
+            spacingX={{ base: 10, md: 16 }}
           >
             <Box order={{ base: "initial", md: 2 }}>
               <Title>AI systems that stay reliable</Title>
@@ -118,34 +116,18 @@ export default function HighlightSwitchback() {
                 </Button>
               </Link>
             </Box>
-            <Box
-              w="full"
-              h="full"
-              bg="blackAlpha.700"
-              border="1px solid"
-              borderColor="whiteAlpha.200"
-              textAlign={"center"}
-              borderRadius="2xl"
-              px={8}
-              py={10}
-            >
-              <Stack spacing={4} align="flex-start">
+            <Box className="highlight-visual" order={{ base: "initial", md: 1 }}>
+              <Image
+                src={HIGHLIGHT_VISUALS[1].src}
+                alt={HIGHLIGHT_VISUALS[1].alt}
+                width={480}
+                height={180}
+                style={{ width: "100%", height: "auto", display: "block" }}
+              />
+              <Stack spacing={2} p={4} align="flex-start">
                 <Text fontSize="sm" textTransform="uppercase" color="gray.400">
                   AI operations
                 </Text>
-                <Text fontSize="2xl" color="white" fontWeight="semibold">
-                  Automation + control
-                </Text>
-                <Box
-                  w="full"
-                  h="140px"
-                  borderRadius="lg"
-                  bgGradient="linear(to-br, rgba(96,165,250,0.2), rgba(0,0,0,0))"
-                  border="1px solid"
-                  borderColor="whiteAlpha.200"
-                  backgroundImage="linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)"
-                  backgroundSize="32px 32px"
-                />
                 <Text fontSize="sm" color="gray.400">
                   Model deployment, feedback loops, and measurable outcomes.
                 </Text>
@@ -154,13 +136,12 @@ export default function HighlightSwitchback() {
           </SimpleGrid>
         </FadeIn>
 
-        {/* Left Section */}
         <FadeIn direction="from-bottom-to-top">
           <SimpleGrid
             alignItems="center"
             columns={{ base: 1, md: 2 }}
-            spacingY={{ base: 10, md: 32 }}
-            spacingX={{ base: 10, md: 24 }}
+            spacingY={{ base: 10, md: 16 }}
+            spacingX={{ base: 10, md: 16 }}
           >
             <Box>
               <Title>Production and design that delivers</Title>
@@ -185,34 +166,18 @@ export default function HighlightSwitchback() {
                 </Button>
               </Link>
             </Box>
-            <Box
-              w="full"
-              h="full"
-              bg="blackAlpha.700"
-              border="1px solid"
-              borderColor="whiteAlpha.200"
-              textAlign={"center"}
-              borderRadius="2xl"
-              px={8}
-              py={10}
-            >
-              <Stack spacing={4} align="flex-start">
+            <Box className="highlight-visual">
+              <Image
+                src={HIGHLIGHT_VISUALS[2].src}
+                alt={HIGHLIGHT_VISUALS[2].alt}
+                width={480}
+                height={180}
+                style={{ width: "100%", height: "auto", display: "block" }}
+              />
+              <Stack spacing={2} p={4} align="flex-start">
                 <Text fontSize="sm" textTransform="uppercase" color="gray.400">
                   Production stack
                 </Text>
-                <Text fontSize="2xl" color="white" fontWeight="semibold">
-                  Spatial + digital output
-                </Text>
-                <Box
-                  w="full"
-                  h="140px"
-                  borderRadius="lg"
-                  bgGradient="linear(to-br, rgba(255,80,80,0.2), rgba(0,0,0,0))"
-                  border="1px solid"
-                  borderColor="whiteAlpha.200"
-                  backgroundImage="linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)"
-                  backgroundSize="32px 32px"
-                />
                 <Text fontSize="sm" color="gray.400">
                   Lighting, fabrication, interactive media, and blockchain
                   touchpoints engineered for real environments.

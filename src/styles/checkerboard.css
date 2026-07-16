@@ -2,11 +2,13 @@
 
 html {
   --checker-cell: 72px;
+  --checker-cell-base: 72px;
   --checker-offset-x: 0px;
   --checker-offset-y: 0px;
   --checker-rotate: 0deg;
   --checker-tilt: 0deg;
   --checker-roll: 0deg;
+  --checker-rotation-amount: 3deg;
   --checker-scale: 1;
   --edge-reveal: 0;
   --section-fill: #000000;
@@ -15,12 +17,17 @@ html {
   --checker-base: #ffffff;
   --checker-vignette: rgba(0, 0, 0, 0.12);
   --fracture-angle: -3deg;
+  --fracture-angle-amount: 0deg;
   --fracture-offset: 0px;
   --checker-intensity: 0.72;
+  --seam-intensity: 0.58;
+  --vignette-strength: 0.38;
   --fade-amount: 0.28;
   --color-saturation: 0.42;
   --glow-strength: 0.22;
+  --hue-shift: 0deg;
   --scroll-motion: 0.58;
+  --background-speed: 1;
   --accent-cyan: rgba(34, 211, 238, 0.35);
   --accent-magenta: rgba(232, 121, 249, 0.3);
   --accent-amber: rgba(251, 191, 36, 0.28);
@@ -122,6 +129,7 @@ html[data-bg-mode="light"].checker-scroll-root {
     radial-gradient(ellipse 50% 40% at 82% 22%, var(--accent-magenta), transparent 68%),
     radial-gradient(ellipse 45% 38% at 50% 88%, var(--accent-amber), transparent 72%);
   mix-blend-mode: screen;
+  filter: hue-rotate(var(--hue-shift));
   pointer-events: none;
 }
 
@@ -131,11 +139,11 @@ html[data-bg-mode="light"].checker-scroll-root {
   inset: 0;
   background: radial-gradient(
     ellipse 120% 80% at 50% 45%,
-    transparent 40%,
+    transparent calc(30% - var(--vignette-strength) * 12%),
     var(--checker-vignette) 100%
   );
   mix-blend-mode: multiply;
-  opacity: calc(0.2 + (1 - var(--checker-intensity)) * 0.25);
+  opacity: calc(0.15 + var(--vignette-strength) * 0.55 + (1 - var(--checker-intensity)) * 0.15);
 }
 
 html[data-bg-mode="light"] .checker-scroll-layer::after {
@@ -199,7 +207,7 @@ html[data-bg-mode="neon"] .checker-glow-ambient {
   pointer-events: none;
   width: 100%;
   height: 100%;
-  opacity: calc(0.4 + var(--checker-intensity) * 0.25);
+  opacity: calc(0.15 + var(--seam-intensity) * 0.55 + var(--checker-intensity) * 0.12);
 }
 
 html[data-bg-mode="light"] .checker-curve-line {
@@ -346,6 +354,111 @@ html[data-bg-mode="neon"] .checker-section::after {
 .checker-section-content {
   position: relative;
   z-index: 1;
+}
+
+/* Section frame — readability panel over dynamic checker bg */
+.section-frame {
+  position: relative;
+}
+
+.section-frame__inner {
+  position: relative;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-radius: 1.25rem;
+  border: 1px solid var(--section-frame-accent, rgba(255, 255, 255, 0.18));
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 calc(20px + var(--glow-strength, 0.22) * 28px) var(--section-frame-glow, transparent);
+}
+
+html[data-bg-mode="dark"] .section-frame__inner,
+html[data-bg-mode="fracture"] .section-frame__inner,
+html[data-bg-mode="glow"] .section-frame__inner,
+html[data-bg-mode="neon"] .section-frame__inner {
+  background: rgba(8, 8, 12, 0.78);
+  border-color: var(--section-frame-accent, rgba(255, 255, 255, 0.14));
+  box-shadow:
+    0 10px 44px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 calc(24px + var(--glow-strength, 0.22) * 32px) var(--section-frame-glow, transparent);
+}
+
+html[data-bg-mode="ambient"] .section-frame__inner {
+  background: rgba(10, 10, 14, 0.72);
+}
+
+html[data-bg-mode="light"] .section-frame__inner {
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.section-frame--bleed .section-frame__inner {
+  margin-inline: calc(-1 * clamp(0.5rem, 2vw, 1rem));
+}
+
+.section-frame[data-frame-size="full"] .section-frame__inner {
+  border-radius: 1rem;
+}
+
+/* Card imagery */
+.card-image {
+  position: relative;
+  width: 100%;
+  border-radius: 0.65rem;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+  background: rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 16px var(--card-image-accent, transparent);
+}
+
+html[data-bg-mode="dark"] .card-image,
+html[data-bg-mode="glow"] .card-image,
+html[data-bg-mode="neon"] .card-image {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.card-image__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.project-card {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+html[data-bg-mode="dark"] .project-card,
+html[data-bg-mode="fracture"] .project-card,
+html[data-bg-mode="glow"] .project-card,
+html[data-bg-mode="neon"] .project-card {
+  background: rgba(10, 10, 14, 0.86);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.project-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--project-accent, rgba(96, 165, 250, 0.5));
+}
+
+.highlight-visual {
+  position: relative;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
 }
 
 /* Services section readability */
@@ -518,7 +631,7 @@ html[data-bg-mode="neon"] .service-card__description {
 }
 
 .bg-mode-panel__drawer {
-  width: min(18rem, calc(100vw - 2rem));
+  width: min(19.5rem, calc(100vw - 2rem));
   padding: 0.85rem 1rem 1rem;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 1rem;
@@ -628,6 +741,34 @@ html[data-bg-mode="light"] .bg-mode-panel__mode-icon {
 
 .bg-mode-panel__mode-label {
   line-height: 1.1;
+}
+
+.bg-mode-panel__slider-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  max-height: min(42vh, 22rem);
+  overflow-y: auto;
+  padding-right: 0.15rem;
+}
+
+.bg-mode-panel__slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.bg-mode-panel__group-label {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  padding-top: 0.15rem;
+}
+
+.bg-mode-panel__slider-group:first-child .bg-mode-panel__group-label {
+  padding-top: 0;
 }
 
 .bg-mode-panel__sliders {
