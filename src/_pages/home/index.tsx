@@ -1,6 +1,8 @@
 "use client";
 
 import { Box, Divider, Flex } from "@chakra-ui/react";
+import { BackgroundModeProvider } from "@components/landing-page/BackgroundModeProvider";
+import BackgroundModeToggle from "@components/landing-page/BackgroundModeToggle";
 import CheckerboardScrollBackground from "@components/landing-page/CheckerboardScrollBackground";
 import CheckerboardSection from "@components/landing-page/CheckerboardSection";
 import { Community } from "@components/landing-page/Community";
@@ -12,9 +14,11 @@ import { PageAnimation } from "@components/motion/PageAnimation";
 
 const Home = () => {
   return (
-    <PageAnimation>
-      <CheckerboardScrollBackground />
-      <Flex
+    <BackgroundModeProvider>
+      <PageAnimation>
+        <CheckerboardScrollBackground />
+        <BackgroundModeToggle />
+        <Flex
         direction="column"
         alignItems="center"
         justifyContent="center"
@@ -43,8 +47,9 @@ const Home = () => {
         </CheckerboardSection>
         <Box p={10} />
         <Divider borderColor="whiteAlpha.300" />
-      </Flex>
-    </PageAnimation>
+        </Flex>
+      </PageAnimation>
+    </BackgroundModeProvider>
   );
 };
 

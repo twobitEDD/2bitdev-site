@@ -49,10 +49,25 @@ export const metadata: Metadata = {
   },
 };
 
+const bgModeBootstrapScript = `
+(function () {
+  try {
+    var key = "2bitent-bg-mode";
+    var modes = ["dark", "light", "fracture", "ambient"];
+    var stored = localStorage.getItem(key);
+    var mode = modes.indexOf(stored) >= 0 ? stored : "dark";
+    document.documentElement.setAttribute("data-bg-mode", mode);
+  } catch (e) {
+    document.documentElement.setAttribute("data-bg-mode", "dark");
+  }
+})();
+`;
+
 const RootLayout = ({ children }: RootLayoutProps) => {
   return (
-    <html lang="en">
+    <html lang="en" data-bg-mode="dark" suppressHydrationWarning>
       <body>
+        <script dangerouslySetInnerHTML={{ __html: bgModeBootstrapScript }} />
         <Providers>
           <Layout>{children}</Layout>
         </Providers>
