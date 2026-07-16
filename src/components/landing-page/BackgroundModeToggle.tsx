@@ -1,9 +1,10 @@
 "use client";
 
 import {
-  BG_EFFECT_SLIDER_GROUPS,
+  BG_EFFECT_SLIDERS,
   BG_MODE_META,
   BG_MODES,
+  freezeOnHoverEnabled,
   type BgMode,
 } from "@lib/background-mode";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -15,6 +16,7 @@ export default function BackgroundModeToggle() {
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const meta = BG_MODE_META[mode];
+  const freezeOn = freezeOnHoverEnabled(effects.freezeOnHover);
 
   const closePanel = useCallback(() => setOpen(false), []);
 
@@ -45,18 +47,18 @@ export default function BackgroundModeToggle() {
       {open && (
         <div className="bg-mode-panel__drawer" role="dialog" aria-label="Background settings">
           <div className="bg-mode-panel__header">
-            <span className="bg-mode-panel__title">Background</span>
+            <span className="bg-mode-panel__title">Fairies</span>
             <button
               type="button"
               className="bg-mode-panel__reset"
               onClick={resetEffects}
-              aria-label="Reset effect sliders to mode defaults"
+              aria-label="Reset fairy settings to palette defaults"
             >
               Reset
             </button>
           </div>
 
-          <div className="bg-mode-panel__modes" role="group" aria-label="Background mode">
+          <div className="bg-mode-panel__modes" role="group" aria-label="Color palette">
             {BG_MODES.map((modeKey) => {
               const modeMeta = BG_MODE_META[modeKey];
               const isActive = mode === modeKey;
@@ -78,33 +80,42 @@ export default function BackgroundModeToggle() {
             })}
           </div>
 
-          <div className="bg-mode-panel__slider-groups">
-            {BG_EFFECT_SLIDER_GROUPS.map((group) => (
-              <div key={group.group} className="bg-mode-panel__slider-group">
-                <span className="bg-mode-panel__group-label">{group.label}</span>
-                {group.sliders.map((slider) => (
-                  <label key={slider.key} className="bg-mode-panel__slider">
-                    <span className="bg-mode-panel__slider-label">{slider.label}</span>
-                    <input
-                      type="range"
-                      min={slider.min}
-                      max={slider.max}
-                      value={effects[slider.key]}
-                      onChange={(event) =>
-                        setEffect(slider.key, Number(event.target.value))
-                      }
-                      className="bg-mode-panel__range"
-                      aria-valuemin={slider.min}
-                      aria-valuemax={slider.max}
-                      aria-valuenow={effects[slider.key]}
-                    />
-                    <span className="bg-mode-panel__slider-value">
-                      {effects[slider.key]}
-                    </span>
-                  </label>
-                ))}
-              </div>
+          <div className="bg-mode-panel__sliders">
+            {BG_EFFECT_SLIDERS.map((slider) => (
+              <label key={slider.key} className="bg-mode-panel__slider">
+                <span className="bg-mode-panel__slider-label">{slider.label}</span>
+                <input
+                  type="range"
+                  min={slider.min}
+                  max={slider.max}
+                  value={effects[slider.key]}
+                  onChange={(event) =>
+                    setEffect(slider.key, Number(event.target.value))
+                  }
+                  className="bg-mode-panel__range"
+                  aria-valuemin={slider.min}
+                  aria-valuemax={slider.max}
+                  aria-valuenow={effects[slider.key]}
+                />
+                <span className="bg-mode-panel__slider-value">
+                  {effects[slider.key]}
+                </span>
+              </label>
             ))}
+          </div>
+
+          <div className="bg-mode-panel__toggle">
+            <span className="bg-mode-panel__toggle-label">Freeze on hover</span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={freezeOn}
+              className={`bg-mode-panel__switch${freezeOn ? " bg-mode-panel__switch--on" : ""}`}
+              onClick={() => setEffect("freezeOnHover", freezeOn ? 0 : 100)}
+              aria-label="Toggle freeze fairies when cursor is near"
+            >
+              <span className="bg-mode-panel__switch-knob" aria-hidden="true" />
+            </button>
           </div>
         </div>
       )}
@@ -113,7 +124,7 @@ export default function BackgroundModeToggle() {
         type="button"
         className={`bg-mode-toggle${open ? " bg-mode-toggle--open" : ""}`}
         onClick={() => setOpen((prev) => !prev)}
-        aria-label={`Background settings: ${meta.label}. ${meta.description}`}
+        aria-label={`Fairy settings: ${meta.label}. ${meta.description}`}
         aria-expanded={open}
         title={meta.description}
       >

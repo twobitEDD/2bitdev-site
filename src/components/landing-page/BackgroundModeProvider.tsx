@@ -62,9 +62,9 @@ function persistEffects(mode: BgMode, settings: BgEffectSettings) {
 }
 
 export function BackgroundModeProvider({ children }: { children: ReactNode }) {
-  const [mode, setModeState] = useState<BgMode>("tessellation");
+  const [mode, setModeState] = useState<BgMode>("garden");
   const [effects, setEffectsState] = useState<BgEffectSettings>(
-    DEFAULT_EFFECT_SETTINGS.tessellation
+    DEFAULT_EFFECT_SETTINGS.garden
   );
 
   useEffect(() => {

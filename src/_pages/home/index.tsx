@@ -4,7 +4,7 @@ import { Box, Divider, Flex } from "@chakra-ui/react";
 import { BackgroundModeProvider } from "@components/landing-page/BackgroundModeProvider";
 import BackgroundModeToggle from "@components/landing-page/BackgroundModeToggle";
 import LandingSection from "@components/landing-page/LandingSection";
-import MagneticEscherBackground from "@components/landing-page/MagneticEscherBackground";
+import PixelFairyBackground from "@components/landing-page/PixelFairyBackground";
 import { Community } from "@components/landing-page/Community";
 import Features from "@components/landing-page/Features";
 import Hero from "@components/landing-page/Hero";
@@ -16,7 +16,7 @@ const Home = () => {
   return (
     <BackgroundModeProvider>
       <PageAnimation>
-        <MagneticEscherBackground />
+        <PixelFairyBackground />
         <BackgroundModeToggle />
         <Flex
           direction="column"

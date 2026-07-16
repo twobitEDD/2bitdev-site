@@ -1,197 +1,115 @@
-export const BG_MODES = [
-  "tessellation",
-  "warp",
-  "impossible-grid",
-  "birds",
-] as const;
+export const BG_MODES = ["garden", "twilight", "midnight"] as const;
 
 export type BgMode = (typeof BG_MODES)[number];
 
-/** Legacy modes from checker era — map to nearest attractor preset on read. */
+/** Legacy modes — map to nearest fairy palette on read. */
 const LEGACY_MODE_MAP: Record<string, BgMode> = {
-  voxel: "tessellation",
-  "ent-mono": "impossible-grid",
-  "studio-neon": "birds",
-  bloom: "warp",
-  slate: "impossible-grid",
-  fracture: "warp",
-  dark: "impossible-grid",
-  light: "tessellation",
-  ambient: "tessellation",
-  glow: "birds",
-  neon: "birds",
+  tessellation: "garden",
+  warp: "twilight",
+  "impossible-grid": "midnight",
+  birds: "garden",
+  voxel: "garden",
+  "ent-mono": "midnight",
+  "studio-neon": "twilight",
+  bloom: "twilight",
+  slate: "midnight",
+  fracture: "twilight",
+  dark: "midnight",
+  light: "garden",
+  ambient: "garden",
+  glow: "twilight",
+  neon: "twilight",
 };
 
 export const BG_MODE_STORAGE_KEY = "2bitent-bg-mode";
 export const BG_EFFECTS_STORAGE_KEY = "2bitent-bg-effects";
 
 export type BgEffectSettings = {
-  attractorCount: number;
-  magneticStrength: number;
-  driftSpeed: number;
-  contrast: number;
-  accentHue: number;
-  scrollMotion: number;
-  layerDepth: number;
-  pulseIntensity: number;
+  fairyCount: number;
+  danceSpeed: number;
+  freezeOnHover: number;
 };
 
-export type BgEffectSliderGroup = "attractors" | "visual" | "motion";
-
-export const BG_EFFECT_SLIDER_GROUPS: {
-  group: BgEffectSliderGroup;
+export const BG_EFFECT_SLIDERS: {
+  key: keyof BgEffectSettings;
   label: string;
-  sliders: {
-    key: keyof BgEffectSettings;
-    label: string;
-    min: number;
-    max: number;
-  }[];
+  min: number;
+  max: number;
 }[] = [
-  {
-    group: "attractors",
-    label: "Attractors",
-    sliders: [
-      { key: "attractorCount", label: "Count", min: 0, max: 100 },
-      { key: "magneticStrength", label: "Strength", min: 0, max: 100 },
-      { key: "pulseIntensity", label: "Pulse", min: 0, max: 100 },
-    ],
-  },
-  {
-    group: "visual",
-    label: "Visual",
-    sliders: [
-      { key: "contrast", label: "Contrast", min: 0, max: 100 },
-      { key: "accentHue", label: "Accent", min: 0, max: 100 },
-      { key: "layerDepth", label: "Depth", min: 0, max: 100 },
-    ],
-  },
-  {
-    group: "motion",
-    label: "Motion",
-    sliders: [
-      { key: "driftSpeed", label: "Drift", min: 0, max: 100 },
-      { key: "scrollMotion", label: "Scroll", min: 0, max: 100 },
-    ],
-  },
+  { key: "fairyCount", label: "Fairies", min: 0, max: 100 },
+  { key: "danceSpeed", label: "Dance", min: 0, max: 100 },
 ];
 
-/** @deprecated Use BG_EFFECT_SLIDER_GROUPS */
-export const BG_EFFECT_SLIDERS = BG_EFFECT_SLIDER_GROUPS.flatMap((g) => g.sliders);
-
-const baseDefaults = {
-  attractorCount: 55,
-  magneticStrength: 62,
-  driftSpeed: 42,
-  contrast: 58,
-  accentHue: 50,
-  scrollMotion: 55,
-  layerDepth: 48,
-  pulseIntensity: 38,
+export const baseDefaults = {
+  fairyCount: 55,
+  danceSpeed: 45,
+  freezeOnHover: 100,
 } satisfies BgEffectSettings;
 
 export const DEFAULT_EFFECT_SETTINGS: Record<BgMode, BgEffectSettings> = {
-  tessellation: {
-    ...baseDefaults,
-    attractorCount: 50,
-    magneticStrength: 58,
-    contrast: 52,
-    accentHue: 42,
-    layerDepth: 55,
-  },
-  warp: {
-    ...baseDefaults,
-    attractorCount: 62,
-    magneticStrength: 72,
-    driftSpeed: 48,
-    contrast: 64,
-    accentHue: 58,
-    pulseIntensity: 45,
-  },
-  "impossible-grid": {
-    ...baseDefaults,
-    attractorCount: 45,
-    magneticStrength: 48,
-    driftSpeed: 35,
-    contrast: 72,
-    accentHue: 0,
-    layerDepth: 38,
-    pulseIntensity: 28,
-  },
-  birds: {
-    ...baseDefaults,
-    attractorCount: 58,
-    magneticStrength: 65,
-    driftSpeed: 52,
-    contrast: 55,
-    accentHue: 78,
-    pulseIntensity: 52,
-    layerDepth: 62,
-  },
+  garden: { ...baseDefaults, fairyCount: 50, danceSpeed: 50 },
+  twilight: { ...baseDefaults, fairyCount: 55, danceSpeed: 42 },
+  midnight: { ...baseDefaults, fairyCount: 48, danceSpeed: 38 },
 };
 
 export const BG_MODE_META: Record<
   BgMode,
   { label: string; shortLabel: string; description: string }
 > = {
-  tessellation: {
-    label: "Tessellation",
-    shortLabel: "T",
-    description: "Hexagonal Escher tiles warped by magnetic attractors",
-  },
-  warp: {
-    label: "Warp",
-    shortLabel: "W",
-    description: "Morphing grid lines pulled through impossible curvature",
-  },
-  "impossible-grid": {
-    label: "Impossible Grid",
+  garden: {
+    label: "Garden",
     shortLabel: "G",
-    description: "Penrose-style stair grids with depth inversions",
+    description: "Bright cream meadow with colorful pixel fairies",
   },
-  birds: {
-    label: "Birds",
-    shortLabel: "B",
-    description: "Interlocking bird-fish motifs that flip inside-out",
+  twilight: {
+    label: "Twilight",
+    shortLabel: "T",
+    description: "Soft lavender dusk with gentle fairy glow",
+  },
+  midnight: {
+    label: "Midnight",
+    shortLabel: "M",
+    description: "Dark studio sky with vivid fairy sparkles",
   },
 };
 
-export type AttractorPalette = {
-  bg: string;
-  tileA: string;
-  tileB: string;
-  line: string;
-  accent: string;
+export type FairyPalette = {
+  bgTop: string;
+  bgBottom: string;
+  fairyColors: string[];
+  sparkle: string;
+  themeAccent: string;
+  sectionFrameAccent: string;
+  sectionFrameGlow: string;
 };
 
-export const PRESET_PALETTES: Record<BgMode, AttractorPalette> = {
-  tessellation: {
-    bg: "#0d0d12",
-    tileA: "#1a1a24",
-    tileB: "#e8e4dc",
-    line: "#3d3850",
-    accent: "#9cb89a",
+export const PRESET_PALETTES: Record<BgMode, FairyPalette> = {
+  garden: {
+    bgTop: "#f5f0e8",
+    bgBottom: "#e8dff5",
+    fairyColors: ["#ff6eb4", "#22d3ee", "#fde047", "#a3e635", "#c4b5fd"],
+    sparkle: "rgba(255, 255, 255, 0.55)",
+    themeAccent: "#ff6eb4",
+    sectionFrameAccent: "rgba(255, 110, 180, 0.32)",
+    sectionFrameGlow: "rgba(34, 211, 238, 0.18)",
   },
-  warp: {
-    bg: "#080810",
-    tileA: "#12121c",
-    tileB: "#d4d0c8",
-    line: "#252535",
-    accent: "#60a5fa",
+  twilight: {
+    bgTop: "#3d3558",
+    bgBottom: "#2a2438",
+    fairyColors: ["#f0abfc", "#67e8f9", "#fcd34d", "#86efac", "#c4b5fd"],
+    sparkle: "rgba(255, 255, 255, 0.35)",
+    themeAccent: "#c4b5fd",
+    sectionFrameAccent: "rgba(196, 181, 253, 0.35)",
+    sectionFrameGlow: "rgba(240, 171, 252, 0.16)",
   },
-  "impossible-grid": {
-    bg: "#0a0a0a",
-    tileA: "#141414",
-    tileB: "#f0f0f0",
-    line: "#2a2a2a",
-    accent: "#a3a3a3",
-  },
-  birds: {
-    bg: "#0c0c14",
-    tileA: "#161622",
-    tileB: "#e0dcd4",
-    line: "#2d2d42",
-    accent: "#e879f9",
+  midnight: {
+    bgTop: "#12121a",
+    bgBottom: "#0a0a10",
+    fairyColors: ["#f472b6", "#22d3ee", "#facc15", "#84cc16", "#a78bfa"],
+    sparkle: "rgba(255, 255, 255, 0.4)",
+    themeAccent: "#22d3ee",
+    sectionFrameAccent: "rgba(34, 211, 238, 0.32)",
+    sectionFrameGlow: "rgba(244, 114, 182, 0.2)",
   },
 };
 
@@ -206,7 +124,7 @@ export function resolveBgMode(value: string | null | undefined): BgMode {
   if (value && value in LEGACY_MODE_MAP) {
     return LEGACY_MODE_MAP[value];
   }
-  return "tessellation";
+  return "garden";
 }
 
 export function nextBgMode(current: BgMode): BgMode {
@@ -216,13 +134,13 @@ export function nextBgMode(current: BgMode): BgMode {
 
 export function readStoredBgMode(): BgMode {
   if (typeof window === "undefined") {
-    return "tessellation";
+    return "garden";
   }
   try {
     const stored = window.localStorage.getItem(BG_MODE_STORAGE_KEY);
     return resolveBgMode(stored);
   } catch {
-    return "tessellation";
+    return "garden";
   }
 }
 
@@ -272,26 +190,31 @@ export function readStoredEffectSettings(mode: BgMode): BgEffectSettings {
   }
 }
 
-/** Map slider 0–100 to attractor count 3–8 */
-export function attractorCountFromSlider(value: number): number {
-  return Math.round(3 + (value / 100) * 5);
+/** Map slider 0–100 to fairy count 15–40 */
+export function fairyCountFromSlider(value: number): number {
+  return Math.round(15 + (value / 100) * 25);
+}
+
+/** Map slider 0–100 to dance speed multiplier 0.3–1.6 */
+export function danceSpeedFromSlider(value: number): number {
+  return 0.3 + (value / 100) * 1.3;
+}
+
+export function freezeOnHoverEnabled(value: number): boolean {
+  return value >= 50;
 }
 
 export function effectSettingsToCssVars(
   mode: BgMode,
   settings: BgEffectSettings
 ): Record<string, string> {
-  const hue = (settings.accentHue / 100) * 360;
+  const palette = PRESET_PALETTES[mode];
   return {
-    "--attractor-strength": String(settings.magneticStrength / 100),
-    "--attractor-drift": String(settings.driftSpeed / 100),
-    "--attractor-contrast": String(settings.contrast / 100),
-    "--attractor-scroll": String(settings.scrollMotion / 100),
-    "--attractor-depth": String(settings.layerDepth / 100),
-    "--attractor-pulse": String(settings.pulseIntensity / 100),
-    "--accent-hue": `${hue}deg`,
-    "--glow-strength": String(0.12 + (settings.contrast / 100) * 0.35),
-    "--theme-accent": PRESET_PALETTES[mode].accent,
-    "--escher-bg": PRESET_PALETTES[mode].bg,
+    "--fairy-bg-top": palette.bgTop,
+    "--fairy-bg-bottom": palette.bgBottom,
+    "--theme-accent": palette.themeAccent,
+    "--section-frame-accent": palette.sectionFrameAccent,
+    "--section-frame-glow": palette.sectionFrameGlow,
+    "--glow-strength": String(0.15 + (settings.danceSpeed / 100) * 0.25),
   };
 }
