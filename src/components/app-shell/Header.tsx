@@ -19,6 +19,35 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
+function HomeBrandLink() {
+  return (
+    <chakra.a
+      as={Link}
+      href="/"
+      aria-label="Home — 2bitent.com"
+      fontFamily="heading"
+      fontSize={{ base: "10px", sm: "11px" }}
+      fontWeight="semibold"
+      textTransform="uppercase"
+      letterSpacing="0.14em"
+      color="whiteAlpha.800"
+      flexShrink={0}
+      transition="color 0.2s"
+      _hover={{ color: "white", textDecoration: "none" }}
+      _focusVisible={{
+        outline: "2px solid",
+        outlineColor: "whiteAlpha.500",
+        outlineOffset: "2px",
+      }}
+    >
+      2bit<chakra.span color="whiteAlpha.500">[</chakra.span>
+      <chakra.span color="white">ENT</chakra.span>
+      <chakra.span color="whiteAlpha.500">]</chakra.span>
+      .com
+    </chakra.a>
+  );
+}
+
 export default function App() {
   const pathname = usePathname();
   const mobileNav = useDisclosure();
@@ -117,6 +146,14 @@ export default function App() {
       zIndex="999"
       px="2" // match the body container (not units but actual space)
     >
+      <Box
+        position="absolute"
+        top={{ base: 1.5, sm: 2 }}
+        right={{ base: 2, sm: 4, lg: 6 }}
+        zIndex={1}
+      >
+        <HomeBrandLink />
+      </Box>
       <Container maxWidth={"7xl"}>
         <chakra.header transition="box-shadow 0.2s" w="full" overflowY="hidden">
           <chakra.div h="4.5rem">
