@@ -9,6 +9,7 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { BrandMark } from "@components/brand/BrandMark";
 import { siteConfig } from "@config/site";
 import { ReactNode } from "react";
 
@@ -99,21 +100,7 @@ function Footer() {
       >
         <Stack spacing={6}>
           <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
-            <Flex
-              align="center"
-              justify="center"
-              border="1px solid"
-              borderColor="whiteAlpha.300"
-              borderRadius="md"
-              w="32px"
-              h="32px"
-              fontSize="xs"
-              fontWeight="bold"
-              color="white"
-              bg="blackAlpha.700"
-            >
-              2b
-            </Flex>
+            <BrandMark height={24} color="white" />
             <Heading fontSize={"xl"} display={"inline-block"} ml={2}>
               {siteConfig.name}
             </Heading>

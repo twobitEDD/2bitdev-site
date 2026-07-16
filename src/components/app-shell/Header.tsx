@@ -12,6 +12,7 @@ import {
   useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
+import { BrandMark } from "@components/brand/BrandMark";
 import { Icons } from "@components/icons";
 import { siteConfig } from "@config/site";
 import { useViewportScroll } from "framer-motion";
@@ -28,8 +29,7 @@ function HomeBrandLink() {
       fontFamily="heading"
       fontSize={{ base: "10px", sm: "11px" }}
       fontWeight="semibold"
-      textTransform="uppercase"
-      letterSpacing="0.14em"
+      letterSpacing="0.02em"
       color="whiteAlpha.800"
       flexShrink={0}
       transition="color 0.2s"
@@ -149,7 +149,7 @@ export default function App() {
       <Box
         position="absolute"
         top={{ base: 1.5, sm: 2 }}
-        right={{ base: 2, sm: 4, lg: 6 }}
+        left={{ base: 2, sm: 4, lg: 6 }}
         zIndex={1}
       >
         <HomeBrandLink />
@@ -160,27 +160,9 @@ export default function App() {
             <Flex w="full" h="full" align="center" justify="space-between">
               {/* Logo Section */}
               <Flex align="center">
-                <Link
-                  href="/"
-                  style={{
-                    width: 40,
-                    height: 40,
-                  }}
-                >
-                  <Flex
-                    align="center"
-                    justify="center"
-                    border="1px solid"
-                    borderColor="whiteAlpha.300"
-                    borderRadius="md"
-                    w="40px"
-                    h="40px"
-                    fontSize="sm"
-                    fontWeight="bold"
-                    color="white"
-                    bg="blackAlpha.700"
-                  >
-                    2b
+                <Link href="/" aria-label="Home">
+                  <Flex align="center" color="white" _hover={{ color: "whiteAlpha.900" }}>
+                    <BrandMark height={28} />
                   </Flex>
                 </Link>
                 <chakra.h1
