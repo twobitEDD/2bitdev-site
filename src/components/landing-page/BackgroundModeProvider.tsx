@@ -62,9 +62,9 @@ function persistEffects(mode: BgMode, settings: BgEffectSettings) {
 }
 
 export function BackgroundModeProvider({ children }: { children: ReactNode }) {
-  const [mode, setModeState] = useState<BgMode>("dark");
+  const [mode, setModeState] = useState<BgMode>("voxel");
   const [effects, setEffectsState] = useState<BgEffectSettings>(
-    DEFAULT_EFFECT_SETTINGS.dark
+    DEFAULT_EFFECT_SETTINGS.voxel
   );
 
   useEffect(() => {

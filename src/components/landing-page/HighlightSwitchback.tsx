@@ -8,14 +8,23 @@ const HIGHLIGHT_VISUALS = [
   {
     src: "/images/cards/integration-map.svg",
     alt: "Integration map showing connected signal and infrastructure nodes",
+    label: "Technology integration",
+    caption:
+      "Platform architecture, APIs, and operational software that connects field to customer.",
   },
   {
-    src: "/images/cards/ai-operations.svg",
-    alt: "AI operations dashboard with automation metrics",
+    src: "/images/cards/branding-identity.svg",
+    alt: "Brand identity system with mascot and visual language",
+    label: "Brand identity",
+    caption:
+      "Mascots, design systems, and product UX — like CO2T's Bigfoot from scratch.",
   },
   {
-    src: "/images/cards/production-stack.svg",
-    alt: "Production stack with spatial and digital output layers",
+    src: "/images/cards/marketing-campaigns.svg",
+    alt: "Marketing campaign production stack",
+    label: "Campaign production",
+    caption:
+      "Interactive retail, launch events, and product storytelling for major brands.",
   },
 ];
 
@@ -42,11 +51,11 @@ export default function HighlightSwitchback() {
             spacingX={{ base: 10, md: 16 }}
           >
             <Box>
-              <Title>Integration that feels effortless</Title>
+              <Title>Software that connects the stack</Title>
               <Description>
-                We step into complex environments and connect the systems
-                underneath. From construction tech to operational tooling, we
-                wire the hardware, software, and data flow to work as one.
+                We architect and build the platforms underneath complex
+                businesses — e-commerce, carbon traceability, game catalogs, and
+                operational tooling that teams rely on daily.
               </Description>
               <Link
                 nonce="false"
@@ -74,11 +83,10 @@ export default function HighlightSwitchback() {
               />
               <Stack spacing={2} p={4} align="flex-start">
                 <Text fontSize="sm" textTransform="uppercase" color="gray.400">
-                  Integration map
+                  {HIGHLIGHT_VISUALS[0].label}
                 </Text>
                 <Text fontSize="sm" color="gray.400">
-                  Sensor networks, edge compute, and real-time dashboards that
-                  stay online.
+                  {HIGHLIGHT_VISUALS[0].caption}
                 </Text>
               </Stack>
             </Box>
@@ -94,17 +102,17 @@ export default function HighlightSwitchback() {
             spacingX={{ base: 10, md: 16 }}
           >
             <Box order={{ base: "initial", md: 2 }}>
-              <Title>AI systems that stay reliable</Title>
+              <Title>Branding with a point of view</Title>
               <Description>
-                We bring applied AI into production environments without
-                compromising security or uptime. From orchestration to
-                observability, we turn tools into dependable systems.
+                Visual identity is not an afterthought — we design mascots,
+                typography, and product surfaces that make new businesses feel
+                established from day one.
               </Description>
               <Link
                 nonce="false"
                 href={"#contact"}
                 passHref
-                key={"#contact"}
+                key={"#contact-brand"}
               >
                 <Button
                   w={{ base: "full", sm: "auto" }}
@@ -112,7 +120,7 @@ export default function HighlightSwitchback() {
                   size="lg"
                   variant="solid"
                 >
-                  Plan an AI rollout
+                  Discuss brand work
                 </Button>
               </Link>
             </Box>
@@ -126,10 +134,10 @@ export default function HighlightSwitchback() {
               />
               <Stack spacing={2} p={4} align="flex-start">
                 <Text fontSize="sm" textTransform="uppercase" color="gray.400">
-                  AI operations
+                  {HIGHLIGHT_VISUALS[1].label}
                 </Text>
                 <Text fontSize="sm" color="gray.400">
-                  Model deployment, feedback loops, and measurable outcomes.
+                  {HIGHLIGHT_VISUALS[1].caption}
                 </Text>
               </Stack>
             </Box>
@@ -144,17 +152,17 @@ export default function HighlightSwitchback() {
             spacingX={{ base: 10, md: 16 }}
           >
             <Box>
-              <Title>Production and design that delivers</Title>
+              <Title>Marketing and interactive production</Title>
               <Description>
-                We produce the physical and digital layers that connect people
-                to technology. Expect modern aesthetics, clear documentation,
-                and hands-on delivery from design through install.
+                Campaign programs, experiential builds, and accessible games —
+                delivered through agency partnerships for Google, adidas, Dell,
+                and Washington University, plus our own studio catalog.
               </Description>
               <Link
                 nonce="false"
                 href={"#contact"}
                 passHref
-                key={"#contact"}
+                key={"#contact-campaign"}
               >
                 <Button
                   w={{ base: "full", sm: "auto" }}
@@ -176,11 +184,10 @@ export default function HighlightSwitchback() {
               />
               <Stack spacing={2} p={4} align="flex-start">
                 <Text fontSize="sm" textTransform="uppercase" color="gray.400">
-                  Production stack
+                  {HIGHLIGHT_VISUALS[2].label}
                 </Text>
                 <Text fontSize="sm" color="gray.400">
-                  Lighting, fabrication, interactive media, and blockchain
-                  touchpoints engineered for real environments.
+                  {HIGHLIGHT_VISUALS[2].caption}
                 </Text>
               </Stack>
             </Box>

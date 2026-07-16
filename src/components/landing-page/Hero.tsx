@@ -19,8 +19,7 @@ import AnimatedLandscape from "./AnimatedLandscape";
 export default function Hero() {
   const projectSignals = studioProjects.slice(0, 3).map((project) => ({
     title: project.title,
-    description:
-      project.summary.split(" — ")[0].replace(/\.$/, "") + ".",
+    description: project.summary.split(" — ")[0].replace(/\.$/, "") + ".",
   }));
 
   return (
@@ -29,7 +28,7 @@ export default function Hero() {
       <Box
         position="absolute"
         inset={0}
-        bgGradient="linear(to-b, rgba(5,5,5,0.4), rgba(5,5,5,0.9))"
+        bgGradient="linear(to-b, rgba(61,56,80,0.35), rgba(5,5,5,0.92))"
         pointerEvents="none"
       />
       <Stack
@@ -40,7 +39,6 @@ export default function Hero() {
         zIndex={1}
         px={{ base: 6, md: 10 }}
       >
-        {/* Left Column */}
         <Stack flex={1} spacing={{ base: 6, md: 6 }}>
           <Text
             fontSize="sm"
@@ -48,7 +46,7 @@ export default function Hero() {
             letterSpacing="0.24em"
             color="gray.400"
           >
-            Technology, games, production
+            Technology · software · branding · marketing
           </Text>
           <Heading
             lineHeight={1.1}
@@ -57,22 +55,21 @@ export default function Hero() {
           >
             <Text as={"span"} color="white">
               2bit
-            </Text>{" "}
-            <Text as={"span"} color="gray.300">
-              entertainment
+            </Text>
+            <Text as={"span"} color="#9cb89a" fontWeight={700}>
+              ENT
             </Text>
           </Heading>
 
           <Text fontSize={"lg"} color={"gray.300"} mb={2} maxW="lg">
-            {siteConfig.legalName} — indie games, interactive experiences, and
-            software production. Founder-led studio work from 2012–2014, then
-            re-established in 2018 as a production business.
+            {siteConfig.legalName} — technology integration, software production,
+            branding, and marketing services. Interactive and games are one pillar
+            of a broader agency practice.
           </Text>
           <Text fontSize={"lg"} color={"gray.400"} mb={4} maxW="lg">
-            From Planet&apos;s Core and Fish Fight to ERGnomes and PokePocket,
-            we ship games and contract through agencies like Nice Touch and
-            Uncorked for clients including Google, Dell, and Washington
-            University.
+            From CO2True and ERGO.games to Fish Fight and agency work for Google,
+            adidas, and Dell — we ship platforms, identities, campaigns, and
+            experiences from our voxel-grid design studio.
           </Text>
           <Stack
             spacing={{ base: 4, sm: 6 }}
@@ -104,13 +101,12 @@ export default function Hero() {
                 rightIcon={<Icons.arrowRight />}
                 _hover={{ bg: "whiteAlpha.100" }}
               >
-                Explore projects
+                View our work
               </Button>
             </Link>
           </Stack>
         </Stack>
 
-        {/* Right Column */}
         <Flex
           flex={1}
           justify={"center"}
@@ -134,7 +130,7 @@ export default function Hero() {
             <Box className="card-image" mb={4} border="none" boxShadow="none">
               <Image
                 src="/images/cards/hero-signals.svg"
-                alt="Live systems dashboard showing AI, games, and blockchain signals"
+                alt="Live systems dashboard showing technology, brand, and campaign signals"
                 width={480}
                 height={200}
                 priority
@@ -142,10 +138,10 @@ export default function Hero() {
               />
             </Box>
             <Text fontSize="sm" textTransform="uppercase" color="gray.400">
-              Digital projects in motion
+              Selected work in motion
             </Text>
             <Heading size="md" color="white" mt={2} mb={4}>
-              Build the future with live systems
+              Build with live systems
             </Heading>
             <Stack spacing={4}>
               {projectSignals.map((project) => (
@@ -162,9 +158,9 @@ export default function Hero() {
             </Stack>
             <Stack direction="row" spacing={3} mt={6} flexWrap="wrap">
               {[
-                { label: "AI Integration", color: "accent.green" },
-                { label: "Game Experiences", color: "accent.blue" },
-                { label: "Blockchain Ready", color: "accent.red" },
+                { label: "Software", color: "accent.green" },
+                { label: "Branding", color: "accent.blue" },
+                { label: "Campaigns", color: "accent.red" },
               ].map((item) => (
                 <Box
                   key={item.label}

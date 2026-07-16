@@ -12,8 +12,9 @@ export const Community = () => {
       <Stack as={Container} maxW={"3xl"} textAlign={"center"} id="contact" px={0}>
         <Title>Start the conversation</Title>
         <Description>
-          Tell us about the technology, production, or design challenges you
-          want to solve. We respond quickly and bring clarity to the next steps.
+          Tell us about the technology, branding, or marketing challenges you
+          want to solve. Reach us at {siteConfig.contactEmail} — we respond
+          quickly and bring clarity to the next steps.
         </Description>
       </Stack>
 
@@ -41,7 +42,7 @@ export const Community = () => {
 export const communityAccounts = [
   {
     title: "Email",
-    description: "Project inquiries and introductions.",
+    description: `Project inquiries at ${siteConfig.contactEmail}.`,
     icon: <Icons.mail />,
     iconColor: "#60A5FA",
     href: siteConfig.links.email,

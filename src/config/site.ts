@@ -10,7 +10,7 @@ const navItems = [
     href: "/#capabilities",
   },
   {
-    label: "Projects",
+    label: "Work",
     href: "/#projects",
   },
   {
@@ -20,20 +20,25 @@ const navItems = [
 ];
 
 export const siteConfig = {
-  name: "2bit Entertainment",
+  name: "2bitENT",
   legalName: "2bit Entertainment",
   description:
-    "Indie games, interactive experiences, and software production — from Planet's Core and Fish Fight to agency-backed work for Google, Dell, and Washington University.",
+    "Technology, software, branding, and marketing services — from platform architecture and visual identity to campaign production and interactive experiences.",
   siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://2bitENT.com",
+  contactEmail: "Admin@2bitENT.com",
   navItems: navItems,
   navMenuItems: navItems,
   links: {
     github: "https://github.com/twobitENT",
-    email: "mailto:hello@2bitentertainment.com",
+    email: "mailto:Admin@2bitENT.com",
     studio: "/#contact",
+    portfolio: "https://2bitdev.com",
     fishFight: "https://fishfight.app",
     ergnomes: "https://ergnomes.io",
     pokepocket: "https://pokepocket.cards",
+    co2t: "https://co2t.earth",
+    co2true: "https://co2true.com",
+    ergo: "https://ergo.games",
   },
   maxHeaderWidth: "xl",
   maxContentWidth: "max-w-[1280]",

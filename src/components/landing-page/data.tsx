@@ -6,45 +6,45 @@ import type { ServiceAccent } from "./ServiceVisual";
 export const data = {
   topFeatures: [
     {
-      title: "Technology Integration",
+      title: "Technology & Software",
       description:
-        "We design, install, and integrate the technical systems that power complex environments, from infrastructure to live operations.",
+        "Platform architecture, integrations, and production software — from e-commerce and data pipelines to AI workflows and operational tooling.",
       icon: <Icons.slidersHorizontal />,
       accent: "cyan" as ServiceAccent,
       image: "/images/cards/tech-integration.svg",
-      imageAlt: "Connected systems and infrastructure integration diagram",
+      imageAlt: "Connected systems and software integration diagram",
     },
     {
-      title: "AI + Automation",
+      title: "Branding & Identity",
       description:
-        "Deploy practical AI workflows, custom tooling, and intelligent automations that keep your team moving fast.",
+        "Visual identity, mascots, and design systems that give products a distinctive voice — from CO2T's Bigfoot to campaign-ready brand kits.",
       icon: <Icons.sun />,
       accent: "magenta" as ServiceAccent,
-      image: "/images/cards/ai-automation.svg",
-      imageAlt: "AI neural network and automation workflow illustration",
+      image: "/images/cards/branding-identity.svg",
+      imageAlt: "Brand identity and visual system illustration",
     },
     {
-      title: "Interactive Experiences",
+      title: "Marketing & Campaigns",
       description:
-        "Video games, immersive media, and experiential builds tuned for real-world execution.",
+        "Go-to-market assets, interactive product storytelling, and launch programs for brands including Google, adidas, and Dell.",
       icon: <Icons.media />,
       accent: "amber" as ServiceAccent,
-      image: "/images/cards/interactive-experiences.svg",
-      imageAlt: "Interactive game screen and controller experience",
+      image: "/images/cards/marketing-campaigns.svg",
+      imageAlt: "Marketing campaign and launch production illustration",
     },
     {
-      title: "Blockchain Connection",
+      title: "Interactive & Games",
       description:
-        "Wallets, tokenized access, and on-chain integrations that connect experiences to blockchain.",
+        "Web games, immersive media, and accessible interactive experiences — one pillar of a broader technology and production practice.",
       icon: <Icons.check />,
       accent: "emerald" as ServiceAccent,
-      image: "/images/cards/blockchain.svg",
-      imageAlt: "Blockchain network nodes and connection links",
+      image: "/images/cards/interactive-experiences.svg",
+      imageAlt: "Interactive game and experience illustration",
     },
   ],
   fullFeatures: [
     {
-      title: "Strategy that aligns with execution",
+      title: "Strategy aligned with execution",
       description:
         "We translate bold ideas into roadmaps that teams can build against in weeks, not quarters.",
       icon: <Icons.arrowRight />,
@@ -52,19 +52,19 @@ export const data = {
     {
       title: "Systems built to scale",
       description:
-        "Our infrastructure work keeps operations reliable, from cloud architecture to on-site deployments.",
+        "Cloud architecture, traceability pipelines, and operational software designed for real-world reliability.",
       icon: <Icons.slidersVertical />,
     },
     {
-      title: "Creative technology that ships",
+      title: "Brand systems that ship",
       description:
-        "Interactive installations, game builds, and production pipelines designed for launch-ready delivery.",
+        "Identity, narrative, and visual language that carries from pitch deck through product and campaign.",
       icon: <Icons.media />,
     },
     {
       title: "Integrated AI operations",
       description:
-        "We select, deploy, and monitor the right AI tooling so it stays reliable in the real world.",
+        "We select, deploy, and monitor the right AI tooling so it stays dependable in production.",
       icon: <Icons.sun />,
     },
     {
@@ -74,18 +74,34 @@ export const data = {
       icon: <Icons.messageCircle />,
     },
     {
-      title: "Blockchain-ready experiences",
+      title: "Campaign-ready production",
       description:
-        "We connect products to blockchain when it adds trust, ownership, or new revenue models.",
+        "Interactive retail, event experiences, and launch programs engineered for real environments.",
       icon: <Icons.check />,
     },
   ],
 };
 
 export const PROJECT_IMAGES: Record<string, { src: string; alt: string }> = {
+  "CO2True Platform": {
+    src: "/images/cards/project-co2t.svg",
+    alt: "CO2True environmental platform with carbon tracking dashboard",
+  },
+  "ERGO.games": {
+    src: "/images/cards/project-ergo.svg",
+    alt: "ERGO.games accessible browser game console",
+  },
+  "Agency Client Work": {
+    src: "/images/cards/project-client-work.svg",
+    alt: "Agency client work for Google, adidas, and Dell",
+  },
   "Fish Fight": {
     src: "/images/cards/project-fish-fight.svg",
     alt: "Ocean conservation game with marine habitat illustration",
+  },
+  "CO2T Brand Identity": {
+    src: "/images/cards/project-co2t-brand.svg",
+    alt: "CO2T Bigfoot mascot and brand identity system",
   },
   PokePocket: {
     src: "/images/cards/project-pokepocket.svg",

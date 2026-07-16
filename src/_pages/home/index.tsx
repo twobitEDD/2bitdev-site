@@ -30,19 +30,19 @@ const Home = () => {
         position="relative"
         zIndex={1}
       >
-        <CheckerboardSection variant="black" frameAccent="cyan">
+        <CheckerboardSection variant="black" frameAccent="emerald">
           <Hero />
         </CheckerboardSection>
-        <CheckerboardSection variant="white" frameAccent="cyan">
+        <CheckerboardSection variant="white" frameAccent="emerald">
           <Features />
         </CheckerboardSection>
-        <CheckerboardSection variant="black" frameAccent="magenta">
+        <CheckerboardSection variant="black" frameAccent="cyan">
           <HighlightSwitchback />
         </CheckerboardSection>
         <CheckerboardSection variant="white" frameAccent="amber">
           <InfoAndStats />
         </CheckerboardSection>
-        <CheckerboardSection variant="black" frameAccent="emerald">
+        <CheckerboardSection variant="black" frameAccent="magenta">
           <Community />
         </CheckerboardSection>
         <Box p={10} />

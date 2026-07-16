@@ -1,6 +1,22 @@
-export const BG_MODES = ["dark", "light", "fracture", "ambient", "glow", "neon"] as const;
+export const BG_MODES = [
+  "voxel",
+  "ent-mono",
+  "studio-neon",
+  "bloom",
+  "slate",
+  "fracture",
+] as const;
 
 export type BgMode = (typeof BG_MODES)[number];
+
+/** Legacy modes from earlier builds — map to nearest new theme on read. */
+const LEGACY_MODE_MAP: Record<string, BgMode> = {
+  dark: "ent-mono",
+  light: "ent-mono",
+  ambient: "voxel",
+  glow: "studio-neon",
+  neon: "studio-neon",
+};
 
 export const BG_MODE_STORAGE_KEY = "2bitent-bg-mode";
 export const BG_EFFECTS_STORAGE_KEY = "2bitent-bg-effects";
@@ -83,16 +99,50 @@ const baseDefaults = {
 } satisfies BgEffectSettings;
 
 export const DEFAULT_EFFECT_SETTINGS: Record<BgMode, BgEffectSettings> = {
-  dark: { ...baseDefaults },
-  light: {
+  voxel: {
     ...baseDefaults,
-    checkerIntensity: 68,
-    fadeAmount: 24,
-    colorSaturation: 38,
-    glowStrength: 18,
-    scrollMotion: 48,
-    backgroundSpeed: 48,
+    checkerIntensity: 80,
+    checkerCellSize: 58,
+    fadeAmount: 20,
+    colorSaturation: 55,
+    glowStrength: 26,
+    scrollMotion: 68,
+    backgroundSpeed: 62,
     vignetteStrength: 32,
+  },
+  "ent-mono": { ...baseDefaults },
+  "studio-neon": {
+    ...baseDefaults,
+    checkerIntensity: 74,
+    fadeAmount: 12,
+    colorSaturation: 82,
+    glowStrength: 88,
+    scrollMotion: 38,
+    backgroundSpeed: 48,
+    hueShift: 18,
+    vignetteStrength: 24,
+  },
+  bloom: {
+    ...baseDefaults,
+    checkerIntensity: 76,
+    fadeAmount: 18,
+    colorSaturation: 68,
+    glowStrength: 48,
+    scrollMotion: 62,
+    backgroundSpeed: 58,
+    checkerCellSize: 56,
+    vignetteStrength: 30,
+  },
+  slate: {
+    ...baseDefaults,
+    checkerIntensity: 64,
+    fadeAmount: 26,
+    colorSaturation: 32,
+    glowStrength: 16,
+    scrollMotion: 44,
+    backgroundSpeed: 46,
+    vignetteStrength: 42,
+    seamIntensity: 48,
   },
   fracture: {
     ...baseDefaults,
@@ -105,78 +155,56 @@ export const DEFAULT_EFFECT_SETTINGS: Record<BgMode, BgEffectSettings> = {
     fractureAngle: 68,
     seamIntensity: 35,
   },
-  ambient: {
-    ...baseDefaults,
-    checkerIntensity: 82,
-    fadeAmount: 18,
-    colorSaturation: 48,
-    glowStrength: 32,
-    scrollMotion: 72,
-    backgroundSpeed: 72,
-    checkerCellSize: 62,
-    vignetteStrength: 28,
-  },
-  glow: {
-    ...baseDefaults,
-    checkerIntensity: 70,
-    fadeAmount: 16,
-    colorSaturation: 62,
-    glowStrength: 72,
-    scrollMotion: 50,
-    backgroundSpeed: 52,
-    vignetteStrength: 30,
-  },
-  neon: {
-    ...baseDefaults,
-    checkerIntensity: 74,
-    fadeAmount: 12,
-    colorSaturation: 82,
-    glowStrength: 88,
-    scrollMotion: 38,
-    backgroundSpeed: 48,
-    hueShift: 18,
-    vignetteStrength: 24,
-  },
 };
 
 export const BG_MODE_META: Record<
   BgMode,
   { label: string; shortLabel: string; description: string }
 > = {
-  dark: {
-    label: "Dark",
-    shortLabel: "D",
-    description: "Dark-dominant sections with curved checker seam",
+  voxel: {
+    label: "Voxel",
+    shortLabel: "V",
+    description: "Logo-faithful isometric sage and cream cubes on purple-grey",
   },
-  light: {
-    label: "Light",
-    shortLabel: "L",
-    description: "White-dominant sections with inverted checker seam",
+  "ent-mono": {
+    label: "ENT Mono",
+    shortLabel: "M",
+    description: "Classic black-and-white checker with curved seam",
+  },
+  "studio-neon": {
+    label: "Studio Neon",
+    shortLabel: "N",
+    description: "Magenta and cyan glow on deep black",
+  },
+  bloom: {
+    label: "Marketing Bloom",
+    shortLabel: "B",
+    description: "Warm amber and rose tones for brand-forward work",
+  },
+  slate: {
+    label: "Enterprise Slate",
+    shortLabel: "S",
+    description: "Cool grey and subtle blue for software and consulting",
   },
   fracture: {
-    label: "Fracture",
+    label: "Fracture Zipper",
     shortLabel: "F",
-    description: "Diagonal zipper split with checker stripe in the gap",
-  },
-  ambient: {
-    label: "Ambient",
-    shortLabel: "A",
-    description: "Full-page checker with zoom parallax",
-  },
-  glow: {
-    label: "Glow",
-    shortLabel: "G",
-    description: "Colored edge glow with cyan and magenta accents",
-  },
-  neon: {
-    label: "Neon",
-    shortLabel: "N",
-    description: "High-saturation neon accents with strong bloom",
+    description: "Diagonal zipper split with voxel-edge checker stripes",
   },
 };
 
 export function isBgMode(value: string | null | undefined): value is BgMode {
   return BG_MODES.includes(value as BgMode);
+}
+
+export function resolveBgMode(value: string | null | undefined): BgMode {
+  if (isBgMode(value)) {
+    return value;
+  }
+  if (value && value in LEGACY_MODE_MAP) {
+    return LEGACY_MODE_MAP[value];
+  }
+  return "voxel";
 }
 
 export function nextBgMode(current: BgMode): BgMode {
@@ -186,13 +214,13 @@ export function nextBgMode(current: BgMode): BgMode {
 
 export function readStoredBgMode(): BgMode {
   if (typeof window === "undefined") {
-    return "dark";
+    return "voxel";
   }
   try {
     const stored = window.localStorage.getItem(BG_MODE_STORAGE_KEY);
-    return isBgMode(stored) ? stored : "dark";
+    return resolveBgMode(stored);
   } catch {
-    return "dark";
+    return "voxel";
   }
 }
 
@@ -232,7 +260,8 @@ export function readStoredEffectSettings(mode: BgMode): BgEffectSettings {
       mode?: string;
       settings?: Partial<BgEffectSettings>;
     };
-    if (parsed.mode === mode && parsed.settings) {
+    const storedMode = resolveBgMode(parsed.mode);
+    if (storedMode === mode && parsed.settings) {
       return mergeEffectSettings(mode, parsed.settings);
     }
     return mergeEffectSettings(mode);

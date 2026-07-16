@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" fill="none">
+  <rect width="320" height="180" rx="12" fill="#120a14"/>
+  <rect x="32" y="40" width="256" height="100" rx="8" fill="#1f1020" stroke="#e879f9" stroke-width="1" opacity="0.8"/>
+  <path d="M48 120 L96 72 L144 96 L192 64 L272 108" stroke="#fb923c" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="96" cy="72" r="5" fill="#22d3ee"/>
+  <circle cx="144" cy="96" r="5" fill="#e879f9"/>
+  <circle cx="192" cy="64" r="5" fill="#fbbf24"/>
+  <text x="32" y="28" fill="#f9a8d4" font-family="system-ui,sans-serif" font-size="10" letter-spacing="0.14em">CAMPAIGN LAUNCH</text>
+</svg>

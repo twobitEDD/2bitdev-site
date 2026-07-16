@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
-  themeColor: "#050505",
+  themeColor: "#3d3850",
   icons: {
     icon: [{ url: "/brand/2bit-icon.svg", type: "image/svg+xml" }],
     apple: [{ url: "/brand/apple-touch-icon.svg", type: "image/svg+xml" }],
@@ -54,17 +54,18 @@ const bgModeBootstrapScript = `
   try {
     var modeKey = "2bitent-bg-mode";
     var effectsKey = "2bitent-bg-effects";
-    var modes = ["dark", "light", "fracture", "ambient", "glow", "neon"];
+    var modes = ["voxel", "ent-mono", "studio-neon", "bloom", "slate", "fracture"];
+    var legacy = { dark: "ent-mono", light: "ent-mono", ambient: "voxel", glow: "studio-neon", neon: "studio-neon" };
     var defaults = {
-      dark: { checkerIntensity: 72, fadeAmount: 28, colorSaturation: 42, glowStrength: 22, scrollMotion: 58 },
-      light: { checkerIntensity: 68, fadeAmount: 24, colorSaturation: 38, glowStrength: 18, scrollMotion: 48 },
-      fracture: { checkerIntensity: 78, fadeAmount: 22, colorSaturation: 52, glowStrength: 28, scrollMotion: 42 },
-      ambient: { checkerIntensity: 82, fadeAmount: 18, colorSaturation: 48, glowStrength: 32, scrollMotion: 72 },
-      glow: { checkerIntensity: 70, fadeAmount: 16, colorSaturation: 62, glowStrength: 72, scrollMotion: 50 },
-      neon: { checkerIntensity: 74, fadeAmount: 12, colorSaturation: 82, glowStrength: 88, scrollMotion: 38 }
+      voxel: { checkerIntensity: 80, fadeAmount: 20, colorSaturation: 55, glowStrength: 26, scrollMotion: 68 },
+      "ent-mono": { checkerIntensity: 72, fadeAmount: 28, colorSaturation: 42, glowStrength: 22, scrollMotion: 58 },
+      "studio-neon": { checkerIntensity: 74, fadeAmount: 12, colorSaturation: 82, glowStrength: 88, scrollMotion: 38 },
+      bloom: { checkerIntensity: 76, fadeAmount: 18, colorSaturation: 68, glowStrength: 48, scrollMotion: 62 },
+      slate: { checkerIntensity: 64, fadeAmount: 26, colorSaturation: 32, glowStrength: 16, scrollMotion: 44 },
+      fracture: { checkerIntensity: 78, fadeAmount: 22, colorSaturation: 52, glowStrength: 28, scrollMotion: 42 }
     };
     var stored = localStorage.getItem(modeKey);
-    var mode = modes.indexOf(stored) >= 0 ? stored : "dark";
+    var mode = modes.indexOf(stored) >= 0 ? stored : (legacy[stored] || "voxel");
     document.documentElement.setAttribute("data-bg-mode", mode);
     var effects = defaults[mode];
     try {
@@ -83,14 +84,14 @@ const bgModeBootstrapScript = `
     root.style.setProperty("--glow-strength", String((effects.glowStrength || 22) / 100));
     root.style.setProperty("--scroll-motion", String((effects.scrollMotion || 58) / 100));
   } catch (e) {
-    document.documentElement.setAttribute("data-bg-mode", "dark");
+    document.documentElement.setAttribute("data-bg-mode", "voxel");
   }
 })();
 `;
 
 const RootLayout = ({ children }: RootLayoutProps) => {
   return (
-    <html lang="en" data-bg-mode="dark" suppressHydrationWarning>
+    <html lang="en" data-bg-mode="voxel" suppressHydrationWarning>
       <body>
         <script dangerouslySetInnerHTML={{ __html: bgModeBootstrapScript }} />
         <Providers>

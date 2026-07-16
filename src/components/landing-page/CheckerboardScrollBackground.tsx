@@ -1,7 +1,7 @@
 "use client";
 
 import { usePrefersReducedMotion } from "@chakra-ui/react";
-import { type BgMode } from "@lib/background-mode";
+import { resolveBgMode, type BgMode } from "@lib/background-mode";
 import { useEffect } from "react";
 
 import { useBackgroundMode } from "./BackgroundModeProvider";
@@ -12,12 +12,12 @@ const MODE_PARALLAX: Record<
   BgMode,
   { cellWave: number; offsetX: number; offsetY: number; scale: number; tilt: number }
 > = {
-  dark: { cellWave: 18, offsetX: 0.14, offsetY: 0.07, scale: 0.05, tilt: 3 },
-  light: { cellWave: 16, offsetX: 0.12, offsetY: 0.06, scale: 0.04, tilt: 2.5 },
+  voxel: { cellWave: 32, offsetX: 0.28, offsetY: 0.18, scale: 0.14, tilt: 7 },
+  "ent-mono": { cellWave: 18, offsetX: 0.14, offsetY: 0.07, scale: 0.05, tilt: 3 },
+  "studio-neon": { cellWave: 22, offsetX: 0.18, offsetY: 0.1, scale: 0.07, tilt: 4 },
+  bloom: { cellWave: 26, offsetX: 0.22, offsetY: 0.14, scale: 0.1, tilt: 5 },
+  slate: { cellWave: 16, offsetX: 0.12, offsetY: 0.06, scale: 0.04, tilt: 2.5 },
   fracture: { cellWave: 12, offsetX: 0.08, offsetY: 0.04, scale: 0.03, tilt: 1.5 },
-  ambient: { cellWave: 32, offsetX: 0.28, offsetY: 0.18, scale: 0.14, tilt: 7 },
-  glow: { cellWave: 20, offsetX: 0.16, offsetY: 0.09, scale: 0.06, tilt: 3.5 },
-  neon: { cellWave: 22, offsetX: 0.18, offsetY: 0.1, scale: 0.07, tilt: 4 },
 };
 
 function clamp(value: number, min: number, max: number) {
@@ -66,16 +66,7 @@ function getFractureAngleAmount(): number {
 
 function getBgMode(): BgMode {
   const attr = document.documentElement.getAttribute("data-bg-mode");
-  if (
-    attr === "light" ||
-    attr === "fracture" ||
-    attr === "ambient" ||
-    attr === "glow" ||
-    attr === "neon"
-  ) {
-    return attr;
-  }
-  return "dark";
+  return resolveBgMode(attr);
 }
 
 function updateScrollState(mode: BgMode) {
@@ -151,7 +142,12 @@ function updateScrollState(mode: BgMode) {
       1
     );
 
-    if (mode === "ambient" || mode === "glow" || mode === "neon") {
+    if (
+      mode === "voxel" ||
+      mode === "bloom" ||
+      mode === "slate" ||
+      mode === "studio-neon"
+    ) {
       edgeReveal = clamp(0.78 + (1 - normalizedCenter) * 0.18, 0.72, 1);
     }
 
@@ -173,7 +169,7 @@ function updateScrollState(mode: BgMode) {
   });
 
   const curvePath = document.getElementById("checker-curve-path");
-  if (curvePath && (mode === "dark" || mode === "light")) {
+  if (curvePath && mode === "ent-mono") {
     const amplitude = (50 + progress * 70) * motion * speed;
     const yBase = viewportHeight * (0.25 + progress * 0.45);
     const width = window.innerWidth;
@@ -244,15 +240,17 @@ export default function CheckerboardScrollBackground() {
     effects.fractureAngle,
   ]);
 
-  const showCurve = !prefersReducedMotion && (mode === "dark" || mode === "light");
+  const showCurve = !prefersReducedMotion && mode === "ent-mono";
   const showFracture = !prefersReducedMotion && mode === "fracture";
-  const isAmbient = mode === "ambient";
-  const isGlowMode = mode === "glow" || mode === "neon";
+  const isAmbient =
+    mode === "voxel" || mode === "bloom" || mode === "slate";
+  const isGlowMode = mode === "studio-neon" || mode === "bloom";
+  const isVoxelLayer = mode === "voxel" || mode === "fracture";
 
   return (
     <>
       <div
-        className={`checker-scroll-layer${isAmbient ? " checker-scroll-layer--ambient" : ""}${isGlowMode ? " checker-scroll-layer--glow" : ""}`}
+        className={`checker-scroll-layer${isAmbient ? " checker-scroll-layer--ambient" : ""}${isGlowMode ? " checker-scroll-layer--glow" : ""}${isVoxelLayer ? " checker-scroll-layer--voxel" : ""}`}
         aria-hidden="true"
         style={
           prefersReducedMotion

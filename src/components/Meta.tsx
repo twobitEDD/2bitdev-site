@@ -11,7 +11,7 @@ const Meta = () => {
       <meta name="apple-mobile-web-app-title" content={APP_NAME} />
       <meta name="format-detection" content="telephone=no" />
       <meta name="mobile-web-app-capable" content="yes" />
-      <meta name="theme-color" content="#050505" />
+      <meta name="theme-color" content="#3d3850" />
 
       <link rel="icon" href="/brand/2bit-icon.svg" type="image/svg+xml" />
       <link rel="apple-touch-icon" href="/brand/apple-touch-icon.svg" />

@@ -174,11 +174,11 @@ export default function Features() {
         boxShadow="none"
       >
         <SuperTitle>Services</SuperTitle>
-        <Title>Full-spectrum technology support</Title>
+        <Title>Technology, brand, and campaign production</Title>
         <Description>
-          {siteConfig.legalName} delivers consulting, production, and technical
-          integration for teams that need expert execution across games,
-          interactive media, and software.
+          {siteConfig.name} delivers consulting, production, and technical
+          integration for teams that need expert execution across software,
+          branding, marketing, and interactive media.
         </Description>
       </Stack>
 

@@ -1,10 +1,18 @@
-import { Box, Container, SimpleGrid, Stack, Text } from "@chakra-ui/react";
+import type { CSSProperties } from "react";
+import { Badge, Box, Container, SimpleGrid, Stack, Text } from "@chakra-ui/react";
 import Image from "next/image";
 import Link from "next/link";
-import { studioProjects } from "@config/projects";
+import { getCategoryLabel, studioProjects } from "@config/projects";
 import { siteConfig } from "@config/site";
 import { PROJECT_IMAGES } from "./data";
 import { Description, SuperTitle, Title } from "./Section";
+
+const CATEGORY_COLORS: Record<string, string> = {
+  tech: "cyan",
+  brand: "pink",
+  marketing: "orange",
+  interactive: "green",
+};
 
 export function InfoAndStats() {
   return (
@@ -18,13 +26,16 @@ export function InfoAndStats() {
             py={{ base: 2, md: 8 }}
           >
             <Box mb={{ base: 8, md: 12 }}>
-              <SuperTitle> Digital projects </SuperTitle>
-              <Title>Games and experiences from the 2bit catalog</Title>
+              <SuperTitle>Work</SuperTitle>
+              <Title>Platforms, brands, and experiences we&apos;ve shipped</Title>
               <Description>
-                {siteConfig.legalName} develops original games and interactive
-                properties while supporting partner teams with production-ready
-                technology, immersive media, and blockchain-connected
-                integrations.
+                {siteConfig.name} builds original products and supports partner
+                teams with production-ready technology, brand systems, and
+                campaign delivery — drawn from the{" "}
+                <Link href={siteConfig.links.portfolio} target="_blank" rel="noopener noreferrer">
+                  2bitdev portfolio
+                </Link>
+                .
               </Description>
             </Box>
 
@@ -41,7 +52,14 @@ export function InfoAndStats() {
                     rel={project.external ? "noopener noreferrer" : undefined}
                     style={{ textDecoration: "none" }}
                   >
-                    <Box className="project-card">
+                    <Box
+                      className="project-card"
+                      style={
+                        {
+                          "--project-accent": `var(--chakra-colors-${CATEGORY_COLORS[project.category]}-400)`,
+                        } as CSSProperties
+                      }
+                    >
                       {imageMeta && (
                         <Box className="card-image" mb={3}>
                           <Image
@@ -53,6 +71,16 @@ export function InfoAndStats() {
                           />
                         </Box>
                       )}
+                      <Badge
+                        mb={2}
+                        colorScheme={CATEGORY_COLORS[project.category]}
+                        variant="subtle"
+                        textTransform="uppercase"
+                        fontSize="0.65rem"
+                        letterSpacing="0.08em"
+                      >
+                        {getCategoryLabel(project.category)}
+                      </Badge>
                       <Text
                         fontFamily={"heading"}
                         fontSize={"2xl"}

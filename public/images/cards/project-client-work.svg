@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" fill="none">
+  <rect width="320" height="180" rx="12" fill="#111118"/>
+  <circle cx="80" cy="90" r="28" fill="#4285f4" opacity="0.35"/>
+  <circle cx="160" cy="90" r="28" fill="#ffffff" opacity="0.12"/>
+  <circle cx="240" cy="90" r="28" fill="#0076ce" opacity="0.35"/>
+  <path d="M56 90h48M136 90h48M216 90h48" stroke="#e879f9" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+  <rect x="48" y="130" width="64" height="20" rx="4" fill="#2a2a32"/>
+  <rect x="128" y="130" width="64" height="20" rx="4" fill="#2a2a32"/>
+  <rect x="208" y="130" width="64" height="20" rx="4" fill="#2a2a32"/>
+  <text x="52" y="144" fill="#a3a3a3" font-family="system-ui,sans-serif" font-size="8">GOOGLE</text>
+  <text x="136" y="144" fill="#a3a3a3" font-family="system-ui,sans-serif" font-size="8">ADIDAS</text>
+  <text x="224" y="144" fill="#a3a3a3" font-family="system-ui,sans-serif" font-size="8">DELL</text>
+</svg>
