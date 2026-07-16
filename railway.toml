@@ -1,5 +1,9 @@
 # 2bit Entertainment studio site — deploy to 2bitENT.com on Railway.
 # Source: twobitEDD/2bitdev-site (fork of serv-website entertainment branch).
+#
+# Deploy via GitHub push only — see DEPLOY.md (do NOT use `railway up`).
+# Service: 2bitent-com (9803a8a5-536f-44ab-aef6-21651ed48de9)
+# FORBIDDEN: never CLI deploy to legacy 2bitent-site (8334c011-9071-46ca-bb97-7929d618d176).
 # Deploy via GitHub push only — see DEPLOY.md (do NOT use `railway up`).
 # Service: 2bitent-com — https://2bitent-com-production.up.railway.app
 
