@@ -28,7 +28,7 @@ const Footer2 = () => {
 export default Footer;
 
 import { VisuallyHidden, chakra } from "@chakra-ui/react";
-import { FaEnvelope, FaGithub, FaTwitter } from "react-icons/fa";
+import { FaEnvelope, FaGithub } from "react-icons/fa";
 
 const Logo = (props: any) => {
   return (
@@ -129,12 +129,6 @@ function Footer() {
               href={siteConfig.links.email}
             >
               <FaEnvelope />
-            </SocialButton>
-            <SocialButton
-              label={"Twitter"}
-              href={siteConfig.links.twitter}
-            >
-              <FaTwitter />
             </SocialButton>
             <SocialButton
               label={"Github"}

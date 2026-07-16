@@ -10,24 +10,16 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Icons } from "@components/icons";
+import { studioProjects } from "@config/projects";
+import { siteConfig } from "@config/site";
 import Link from "next/link";
 import AnimatedLandscape from "./AnimatedLandscape";
 
 export default function Hero() {
-  const projectSignals = [
-    {
-      title: "Fish Fight",
-      description: "Competitive action prototype with reactive systems.",
-    },
-    {
-      title: "PokePocket Cards",
-      description: "Collectible digital card experience in production.",
-    },
-    {
-      title: "SERV",
-      description: "Infrastructure and tooling for secure integrations.",
-    },
-  ];
+  const projectSignals = studioProjects.slice(0, 3).map((project) => ({
+    title: project.title,
+    description: project.summary.split(" — ")[0] + ".",
+  }));
 
   return (
     <Box position="relative" w="full" overflow="hidden" py={{ base: 16, md: 24 }}>
@@ -54,7 +46,7 @@ export default function Hero() {
             letterSpacing="0.24em"
             color="gray.400"
           >
-            Technology, consulting, production
+            Technology, games, production
           </Text>
           <Heading
             lineHeight={1.1}
@@ -63,22 +55,22 @@ export default function Hero() {
           >
             <Text as={"span"} color="white">
               2bit
-            </Text>{" "}
-            <Text as={"span"} color="gray.300">
-              entertainment
+            </Text>
+            <Text as={"span"} color="brand.300">
+              DEV
             </Text>
           </Heading>
 
           <Text fontSize={"lg"} color={"gray.300"} mb={2} maxW="lg">
-            We build modern systems that blend technology integration, AI
-            deployment, and hands-on production for construction, design, and
-            interactive experiences.
+            {siteConfig.legalName} — indie games, interactive experiences, and
+            software production. Founder-led studio work from 2012–2014, then
+            re-established in 2018 as a production business.
           </Text>
           <Text fontSize={"lg"} color={"gray.400"} mb={4} maxW="lg">
-            From strategy to execution, our team brings together engineering,
-            creative production, and infrastructure support so you can ship
-            video game entertainment, immersive experiences, and blockchain-
-            connected products with confidence.
+            From Planet&apos;s Core and Fish Fight to ERGnomes and PokePocket,
+            we ship games and contract through agencies like Nice Touch and
+            Uncorked for clients including Google, Dell, and Washington
+            University.
           </Text>
           <Stack
             spacing={{ base: 4, sm: 6 }}

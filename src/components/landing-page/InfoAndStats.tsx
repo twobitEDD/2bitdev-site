@@ -1,6 +1,7 @@
 import { Box, Container, SimpleGrid, Stack, Text } from "@chakra-ui/react";
 import Link from "next/link";
-import { ReactNode } from "react";
+import { studioProjects } from "@config/projects";
+import { siteConfig } from "@config/site";
 import { Description, SuperTitle, Title } from "./Section";
 
 export function InfoAndStats() {
@@ -16,77 +17,44 @@ export function InfoAndStats() {
           >
             <Box mb={{ base: 8, md: 20 }}>
               <SuperTitle> Digital projects </SuperTitle>
-              <Title>Experiences we are actively building</Title>
+              <Title>Games and experiences from the 2bit catalog</Title>
               <Description>
-                2bit entertainment develops original digital properties while
-                supporting partner teams with production-ready technology,
-                interactive media, and blockchain-connected integrations.
+                {siteConfig.legalName} develops original games and interactive
+                properties while supporting partner teams with production-ready
+                technology, immersive media, and blockchain-connected
+                integrations.
               </Description>
             </Box>
 
-            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={10}>
-              {stats.map((stat) => (
-                <Link nonce="false" href={stat.link} passHref key={stat.link}>
-                  <Box key={stat.title}>
+            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
+              {studioProjects.map((project) => (
+                <Link
+                  nonce="false"
+                  href={project.link}
+                  passHref
+                  key={project.title}
+                  target={project.external ? "_blank" : undefined}
+                  rel={project.external ? "noopener noreferrer" : undefined}
+                >
+                  <Box>
                     <Text
                       fontFamily={"heading"}
                       fontSize={"3xl"}
                       color={"white"}
                       mb={3}
                     >
-                      {stat.title}
+                      {project.title}
                     </Text>
                     <Text fontSize={"xl"} color={"gray.400"}>
-                      {stat.content}
+                      {project.summary}
                     </Text>
                   </Box>
                 </Link>
               ))}
             </SimpleGrid>
           </Stack>
-          {/* <Flex flex={1} /> */}
         </Stack>
       </Container>
     </Box>
   );
 }
-
-const StatsText = ({ children }: { children: ReactNode }) => (
-  <Text as={"span"} fontWeight={700} color={"white"}>
-    {children}
-  </Text>
-);
-
-const stats = [
-  {
-    title: "Fish Fight",
-    link: "/#projects",
-    content: (
-      <>
-        An action-forward digital world where player decisions reshape the
-        battlefield. Live tuning, competitive mechanics, and cinematic
-        storytelling.
-      </>
-    ),
-  },
-  {
-    title: "PokePocket Cards",
-    link: "/#projects",
-    content: (
-      <>
-        A tactile digital collectible experience with dynamic rarity, social
-        drops, and production-grade merchandising support.
-      </>
-    ),
-  },
-  {
-    title: "SERV",
-    link: "/#projects",
-    content: (
-      <>
-        Systems and integrations built for reliability. We keep these tools in
-        motion to support rapid deployment for partners.
-      </>
-    ),
-  },
-];

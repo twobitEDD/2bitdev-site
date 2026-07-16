@@ -1,4 +1,6 @@
-const APP_NAME = "2bit entertainment";
+import { siteConfig } from "@config/site";
+
+const APP_NAME = siteConfig.name;
 
 const Meta = () => {
   return (

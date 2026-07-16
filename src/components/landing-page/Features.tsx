@@ -6,6 +6,7 @@ import { Description, SuperTitle, Title } from "./Section";
 import Link from "next/link";
 
 import { FadeIn } from "@components/motion/Animation";
+import { siteConfig } from "@config/site";
 import { data } from "./data";
 
 interface CardProps {
@@ -98,9 +99,9 @@ export default function Features() {
         <SuperTitle>Services</SuperTitle>
         <Title>Full-spectrum technology support</Title>
         <Description>
-          2bit entertainment delivers consulting, production, and technical
-          integration for teams that need expert execution across software,
-          space, and storytelling.
+          {siteConfig.legalName} delivers consulting, production, and technical
+          integration for teams that need expert execution across games,
+          interactive media, and software.
           <Text></Text>
         </Description>
       </Stack>

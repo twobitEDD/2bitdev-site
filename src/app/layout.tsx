@@ -2,17 +2,17 @@ import type { Metadata } from "next";
 
 import Providers from "@app/providers";
 import Layout from "@components/app-shell";
+import { siteConfig } from "@config/site";
 
 type RootLayoutProps = {
   children: React.ReactNode;
 };
 
-const APP_NAME = "2bit entertainment";
+const APP_NAME = siteConfig.name;
 
 export const metadata: Metadata = {
-  title: { default: APP_NAME, template: "%s | nextarter-chakra" },
-  description:
-    "Technology integration, consulting, and production for ambitious teams.",
+  title: { default: APP_NAME, template: `%s | ${APP_NAME}` },
+  description: siteConfig.description,
 
   viewport: {
     width: "device-width",
@@ -29,13 +29,12 @@ export const metadata: Metadata = {
   },
   themeColor: "#050505",
   openGraph: {
-    url: "https://2bitentertainment.com",
-    title: "2bit entertainment",
-    description:
-      "Technology integration, consulting, and production for ambitious teams.",
+    url: siteConfig.siteUrl,
+    title: APP_NAME,
+    description: siteConfig.description,
     images: {
       url: "/og-image.svg",
-      alt: "2bit entertainment",
+      alt: APP_NAME,
     },
   },
   twitter: {
