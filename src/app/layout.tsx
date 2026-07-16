@@ -11,6 +11,7 @@ type RootLayoutProps = {
 const APP_NAME = siteConfig.name;
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.siteUrl),
   title: { default: APP_NAME, template: `%s | ${APP_NAME}` },
   description: siteConfig.description,
 
