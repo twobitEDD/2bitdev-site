@@ -18,7 +18,8 @@ import AnimatedLandscape from "./AnimatedLandscape";
 export default function Hero() {
   const projectSignals = studioProjects.slice(0, 3).map((project) => ({
     title: project.title,
-    description: project.summary.split(" — ")[0] + ".",
+    description:
+      project.summary.split(" — ")[0].replace(/\.$/, "") + ".",
   }));
 
   return (
