@@ -4,7 +4,6 @@ import {
   BG_EFFECT_SLIDERS,
   BG_MODE_META,
   BG_MODES,
-  freezeOnHoverEnabled,
   type BgMode,
 } from "@lib/background-mode";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -16,7 +15,6 @@ export default function BackgroundModeToggle() {
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const meta = BG_MODE_META[mode];
-  const freezeOn = freezeOnHoverEnabled(effects.freezeOnHover);
 
   const closePanel = useCallback(() => setOpen(false), []);
 
@@ -47,18 +45,18 @@ export default function BackgroundModeToggle() {
       {open && (
         <div className="bg-mode-panel__drawer" role="dialog" aria-label="Background settings">
           <div className="bg-mode-panel__header">
-            <span className="bg-mode-panel__title">Fairies</span>
+            <span className="bg-mode-panel__title">Background</span>
             <button
               type="button"
               className="bg-mode-panel__reset"
               onClick={resetEffects}
-              aria-label="Reset fairy settings to palette defaults"
+              aria-label="Reset background settings to palette defaults"
             >
               Reset
             </button>
           </div>
 
-          <div className="bg-mode-panel__modes" role="group" aria-label="Color palette">
+          <div className="bg-mode-panel__modes" role="group" aria-label="Checker palette">
             {BG_MODES.map((modeKey) => {
               const modeMeta = BG_MODE_META[modeKey];
               const isActive = mode === modeKey;
@@ -103,20 +101,6 @@ export default function BackgroundModeToggle() {
               </label>
             ))}
           </div>
-
-          <div className="bg-mode-panel__toggle">
-            <span className="bg-mode-panel__toggle-label">Freeze on hover</span>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={freezeOn}
-              className={`bg-mode-panel__switch${freezeOn ? " bg-mode-panel__switch--on" : ""}`}
-              onClick={() => setEffect("freezeOnHover", freezeOn ? 0 : 100)}
-              aria-label="Toggle freeze fairies when cursor is near"
-            >
-              <span className="bg-mode-panel__switch-knob" aria-hidden="true" />
-            </button>
-          </div>
         </div>
       )}
 
@@ -124,7 +108,7 @@ export default function BackgroundModeToggle() {
         type="button"
         className={`bg-mode-toggle${open ? " bg-mode-toggle--open" : ""}`}
         onClick={() => setOpen((prev) => !prev)}
-        aria-label={`Fairy settings: ${meta.label}. ${meta.description}`}
+        aria-label={`Background settings: ${meta.label}. ${meta.description}`}
         aria-expanded={open}
         title={meta.description}
       >

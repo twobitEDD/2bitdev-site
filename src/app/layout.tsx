@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import "@styles/fairy-background.css";
+import "@styles/checkerboard.css";
 import Providers from "@app/providers";
 import Layout from "@components/app-shell";
 import { siteConfig } from "@config/site";
@@ -54,46 +54,47 @@ const bgModeBootstrapScript = `
   try {
     var modeKey = "2bitent-bg-mode";
     var effectsKey = "2bitent-bg-effects";
-    var modes = ["garden", "twilight", "midnight"];
+    var modes = ["dark", "light", "accent", "voxel"];
     var legacy = {
-      tessellation: "garden", warp: "twilight", "impossible-grid": "midnight", birds: "garden",
-      voxel: "garden", "ent-mono": "midnight", "studio-neon": "twilight",
-      bloom: "twilight", slate: "midnight", fracture: "twilight",
-      dark: "midnight", light: "garden", ambient: "garden", glow: "twilight", neon: "twilight"
+      garden: "light", twilight: "accent", midnight: "dark",
+      tessellation: "accent", warp: "accent", "impossible-grid": "dark", birds: "light",
+      voxel: "voxel", "ent-mono": "dark", "studio-neon": "accent",
+      bloom: "accent", slate: "dark", fracture: "dark",
+      ambient: "voxel", glow: "accent", neon: "accent"
     };
-    var palettes = {
-      garden: { bgTop: "#f5f0e8", bgBottom: "#e8dff5", accent: "#ff6eb4" },
-      twilight: { bgTop: "#3d3558", bgBottom: "#2a2438", accent: "#c4b5fd" },
-      midnight: { bgTop: "#12121a", bgBottom: "#0a0a10", accent: "#22d3ee" }
+    var defaults = {
+      dark: { checkerIntensity: 68, fadeAmount: 22, scrollMotion: 36, mouseInfluence: 40 },
+      light: { checkerIntensity: 64, fadeAmount: 20, scrollMotion: 32, mouseInfluence: 40 },
+      accent: { checkerIntensity: 70, fadeAmount: 18, scrollMotion: 34, mouseInfluence: 42 },
+      voxel: { checkerIntensity: 72, fadeAmount: 18, scrollMotion: 38, mouseInfluence: 38 }
     };
     var stored = localStorage.getItem(modeKey);
-    var mode = modes.indexOf(stored) >= 0 ? stored : (legacy[stored] || "garden");
+    var mode = modes.indexOf(stored) >= 0 ? stored : (legacy[stored] || "dark");
     document.documentElement.setAttribute("data-bg-mode", mode);
-    var palette = palettes[mode] || palettes.garden;
-    var danceSpeed = 45;
+    var effects = defaults[mode] || defaults.dark;
     try {
       var raw = localStorage.getItem(effectsKey);
       if (raw) {
         var parsed = JSON.parse(raw);
-        if (parsed && parsed.settings && typeof parsed.settings.danceSpeed === "number") {
-          danceSpeed = parsed.settings.danceSpeed;
+        if (parsed && parsed.mode === mode && parsed.settings) {
+          effects = Object.assign({}, effects, parsed.settings);
         }
       }
     } catch (e2) {}
     var root = document.documentElement;
-    root.style.setProperty("--fairy-bg-top", palette.bgTop);
-    root.style.setProperty("--fairy-bg-bottom", palette.bgBottom);
-    root.style.setProperty("--theme-accent", palette.accent);
-    root.style.setProperty("--glow-strength", String(0.15 + (danceSpeed / 100) * 0.25));
+    root.style.setProperty("--checker-intensity", String((effects.checkerIntensity || 68) / 100));
+    root.style.setProperty("--fade-amount", String((effects.fadeAmount || 22) / 100));
+    root.style.setProperty("--scroll-motion", String((effects.scrollMotion || 36) / 100));
+    root.style.setProperty("--mouse-influence", String((effects.mouseInfluence || 40) / 100));
   } catch (e) {
-    document.documentElement.setAttribute("data-bg-mode", "garden");
+    document.documentElement.setAttribute("data-bg-mode", "dark");
   }
 })();
 `;
 
 const RootLayout = ({ children }: RootLayoutProps) => {
   return (
-    <html lang="en" data-bg-mode="garden" suppressHydrationWarning>
+    <html lang="en" data-bg-mode="dark" suppressHydrationWarning>
       <body>
         <script dangerouslySetInnerHTML={{ __html: bgModeBootstrapScript }} />
         <Providers>

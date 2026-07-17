@@ -47,6 +47,8 @@ export default function LandingSection({
     <Box
       as="section"
       data-landing-section=""
+      data-checker-section=""
+      data-checker-variant={tone === "dark" ? "black" : "white"}
       data-tone={tone}
       className="landing-section"
       id={id}
