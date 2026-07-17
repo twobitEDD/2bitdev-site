@@ -1,6 +1,8 @@
 "use client";
 
 import { Box, usePrefersReducedMotion } from "@chakra-ui/react";
+import { useInView } from "@hooks/useInView";
+import { usePageVisibility } from "@hooks/usePageVisibility";
 import { useEffect, useRef } from "react";
 
 type AnimatedLandscapeProps = {
@@ -19,6 +21,9 @@ export default function AnimatedLandscape({
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const pageVisible = usePageVisibility();
+  const inView = useInView(containerRef, { rootMargin: "120px 0px" });
+  const shouldAnimate = !prefersReducedMotion && pageVisible && inView;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -41,6 +46,7 @@ export default function AnimatedLandscape({
     };
 
     let rafId = 0;
+    let scrollFrame = 0;
 
     const resize = () => {
       const rect = container.getBoundingClientRect();
@@ -56,10 +62,16 @@ export default function AnimatedLandscape({
     };
 
     const handleScroll = () => {
-      state.scrollY = window.scrollY || 0;
-      if (prefersReducedMotion) {
-        renderFrame(0);
+      if (scrollFrame) {
+        return;
       }
+      scrollFrame = window.requestAnimationFrame(() => {
+        scrollFrame = 0;
+        state.scrollY = window.scrollY || 0;
+        if (prefersReducedMotion || !shouldAnimate) {
+          renderFrame(0);
+        }
+      });
     };
 
     const handlePointer = (x: number, y: number) => {
@@ -224,8 +236,10 @@ export default function AnimatedLandscape({
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("touchmove", handleTouchMove, { passive: true });
 
-    if (!prefersReducedMotion) {
+    if (shouldAnimate) {
       rafId = window.requestAnimationFrame(animate);
+    } else {
+      renderFrame(0);
     }
 
     return () => {
@@ -236,8 +250,11 @@ export default function AnimatedLandscape({
       if (rafId) {
         window.cancelAnimationFrame(rafId);
       }
+      if (scrollFrame) {
+        window.cancelAnimationFrame(scrollFrame);
+      }
     };
-  }, [prefersReducedMotion]);
+  }, [prefersReducedMotion, shouldAnimate]);
 
   return (
     <Box

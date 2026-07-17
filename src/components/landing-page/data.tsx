@@ -11,8 +11,8 @@ export const data = {
         "Platform architecture, integrations, and production software — from e-commerce and data pipelines to AI workflows and operational tooling.",
       icon: <Icons.slidersHorizontal />,
       accent: "cyan" as ServiceAccent,
-      image: "/images/cards/tech-integration.svg",
-      imageAlt: "Connected systems and software integration diagram",
+      image: "/images/services/technology-software.svg",
+      imageAlt: "Technology platform dashboard with connected software modules",
     },
     {
       title: "Branding & Identity",
@@ -20,8 +20,8 @@ export const data = {
         "Visual identity, mascots, and design systems that give products a distinctive voice — from CO2T's Bigfoot to campaign-ready brand kits.",
       icon: <Icons.sun />,
       accent: "magenta" as ServiceAccent,
-      image: "/images/cards/branding-identity.svg",
-      imageAlt: "Brand identity and visual system illustration",
+      image: "/images/services/branding-identity.svg",
+      imageAlt: "Brand identity system with logo grid and visual language",
     },
     {
       title: "Marketing & Campaigns",
@@ -29,8 +29,8 @@ export const data = {
         "Go-to-market assets, interactive product storytelling, and launch programs for brands including Google, adidas, and Dell.",
       icon: <Icons.media />,
       accent: "amber" as ServiceAccent,
-      image: "/images/cards/marketing-campaigns.svg",
-      imageAlt: "Marketing campaign and launch production illustration",
+      image: "/images/services/marketing-campaigns.svg",
+      imageAlt: "Marketing campaign launch with creative assets and analytics",
     },
     {
       title: "Interactive & Games",
@@ -38,8 +38,8 @@ export const data = {
         "Web games, immersive media, and accessible interactive experiences — one pillar of a broader technology and production practice.",
       icon: <Icons.check />,
       accent: "emerald" as ServiceAccent,
-      image: "/images/cards/interactive-experiences.svg",
-      imageAlt: "Interactive game and experience illustration",
+      image: "/images/services/interactive-games.svg",
+      imageAlt: "Interactive game experience with voxel-style play surface",
     },
   ],
   fullFeatures: [

@@ -67,6 +67,8 @@ export function InfoAndStats() {
                             alt={imageMeta.alt}
                             width={320}
                             height={180}
+                            loading="lazy"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 320px"
                             style={{ width: "100%", height: "auto" }}
                           />
                         </Box>

@@ -104,7 +104,6 @@ html[data-bg-mode="light"].checker-scroll-root {
     rotateX(var(--checker-tilt))
     rotateZ(var(--checker-roll))
     scale(var(--checker-scale));
-  will-change: transform, background-position;
   opacity: calc(0.52 + var(--checker-intensity) * 0.42);
 }
 

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" fill="none">
+  <defs>
+    <linearGradient id="game-bg" x1="0" y1="0" x2="320" y2="180" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f0f5ee"/>
+      <stop offset="1" stop-color="#e8f0e4"/>
+    </linearGradient>
+    <linearGradient id="game-screen" x1="72" y1="36" x2="248" y2="144" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1a1f16"/>
+      <stop offset="1" stop-color="#0f1410"/>
+    </linearGradient>
+    <pattern id="game-voxel" width="16" height="14" patternUnits="userSpaceOnUse">
+      <path d="M8 0 L16 4 L16 10 L8 14 L0 10 L0 4 Z" fill="#34d399" fill-opacity="0.08" stroke="#9cb89a" stroke-opacity="0.12" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="320" height="180" rx="12" fill="url(#game-bg)"/>
+  <rect x="56" y="28" width="208" height="124" rx="12" fill="url(#game-screen)" stroke="#34d399" stroke-width="2"/>
+  <rect x="68" y="40" width="184" height="88" rx="6" fill="url(#game-voxel)"/>
+  <rect x="88" y="72" width="24" height="24" rx="2" fill="#34d399" opacity="0.55"/>
+  <rect x="88" y="96" width="24" height="24" rx="2" fill="#9cb89a" opacity="0.45"/>
+  <rect x="112" y="96" width="24" height="24" rx="2" fill="#fbbf24" opacity="0.5"/>
+  <rect x="136" y="72" width="24" height="24" rx="2" fill="#34d399" opacity="0.4"/>
+  <rect x="160" y="72" width="24" height="24" rx="2" fill="#22d3ee" opacity="0.45"/>
+  <rect x="184" y="96" width="24" height="24" rx="2" fill="#f97316" opacity="0.5"/>
+  <rect x="208" y="72" width="24" height="24" rx="2" fill="#34d399" opacity="0.35"/>
+  <circle cx="108" cy="56" r="8" fill="#fbbf24" opacity="0.85"/>
+  <rect x="148" y="52" width="40" height="8" rx="2" fill="#34d399" opacity="0.6"/>
+  <rect x="72" y="136" width="32" height="10" rx="4" fill="#374151"/>
+  <circle cx="84" cy="141" r="4" fill="#34d399"/>
+  <rect x="216" y="136" width="32" height="10" rx="4" fill="#374151"/>
+  <circle cx="240" cy="141" r="4" fill="#f97316"/>
+  <path d="M228 141h16" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/>
+  <path d="M236 133v16" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/>
+  <rect x="120" y="136" width="80" height="10" rx="4" fill="#34d399" opacity="0.35"/>
+  <text x="28" y="22" fill="#047857" font-family="ui-monospace,monospace" font-size="8" letter-spacing="0.16em">INTERACTIVE · GAMES</text>
+</svg>

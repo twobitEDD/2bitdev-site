@@ -30,7 +30,6 @@
 .gas-divider__blob {
   position: absolute;
   border-radius: 50%;
-  will-change: transform;
 }
 
 .gas-divider__blob--a {

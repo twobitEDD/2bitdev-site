@@ -6,22 +6,22 @@ import { Description, Title } from "./Section";
 
 const HIGHLIGHT_VISUALS = [
   {
-    src: "/images/cards/integration-map.svg",
-    alt: "Integration map showing connected signal and infrastructure nodes",
+    src: "/images/services/technology-software.svg",
+    alt: "Technology platform dashboard with connected software modules",
     label: "Technology integration",
     caption:
       "Platform architecture, APIs, and operational software that connects field to customer.",
   },
   {
-    src: "/images/cards/branding-identity.svg",
-    alt: "Brand identity system with mascot and visual language",
+    src: "/images/services/branding-identity.svg",
+    alt: "Brand identity system with logo grid and visual language",
     label: "Brand identity",
     caption:
       "Mascots, design systems, and product UX — like CO2T's Bigfoot from scratch.",
   },
   {
-    src: "/images/cards/marketing-campaigns.svg",
-    alt: "Marketing campaign production stack",
+    src: "/images/services/interactive-games.svg",
+    alt: "Interactive game experience with voxel-style play surface",
     label: "Campaign production",
     caption:
       "Interactive retail, launch events, and product storytelling for major brands.",
@@ -79,6 +79,8 @@ export default function HighlightSwitchback() {
                 alt={HIGHLIGHT_VISUALS[0].alt}
                 width={480}
                 height={180}
+                loading="lazy"
+                sizes="(max-width: 768px) 100vw, 480px"
                 style={{ width: "100%", height: "auto", display: "block" }}
               />
               <Stack spacing={2} p={4} align="flex-start">
@@ -130,6 +132,8 @@ export default function HighlightSwitchback() {
                 alt={HIGHLIGHT_VISUALS[1].alt}
                 width={480}
                 height={180}
+                loading="lazy"
+                sizes="(max-width: 768px) 100vw, 480px"
                 style={{ width: "100%", height: "auto", display: "block" }}
               />
               <Stack spacing={2} p={4} align="flex-start">
@@ -180,6 +184,8 @@ export default function HighlightSwitchback() {
                 alt={HIGHLIGHT_VISUALS[2].alt}
                 width={480}
                 height={180}
+                loading="lazy"
+                sizes="(max-width: 768px) 100vw, 480px"
                 style={{ width: "100%", height: "auto", display: "block" }}
               />
               <Stack spacing={2} p={4} align="flex-start">

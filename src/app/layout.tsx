@@ -5,6 +5,7 @@ import "@styles/gas-effects.css";
 import Providers from "@app/providers";
 import Layout from "@components/app-shell";
 import { siteConfig } from "@config/site";
+import { fontMono, fontSans } from "@styles/theme/fonts";
 
 type RootLayoutProps = {
   children: React.ReactNode;
@@ -95,8 +96,13 @@ const bgModeBootstrapScript = `
 
 const RootLayout = ({ children }: RootLayoutProps) => {
   return (
-    <html lang="en" data-bg-mode="light" suppressHydrationWarning>
-      <body>
+    <html
+      lang="en"
+      data-bg-mode="light"
+      suppressHydrationWarning
+      className={`${fontSans.variable} ${fontMono.variable}`}
+    >
+      <body className={fontSans.className}>
         <script dangerouslySetInnerHTML={{ __html: bgModeBootstrapScript }} />
         <Providers>
           <Layout>{children}</Layout>

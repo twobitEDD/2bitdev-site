@@ -4,12 +4,13 @@ import { Inter, Roboto_Mono } from "next/font/google";
 export const fontMono = Roboto_Mono({
     subsets: ["latin"],
     variable: "--font-mono",
+    display: "swap",
 })
 
-// TODO: replace with actual sans font
 export const fontSans = Inter({
     subsets: ["latin"],
     variable: "--font-sans",
+    display: "swap",
 })
 
 export const fonts: DeepPartial<Theme["fonts"]> = {

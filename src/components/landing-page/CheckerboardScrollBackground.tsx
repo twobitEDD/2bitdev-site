@@ -1,6 +1,7 @@
 "use client";
 
 import { usePrefersReducedMotion } from "@chakra-ui/react";
+import { usePageVisibility } from "@hooks/usePageVisibility";
 import { type BgMode } from "@lib/background-mode";
 import { useEffect, useRef } from "react";
 
@@ -160,6 +161,7 @@ function applyMouseVars(
 
 export default function CheckerboardScrollBackground() {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const pageVisible = usePageVisibility();
   const { mode, effects } = useBackgroundMode();
   const mouseRef = useRef({ x: 0.5, y: 0.5, targetX: 0.5, targetY: 0.5 });
   const rafRef = useRef(0);
@@ -193,7 +195,7 @@ export default function CheckerboardScrollBackground() {
   }, [mode, effects.scrollMotion, effects.fadeAmount]);
 
   useEffect(() => {
-    if (prefersReducedMotion) {
+    if (prefersReducedMotion || !pageVisible) {
       applyMouseVars(0.5, 0.5, 0, 0, 0);
       return;
     }
@@ -204,6 +206,11 @@ export default function CheckerboardScrollBackground() {
     };
 
     const animateMouse = () => {
+      if (document.hidden) {
+        rafRef.current = 0;
+        return;
+      }
+
       const state = mouseRef.current;
       state.x = lerp(state.x, state.targetX, MOUSE_LERP);
       state.y = lerp(state.y, state.targetY, MOUSE_LERP);
@@ -241,7 +248,7 @@ export default function CheckerboardScrollBackground() {
       }
       applyMouseVars(0.5, 0.5, 0, 0, 0);
     };
-  }, [prefersReducedMotion, effects.mouseInfluence]);
+  }, [prefersReducedMotion, pageVisible, effects.mouseInfluence]);
 
   const showCurve =
     !prefersReducedMotion && (mode === "dark" || mode === "light");
