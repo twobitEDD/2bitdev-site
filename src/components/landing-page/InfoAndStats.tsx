@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import { Badge, Box, Container, SimpleGrid, Stack, Text } from "@chakra-ui/react";
-import Image from "next/image";
 import Link from "next/link";
+import StaticSvgImage from "./StaticSvgImage";
 import { getCategoryLabel, studioProjects } from "@config/projects";
 import { siteConfig } from "@config/site";
 import { PROJECT_IMAGES } from "./data";
@@ -62,14 +62,11 @@ export function InfoAndStats() {
                     >
                       {imageMeta && (
                         <Box className="card-image" mb={3}>
-                          <Image
+                          <StaticSvgImage
                             src={imageMeta.src}
                             alt={imageMeta.alt}
                             width={320}
                             height={180}
-                            loading="lazy"
-                            unoptimized
-                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 320px"
                             style={{ width: "100%", height: "auto" }}
                           />
                         </Box>

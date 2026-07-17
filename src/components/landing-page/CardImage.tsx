@@ -1,14 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import type { CSSProperties } from "react";
-
-const CARD_IMAGE_SIZES =
-  "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 280px";
-
-function isSvgSrc(src: string) {
-  return src.endsWith(".svg");
-}
+import StaticSvgImage from "./StaticSvgImage";
 
 type CardImageProps = {
   src: string;
@@ -16,16 +9,13 @@ type CardImageProps = {
   accent?: string;
   height?: number | string;
   priority?: boolean;
-  sizes?: string;
 };
 
 export default function CardImage({
   src,
   alt,
   accent,
-  height = "5.5rem",
   priority = false,
-  sizes = CARD_IMAGE_SIZES,
 }: CardImageProps) {
   return (
     <div
@@ -36,15 +26,12 @@ export default function CardImage({
           : undefined
       }
     >
-      <Image
+      <StaticSvgImage
         src={src}
         alt={alt}
         width={320}
         height={180}
         priority={priority}
-        loading={priority ? undefined : "lazy"}
-        sizes={sizes}
-        unoptimized={isSvgSrc(src)}
         className="card-image__img"
         style={{ width: "100%", height: "auto" }}
       />

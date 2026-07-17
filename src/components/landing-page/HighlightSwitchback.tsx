@@ -1,6 +1,6 @@
 import { Box, Button, Flex, SimpleGrid, Stack, Text } from "@chakra-ui/react";
-import Image from "next/image";
 import { FadeIn } from "@components/motion/Animation";
+import StaticSvgImage from "./StaticSvgImage";
 import Link from "next/link";
 import { Description, Title } from "./Section";
 
@@ -74,14 +74,11 @@ export default function HighlightSwitchback() {
               </Link>
             </Box>
             <Box className="highlight-visual">
-              <Image
+              <StaticSvgImage
                 src={HIGHLIGHT_VISUALS[0].src}
                 alt={HIGHLIGHT_VISUALS[0].alt}
                 width={480}
                 height={180}
-                loading="lazy"
-                unoptimized
-                sizes="(max-width: 768px) 100vw, 480px"
                 style={{ width: "100%", height: "auto", display: "block" }}
               />
               <Stack spacing={2} p={4} align="flex-start">
@@ -128,14 +125,11 @@ export default function HighlightSwitchback() {
               </Link>
             </Box>
             <Box className="highlight-visual" order={{ base: "initial", md: 1 }}>
-              <Image
+              <StaticSvgImage
                 src={HIGHLIGHT_VISUALS[1].src}
                 alt={HIGHLIGHT_VISUALS[1].alt}
                 width={480}
                 height={180}
-                loading="lazy"
-                unoptimized
-                sizes="(max-width: 768px) 100vw, 480px"
                 style={{ width: "100%", height: "auto", display: "block" }}
               />
               <Stack spacing={2} p={4} align="flex-start">
@@ -181,14 +175,11 @@ export default function HighlightSwitchback() {
               </Link>
             </Box>
             <Box className="highlight-visual">
-              <Image
+              <StaticSvgImage
                 src={HIGHLIGHT_VISUALS[2].src}
                 alt={HIGHLIGHT_VISUALS[2].alt}
                 width={480}
                 height={180}
-                loading="lazy"
-                unoptimized
-                sizes="(max-width: 768px) 100vw, 480px"
                 style={{ width: "100%", height: "auto", display: "block" }}
               />
               <Stack spacing={2} p={4} align="flex-start">

@@ -1,37 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" fill="none">
-  <defs>
-    <linearGradient id="mkt-bg" x1="0" y1="0" x2="320" y2="180" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#faf8f0"/>
-      <stop offset="1" stop-color="#f5ebe0"/>
-    </linearGradient>
-    <linearGradient id="mkt-burst" x1="160" y1="40" x2="160" y2="140" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#fbbf24" stop-opacity="0.35"/>
-      <stop offset="1" stop-color="#e879f9" stop-opacity="0.1"/>
-    </linearGradient>
-    <linearGradient id="mkt-line" x1="48" y1="120" x2="272" y2="72" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#22d3ee"/>
-      <stop offset="0.5" stop-color="#e879f9"/>
-      <stop offset="1" stop-color="#fbbf24"/>
-    </linearGradient>
-  </defs>
-  <rect width="320" height="180" rx="12" fill="url(#mkt-bg)"/>
-  <ellipse cx="160" cy="90" rx="120" ry="60" fill="url(#mkt-burst)"/>
-  <rect x="28" y="32" width="264" height="116" rx="8" fill="#fff" fill-opacity="0.75" stroke="#fbbf24" stroke-opacity="0.4" stroke-width="1"/>
-  <path d="M48 120 L96 88 L144 104 L192 68 L272 96" stroke="url(#mkt-line)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="96" cy="88" r="5" fill="#22d3ee"/>
-  <circle cx="144" cy="104" r="5" fill="#e879f9"/>
-  <circle cx="192" cy="68" r="5" fill="#fbbf24"/>
-  <circle cx="272" cy="96" r="5" fill="#fb923c"/>
-  <rect x="44" y="44" width="56" height="36" rx="5" fill="#e879f9" fill-opacity="0.15" stroke="#e879f9" stroke-width="1"/>
-  <path d="M52 56h40M52 64h28" stroke="#c026d3" stroke-width="2" stroke-linecap="round"/>
-  <rect x="108" y="44" width="56" height="36" rx="5" fill="#fbbf24" fill-opacity="0.15" stroke="#fbbf24" stroke-width="1"/>
-  <polygon points="136,52 128,68 144,68" fill="#fbbf24" opacity="0.7"/>
-  <rect x="172" y="44" width="56" height="36" rx="5" fill="#22d3ee" fill-opacity="0.12" stroke="#22d3ee" stroke-width="1"/>
-  <rect x="184" y="56" width="32" height="16" rx="2" fill="#22d3ee" opacity="0.35"/>
-  <path d="M248 44 L268 52 L268 72 L248 80 L228 72 L228 52 Z" fill="#9cb89a" fill-opacity="0.3" stroke="#9cb89a" stroke-width="1.2"/>
-  <text x="238" y="66" fill="#5a7a58" font-family="ui-monospace,monospace" font-size="8" font-weight="700">GO</text>
-  <rect x="44" y="128" width="72" height="10" rx="3" fill="#fbbf24" opacity="0.5"/>
-  <rect x="124" y="128" width="48" height="10" rx="3" fill="#e879f9" opacity="0.4"/>
-  <rect x="180" y="128" width="88" height="10" rx="3" fill="#9cb89a" opacity="0.35"/>
-  <text x="28" y="22" fill="#b45309" font-family="ui-monospace,monospace" font-size="8" letter-spacing="0.16em">MARKETING · CAMPAIGNS</text>
+ <defs>
+ <linearGradient id="mkt-bg" x1="0" y1="0" x2="320" y2="180" gradientUnits="userSpaceOnUse">
+ <stop stop-color="#faf8f0"/>
+ <stop offset="1" stop-color="#f5ebe0"/>
+ </linearGradient>
+ <linearGradient id="mkt-burst" x1="160" y1="40" x2="160" y2="140" gradientUnits="userSpaceOnUse">
+ <stop stop-color="#fbbf24" stop-opacity="0.35"/>
+ <stop offset="1" stop-color="#e879f9" stop-opacity="0.1"/>
+ </linearGradient>
+ <linearGradient id="mkt-line" x1="48" y1="120" x2="272" y2="72" gradientUnits="userSpaceOnUse">
+ <stop stop-color="#22d3ee"/>
+ <stop offset="0.5" stop-color="#e879f9"/>
+ <stop offset="1" stop-color="#fbbf24"/>
+ </linearGradient>
+ </defs>
+ <rect width="320" height="180" rx="12" fill="url(#mkt-bg)"/>
+ <ellipse cx="160" cy="90" rx="120" ry="60" fill="url(#mkt-burst)"/>
+ <rect x="28" y="32" width="264" height="116" rx="8" fill="#fff" fill-opacity="0.75" stroke="#fbbf24" stroke-opacity="0.4" stroke-width="1"/>
+ <path d="M48 120 L96 88 L144 104 L192 68 L272 96" stroke="url(#mkt-line)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+ <circle cx="96" cy="88" r="5" fill="#22d3ee"/>
+ <circle cx="144" cy="104" r="5" fill="#e879f9"/>
+ <circle cx="192" cy="68" r="5" fill="#fbbf24"/>
+ <circle cx="272" cy="96" r="5" fill="#fb923c"/>
+ <rect x="44" y="44" width="56" height="36" rx="5" fill="#e879f9" fill-opacity="0.15" stroke="#e879f9" stroke-width="1"/>
+ <path d="M52 56h40M52 64h28" stroke="#c026d3" stroke-width="2" stroke-linecap="round"/>
+ <rect x="108" y="44" width="56" height="36" rx="5" fill="#fbbf24" fill-opacity="0.15" stroke="#fbbf24" stroke-width="1"/>
+ <polygon points="136,52 128,68 144,68" fill="#fbbf24" opacity="0.7"/>
+ <rect x="172" y="44" width="56" height="36" rx="5" fill="#22d3ee" fill-opacity="0.12" stroke="#22d3ee" stroke-width="1"/>
+ <rect x="184" y="56" width="32" height="16" rx="2" fill="#22d3ee" opacity="0.35"/>
+ <path d="M248 44 L268 52 L268 72 L248 80 L228 72 L228 52 Z" fill="#9cb89a" fill-opacity="0.3" stroke="#9cb89a" stroke-width="1.2"/>
+ <text x="238" y="66" fill="#5a7a58" font-family="ui-monospace,monospace" font-size="8" font-weight="700">GO</text>
+ <rect x="44" y="128" width="72" height="10" rx="3" fill="#fbbf24" opacity="0.5"/>
+ <rect x="124" y="128" width="48" height="10" rx="3" fill="#e879f9" opacity="0.4"/>
+ <rect x="180" y="128" width="88" height="10" rx="3" fill="#9cb89a" opacity="0.35"/>
+ <text x="28" y="22" fill="#b45309" font-family="ui-monospace,monospace" font-size="8" letter-spacing="0.16em">MARKETING Â· CAMPAIGNS</text>
 </svg>

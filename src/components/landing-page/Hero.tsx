@@ -12,9 +12,9 @@ import {
 import { Icons } from "@components/icons";
 import { studioProjects } from "@config/projects";
 import { siteConfig } from "@config/site";
-import Image from "next/image";
 import Link from "next/link";
 import AnimatedLandscape from "./AnimatedLandscape";
+import StaticSvgImage from "./StaticSvgImage";
 
 export default function Hero() {
   const projectSignals = studioProjects.slice(0, 3).map((project) => ({
@@ -128,13 +128,12 @@ export default function Hero() {
             overflow="hidden"
           >
             <Box className="card-image" mb={4} border="none" boxShadow="none">
-              <Image
+              <StaticSvgImage
                 src="/images/cards/hero-signals.svg"
                 alt="Live systems dashboard showing technology, brand, and campaign signals"
                 width={480}
                 height={200}
                 priority
-                unoptimized
                 style={{ width: "100%", height: "auto" }}
               />
             </Box>
