@@ -6,6 +6,10 @@ import type { CSSProperties } from "react";
 const CARD_IMAGE_SIZES =
   "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 280px";
 
+function isSvgSrc(src: string) {
+  return src.endsWith(".svg");
+}
+
 type CardImageProps = {
   src: string;
   alt: string;
@@ -40,6 +44,7 @@ export default function CardImage({
         priority={priority}
         loading={priority ? undefined : "lazy"}
         sizes={sizes}
+        unoptimized={isSvgSrc(src)}
         className="card-image__img"
         style={{ width: "100%", height: "auto" }}
       />

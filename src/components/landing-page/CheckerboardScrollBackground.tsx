@@ -3,7 +3,7 @@
 import { usePrefersReducedMotion } from "@chakra-ui/react";
 import { usePageVisibility } from "@hooks/usePageVisibility";
 import { type BgMode } from "@lib/background-mode";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useBackgroundMode } from "./BackgroundModeProvider";
 
@@ -160,11 +160,18 @@ function applyMouseVars(
 }
 
 export default function CheckerboardScrollBackground() {
+  const [mounted, setMounted] = useState(false);
   const prefersReducedMotion = usePrefersReducedMotion();
   const pageVisible = usePageVisibility();
   const { mode, effects } = useBackgroundMode();
   const mouseRef = useRef({ x: 0.5, y: 0.5, targetX: 0.5, targetY: 0.5 });
   const rafRef = useRef(0);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const reduceMotion = mounted && prefersReducedMotion;
 
   useEffect(() => {
     document.documentElement.classList.add(ROOT_CLASS);
@@ -195,7 +202,7 @@ export default function CheckerboardScrollBackground() {
   }, [mode, effects.scrollMotion, effects.fadeAmount]);
 
   useEffect(() => {
-    if (prefersReducedMotion || !pageVisible) {
+    if (!mounted || reduceMotion || !pageVisible) {
       applyMouseVars(0.5, 0.5, 0, 0, 0);
       return;
     }
@@ -248,10 +255,10 @@ export default function CheckerboardScrollBackground() {
       }
       applyMouseVars(0.5, 0.5, 0, 0, 0);
     };
-  }, [prefersReducedMotion, pageVisible, effects.mouseInfluence]);
+  }, [mounted, reduceMotion, pageVisible, effects.mouseInfluence]);
 
   const showCurve =
-    !prefersReducedMotion && (mode === "dark" || mode === "light");
+    mounted && !reduceMotion && (mode === "dark" || mode === "light");
   const isVoxel = mode === "voxel";
 
   return (
@@ -260,13 +267,13 @@ export default function CheckerboardScrollBackground() {
         className={`checker-scroll-layer${isVoxel ? " checker-scroll-layer--voxel" : ""}`}
         aria-hidden="true"
         style={
-          prefersReducedMotion
+          reduceMotion
             ? { backgroundSize: "64px 64px", transform: "none" }
             : undefined
         }
       />
 
-      {!prefersReducedMotion && (
+      {mounted && !reduceMotion && (
         <div className="checker-mouse-spotlight" aria-hidden="true" />
       )}
 

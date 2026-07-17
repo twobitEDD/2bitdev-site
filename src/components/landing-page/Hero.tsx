@@ -134,6 +134,7 @@ export default function Hero() {
                 width={480}
                 height={200}
                 priority
+                unoptimized
                 style={{ width: "100%", height: "auto" }}
               />
             </Box>

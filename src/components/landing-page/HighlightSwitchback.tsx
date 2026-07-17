@@ -80,6 +80,7 @@ export default function HighlightSwitchback() {
                 width={480}
                 height={180}
                 loading="lazy"
+                unoptimized
                 sizes="(max-width: 768px) 100vw, 480px"
                 style={{ width: "100%", height: "auto", display: "block" }}
               />
@@ -133,6 +134,7 @@ export default function HighlightSwitchback() {
                 width={480}
                 height={180}
                 loading="lazy"
+                unoptimized
                 sizes="(max-width: 768px) 100vw, 480px"
                 style={{ width: "100%", height: "auto", display: "block" }}
               />
@@ -185,6 +187,7 @@ export default function HighlightSwitchback() {
                 width={480}
                 height={180}
                 loading="lazy"
+                unoptimized
                 sizes="(max-width: 768px) 100vw, 480px"
                 style={{ width: "100%", height: "auto", display: "block" }}
               />

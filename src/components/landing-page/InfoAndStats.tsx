@@ -68,6 +68,7 @@ export function InfoAndStats() {
                             width={320}
                             height={180}
                             loading="lazy"
+                            unoptimized
                             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 320px"
                             style={{ width: "100%", height: "auto" }}
                           />

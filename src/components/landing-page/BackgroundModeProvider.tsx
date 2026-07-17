@@ -61,10 +61,12 @@ function persistEffects(mode: BgMode, settings: BgEffectSettings) {
   }
 }
 
+const SSR_BG_MODE: BgMode = "light";
+
 export function BackgroundModeProvider({ children }: { children: ReactNode }) {
-  const [mode, setModeState] = useState<BgMode>("dark");
+  const [mode, setModeState] = useState<BgMode>(SSR_BG_MODE);
   const [effects, setEffectsState] = useState<BgEffectSettings>(
-    DEFAULT_EFFECT_SETTINGS.dark
+    DEFAULT_EFFECT_SETTINGS[SSR_BG_MODE]
   );
 
   useEffect(() => {

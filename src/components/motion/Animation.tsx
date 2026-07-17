@@ -1,6 +1,5 @@
 import { useInView } from "framer-motion";
-import { FC, PropsWithChildren, useRef } from "react";
-
+import { FC, PropsWithChildren, useEffect, useRef, useState } from "react";
 
 type SlideDirectionY = "from-top-to-bottom" | "from-bottom-to-top";
 interface FadeInProps extends PropsWithChildren {
@@ -9,20 +8,27 @@ interface FadeInProps extends PropsWithChildren {
 export const FadeIn: FC<FadeInProps> = (props) => {
     const { children, direction } = props;
     const ref = useRef<HTMLDivElement>(null);
+    const [mounted, setMounted] = useState(false);
     const isInView = useInView(ref, { once: true });
-    const transform = isInView
-        ? "none"
-        : direction === "from-top-to-bottom"
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const shouldAnimate = mounted && !isInView;
+    const transform = shouldAnimate
+        ? direction === "from-top-to-bottom"
             ? "translateY(-100px)"
-            : "translateY(100px)";
+            : "translateY(100px)"
+        : "none";
 
     return (
         <div ref={ref}>
             <div
                 style={{
-                    transform: transform,
-                    opacity: isInView ? 1 : 0,
-                    transition: "all 0.9s ease-in-out",
+                    transform,
+                    opacity: shouldAnimate ? 0 : 1,
+                    transition: mounted ? "all 0.9s ease-in-out" : "none",
                 }}
             >
                 {children}
