@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import "@styles/checkerboard.css";
+import "@styles/gas-effects.css";
 import Providers from "@app/providers";
 import Layout from "@components/app-shell";
 import { siteConfig } from "@config/site";
@@ -64,12 +65,12 @@ const bgModeBootstrapScript = `
     };
     var defaults = {
       dark: { checkerIntensity: 68, fadeAmount: 22, scrollMotion: 36, mouseInfluence: 40 },
-      light: { checkerIntensity: 64, fadeAmount: 20, scrollMotion: 32, mouseInfluence: 40 },
+      light: { checkerIntensity: 12, fadeAmount: 8, scrollMotion: 8, mouseInfluence: 8 },
       accent: { checkerIntensity: 70, fadeAmount: 18, scrollMotion: 34, mouseInfluence: 42 },
       voxel: { checkerIntensity: 72, fadeAmount: 18, scrollMotion: 38, mouseInfluence: 38 }
     };
     var stored = localStorage.getItem(modeKey);
-    var mode = modes.indexOf(stored) >= 0 ? stored : (legacy[stored] || "dark");
+    var mode = modes.indexOf(stored) >= 0 ? stored : (legacy[stored] || "light");
     document.documentElement.setAttribute("data-bg-mode", mode);
     var effects = defaults[mode] || defaults.dark;
     try {
@@ -82,19 +83,19 @@ const bgModeBootstrapScript = `
       }
     } catch (e2) {}
     var root = document.documentElement;
-    root.style.setProperty("--checker-intensity", String((effects.checkerIntensity || 68) / 100));
-    root.style.setProperty("--fade-amount", String((effects.fadeAmount || 22) / 100));
-    root.style.setProperty("--scroll-motion", String((effects.scrollMotion || 36) / 100));
-    root.style.setProperty("--mouse-influence", String((effects.mouseInfluence || 40) / 100));
+    root.style.setProperty("--checker-intensity", String((effects.checkerIntensity ?? 12) / 100));
+    root.style.setProperty("--fade-amount", String((effects.fadeAmount ?? 8) / 100));
+    root.style.setProperty("--scroll-motion", String((effects.scrollMotion ?? 8) / 100));
+    root.style.setProperty("--mouse-influence", String((effects.mouseInfluence ?? 8) / 100));
   } catch (e) {
-    document.documentElement.setAttribute("data-bg-mode", "dark");
+    document.documentElement.setAttribute("data-bg-mode", "light");
   }
 })();
 `;
 
 const RootLayout = ({ children }: RootLayoutProps) => {
   return (
-    <html lang="en" data-bg-mode="dark" suppressHydrationWarning>
+    <html lang="en" data-bg-mode="light" suppressHydrationWarning>
       <body>
         <script dangerouslySetInnerHTML={{ __html: bgModeBootstrapScript }} />
         <Providers>

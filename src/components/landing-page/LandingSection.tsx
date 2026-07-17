@@ -3,6 +3,7 @@
 import { Box } from "@chakra-ui/react";
 import type { CSSProperties, PropsWithChildren } from "react";
 
+import GasDivider, { type GasHue } from "./GasDivider";
 import SectionFrame, { type SectionFrameAccent } from "./SectionFrame";
 
 export type LandingSectionTone = "dark" | "light";
@@ -14,6 +15,8 @@ type LandingSectionProps = PropsWithChildren<{
   frameAccent?: SectionFrameAccent;
   frameSize?: "default" | "wide" | "full";
   framed?: boolean;
+  gasHue?: GasHue;
+  gasAfter?: GasHue;
 }>;
 
 const toneVars = {
@@ -42,32 +45,38 @@ export default function LandingSection({
   frameAccent,
   frameSize = "wide",
   framed = true,
+  gasHue,
+  gasAfter,
 }: LandingSectionProps) {
   return (
-    <Box
-      as="section"
-      data-landing-section=""
-      data-checker-section=""
-      data-checker-variant={tone === "dark" ? "black" : "white"}
-      data-tone={tone}
-      className="landing-section"
-      id={id}
-      py={py}
-      w="full"
-      style={toneVars[tone] as CSSProperties}
-    >
-      <Box className="landing-section__content" w="full">
-        {framed ? (
-          <SectionFrame
-            accent={frameAccent ?? toneAccent[tone]}
-            size={frameSize}
-          >
-            {children}
-          </SectionFrame>
-        ) : (
-          children
-        )}
+    <>
+      {gasHue ? <GasDivider hue={gasHue} /> : null}
+      <Box
+        as="section"
+        data-landing-section=""
+        data-checker-section=""
+        data-checker-variant={tone === "dark" ? "black" : "white"}
+        data-tone={tone}
+        className="landing-section"
+        id={id}
+        py={py}
+        w="full"
+        style={toneVars[tone] as CSSProperties}
+      >
+        <Box className="landing-section__content" w="full">
+          {framed ? (
+            <SectionFrame
+              accent={frameAccent ?? toneAccent[tone]}
+              size={frameSize}
+            >
+              {children}
+            </SectionFrame>
+          ) : (
+            children
+          )}
+        </Box>
       </Box>
-    </Box>
+      {gasAfter ? <GasDivider hue={gasAfter} /> : null}
+    </>
   );
 }

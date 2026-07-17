@@ -30,19 +30,19 @@ const Home = () => {
           position="relative"
           zIndex={1}
         >
-          <LandingSection tone="dark" frameAccent="emerald">
+          <LandingSection tone="dark" frameAccent="emerald" gasHue="cyan">
             <Hero />
           </LandingSection>
-          <LandingSection tone="light" frameAccent="emerald">
+          <LandingSection tone="light" frameAccent="emerald" gasHue="magenta">
             <Features />
           </LandingSection>
-          <LandingSection tone="dark" frameAccent="cyan">
+          <LandingSection tone="dark" frameAccent="cyan" gasHue="amber">
             <HighlightSwitchback />
           </LandingSection>
-          <LandingSection tone="light" frameAccent="amber">
+          <LandingSection tone="light" frameAccent="amber" gasHue="sage">
             <InfoAndStats />
           </LandingSection>
-          <LandingSection tone="dark" frameAccent="magenta">
+          <LandingSection tone="dark" frameAccent="magenta" gasHue="emerald">
             <Community />
           </LandingSection>
           <Box p={10} />

@@ -43,6 +43,14 @@ export const BG_EFFECT_SLIDERS: {
   { key: "mouseInfluence", label: "Mouse", min: 0, max: 100 },
 ];
 
+/** Minimal effect values — used as light-mode baseline. */
+export const MINIMAL_EFFECT_SETTINGS: BgEffectSettings = {
+  checkerIntensity: 12,
+  fadeAmount: 8,
+  scrollMotion: 8,
+  mouseInfluence: 8,
+};
+
 export const DEFAULT_EFFECT_SETTINGS: Record<BgMode, BgEffectSettings> = {
   dark: {
     checkerIntensity: 68,
@@ -50,12 +58,7 @@ export const DEFAULT_EFFECT_SETTINGS: Record<BgMode, BgEffectSettings> = {
     scrollMotion: 36,
     mouseInfluence: 40,
   },
-  light: {
-    checkerIntensity: 64,
-    fadeAmount: 20,
-    scrollMotion: 32,
-    mouseInfluence: 40,
-  },
+  light: { ...MINIMAL_EFFECT_SETTINGS },
   accent: {
     checkerIntensity: 70,
     fadeAmount: 18,
@@ -107,7 +110,7 @@ export function resolveBgMode(value: string | null | undefined): BgMode {
   if (value && value in LEGACY_MODE_MAP) {
     return LEGACY_MODE_MAP[value];
   }
-  return "dark";
+  return "light";
 }
 
 export function nextBgMode(current: BgMode): BgMode {
@@ -117,13 +120,13 @@ export function nextBgMode(current: BgMode): BgMode {
 
 export function readStoredBgMode(): BgMode {
   if (typeof window === "undefined") {
-    return "dark";
+    return "light";
   }
   try {
     const stored = window.localStorage.getItem(BG_MODE_STORAGE_KEY);
     return resolveBgMode(stored);
   } catch {
-    return "dark";
+    return "light";
   }
 }
 
