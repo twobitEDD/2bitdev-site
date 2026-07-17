@@ -9,7 +9,6 @@ import {
   HStack,
   VStack,
   chakra,
-  useColorModeValue,
   useDisclosure,
 } from "@chakra-ui/react";
 import { BrandMark } from "@components/brand/BrandMark";
@@ -52,7 +51,7 @@ export default function App() {
   const pathname = usePathname();
   const mobileNav = useDisclosure();
 
-  const bg = useColorModeValue("white", "black");
+  const bg = "black";
   const ref = React.useRef<HTMLDivElement | null>(null);
   const [y, setY] = React.useState(0);
   const height = ref.current ? ref.current.getBoundingClientRect() : 0;

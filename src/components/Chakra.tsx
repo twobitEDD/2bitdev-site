@@ -1,8 +1,6 @@
-import {
-  ChakraProvider,
-  ColorModeScript,
-  cookieStorageManager,
-} from "@chakra-ui/react";
+"use client";
+
+import { ChakraProvider, cookieStorageManager } from "@chakra-ui/react";
 
 import customTheme from "@styles/theme/index";
 
@@ -12,17 +10,11 @@ interface ChakraProps {
 
 export const Chakra = ({ children }: ChakraProps) => {
   return (
-    <>
-      <ColorModeScript
-        initialColorMode={customTheme.config?.initialColorMode}
-        type="cookie"
-      />
-      <ChakraProvider
-        colorModeManager={cookieStorageManager}
-        theme={customTheme}
-      >
-        {children}
-      </ChakraProvider>
-    </>
+    <ChakraProvider
+      colorModeManager={cookieStorageManager}
+      theme={customTheme}
+    >
+      {children}
+    </ChakraProvider>
   );
 };

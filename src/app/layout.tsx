@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 
 import "@styles/checkerboard.css";
 import "@styles/gas-effects.css";
 import Providers from "@app/providers";
 import Layout from "@components/app-shell";
+import ColorModeBootstrap from "@components/ColorModeBootstrap";
 import { siteConfig } from "@config/site";
 import { fontMono, fontSans } from "@styles/theme/fonts";
 
@@ -95,6 +97,9 @@ const bgModeBootstrapScript = `
 `;
 
 const RootLayout = ({ children }: RootLayoutProps) => {
+  const colorModeCookie = cookies().get("chakra-ui-color-mode")?.value;
+  const initialColorMode = colorModeCookie === "light" ? "light" : "dark";
+
   return (
     <html
       lang="en"
@@ -102,7 +107,10 @@ const RootLayout = ({ children }: RootLayoutProps) => {
       suppressHydrationWarning
       className={`${fontSans.variable} ${fontMono.variable}`}
     >
-      <body className={fontSans.className}>
+      <head>
+        <ColorModeBootstrap initialColorMode={initialColorMode} />
+      </head>
+      <body className={fontSans.className} suppressHydrationWarning>
         <script dangerouslySetInnerHTML={{ __html: bgModeBootstrapScript }} />
         <Providers>
           <Layout>{children}</Layout>

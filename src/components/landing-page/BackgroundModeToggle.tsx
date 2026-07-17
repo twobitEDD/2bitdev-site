@@ -13,8 +13,16 @@ import { useBackgroundMode } from "./BackgroundModeProvider";
 export default function BackgroundModeToggle() {
   const { mode, effects, setMode, setEffect, resetEffects } = useBackgroundMode();
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const meta = BG_MODE_META[mode];
+  const displayLabel = mounted ? meta.label : BG_MODE_META.light.label;
+  const displayShort = mounted ? meta.shortLabel : BG_MODE_META.light.shortLabel;
 
   const closePanel = useCallback(() => setOpen(false), []);
 
@@ -39,6 +47,27 @@ export default function BackgroundModeToggle() {
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [open, closePanel]);
+
+  if (!mounted) {
+    return (
+      <div className="bg-mode-panel">
+        <button
+          type="button"
+          className="bg-mode-toggle"
+          aria-label="Background settings"
+          aria-expanded={false}
+          suppressHydrationWarning
+        >
+          <span className="bg-mode-toggle__icon" aria-hidden="true">
+            {displayShort}
+          </span>
+          <span className="bg-mode-toggle__label" suppressHydrationWarning>
+            {displayLabel}
+          </span>
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-mode-panel" ref={panelRef}>
